@@ -1,22 +1,23 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: MyBeautify cosmetics storefront API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: catalog
+  - name: account
+  - name: cart
+  - name: checkout
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +25,432 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /products:
+    get:
+      operationId: getProducts
+      tags: [catalog]
+      summary: Browse products
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: brand
+          schema: { type: string }
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [featured, newest, price-low, price-high, rating]
+            default: featured
+      responses:
+        "200":
+          description: Product collection
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [catalog]
+      summary: Get a product
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        "404":
+          description: Product not found
+  /products/{id}/reviews:
+    get:
+      operationId: getProductReviews
+      tags: [catalog]
+      summary: Get product reviews
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Review" }
+  /categories:
+    get:
+      operationId: getCategories
+      tags: [catalog]
+      summary: List categories
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Category" }
+  /brands:
+    get:
+      operationId: getBrands
+      tags: [catalog]
+      summary: List brands
+      responses:
+        "200":
+          description: Brands
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Brand" }
+  /auth/login:
+    post:
+      operationId: login
+      tags: [account]
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AuthInput" }
+      responses:
+        "200":
+          description: Authenticated user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "401":
+          description: Invalid credentials
+  /auth/register:
+    post:
+      operationId: register
+      tags: [account]
+      summary: Create an account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegisterInput" }
+      responses:
+        "201":
+          description: New user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+  /cart:
+    get:
+      operationId: getCart
+      tags: [cart]
+      summary: Get shopping cart
+      responses:
+        "200":
+          description: Shopping cart
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+    delete:
+      operationId: clearCart
+      tags: [cart]
+      summary: Clear shopping cart
+      responses:
+        "200":
+          description: Empty shopping cart
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+  /cart/items:
+    post:
+      operationId: addCartItem
+      tags: [cart]
+      summary: Add a product to the cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CartItemInput" }
+      responses:
+        "200":
+          description: Updated shopping cart
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+  /cart/items/{productId}:
+    patch:
+      operationId: updateCartItem
+      tags: [cart]
+      summary: Update cart quantity
+      parameters:
+        - { in: path, name: productId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CartItemQuantity" }
+      responses:
+        "200":
+          description: Updated shopping cart
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+    delete:
+      operationId: removeCartItem
+      tags: [cart]
+      summary: Remove a cart item
+      parameters:
+        - { in: path, name: productId, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Updated shopping cart
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+  /wishlist:
+    get:
+      operationId: getWishlist
+      tags: [account]
+      summary: Get saved products
+      responses:
+        "200":
+          description: Saved products
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+    post:
+      operationId: addWishlistItem
+      tags: [account]
+      summary: Save a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WishlistItemInput" }
+      responses:
+        "200":
+          description: Saved products
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+  /wishlist/{productId}:
+    delete:
+      operationId: removeWishlistItem
+      tags: [account]
+      summary: Remove a saved product
+      parameters:
+        - { in: path, name: productId, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Saved products
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+  /coupons/validate:
+    post:
+      operationId: validateCoupon
+      tags: [checkout]
+      summary: Validate a promo code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CouponInput" }
+      responses:
+        "200":
+          description: Coupon result
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CouponResult" }
+        "400":
+          description: Invalid coupon
+  /orders:
+    get:
+      operationId: getOrders
+      tags: [checkout]
+      summary: List orders
+      responses:
+        "200":
+          description: Orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Order" }
+    post:
+      operationId: createOrder
+      tags: [checkout]
+      summary: Place an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrderInput" }
+      responses:
+        "201":
+          description: Created order
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+    Product:
+      type: object
+      required: [id, name, brand, category, description, price, rating, reviews, image, badge, stock, ingredients, benefits, sizes]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        brand: { type: string }
+        category: { type: string }
+        description: { type: string }
+        price: { type: number }
+        compareAtPrice: { type: ["number", "null"] }
+        rating: { type: number }
+        reviews: { type: integer }
+        image: { type: string }
+        badge: { type: ["string", "null"] }
+        stock: { type: integer }
+        ingredients:
+          type: array
+          items: { type: string }
+        benefits:
+          type: array
+          items: { type: string }
+        sizes:
+          type: array
+          items: { type: string }
+    Category:
+      type: object
+      required: [id, name, description, image, productCount]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        image: { type: string }
+        productCount: { type: integer }
+    Brand:
+      type: object
+      required: [id, name, description, logo, productCount]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        logo: { type: string }
+        productCount: { type: integer }
+    Review:
+      type: object
+      required: [id, author, rating, title, body, date]
+      properties:
+        id: { type: string }
+        author: { type: string }
+        rating: { type: integer }
+        title: { type: string }
+        body: { type: string }
+        date: { type: string }
+    AuthInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 6 }
+    RegisterInput:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 2 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 6 }
+    AuthResponse:
+      type: object
+      required: [user, token]
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+        token: { type: string }
+    User:
+      type: object
+      required: [id, name, email]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+    CartItem:
+      type: object
+      required: [product, quantity, lineTotal]
+      properties:
+        product: { $ref: "#/components/schemas/Product" }
+        quantity: { type: integer }
+        lineTotal: { type: number }
+    Cart:
+      type: object
+      required: [items, subtotal, shipping, tax, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/CartItem" }
+        subtotal: { type: number }
+        shipping: { type: number }
+        tax: { type: number }
+        total: { type: number }
+        couponDiscount: { type: number }
+    CartItemInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { type: string }
+        quantity: { type: integer, minimum: 1, maximum: 10 }
+    CartItemQuantity:
+      type: object
+      required: [quantity]
+      properties:
+        quantity: { type: integer, minimum: 1, maximum: 10 }
+    WishlistItemInput:
+      type: object
+      required: [productId]
+      properties:
+        productId: { type: string }
+    CouponInput:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, minLength: 1 }
+    CouponResult:
+      type: object
+      required: [valid, code, discount]
+      properties:
+        valid: { type: boolean }
+        code: { type: string }
+        discount: { type: number }
+        message: { type: string }
+    OrderInput:
+      type: object
+      required: [items, shippingAddress, paymentMethod]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/CartItemInput" }
+        shippingAddress: { type: string }
+        paymentMethod: { type: string }
+    Order:
+      type: object
+      required: [id, createdAt, status, total, itemCount]
+      properties:
+        id: { type: string }
+        createdAt: { type: string }
+        status: { type: string }
+        total: { type: number }
+        itemCount: { type: integer }

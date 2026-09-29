@@ -1,6 +1,6 @@
-# [Project name]
+# MyBeautify Cosmetics Store
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+MyBeautify is a premium cosmetics storefront for discovering products, saving favorites, and managing a shopping bag.
 
 ## Run & Operate
 
@@ -22,23 +22,28 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/mybeautify-store/src/` — React storefront routes, shared shell, product cards, cart, auth, wishlist, and account screens
+- `artifacts/api-server/src/routes/catalog.ts` — catalog, cart, wishlist, coupon, auth, and order API routes
+- `lib/api-spec/openapi.yaml` — source of truth for storefront API contracts
+- `lib/api-client-react/src/generated/` — generated React Query client used by the storefront
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The storefront uses the shared `/api` service routing rather than a Vite proxy or hardcoded host.
+- The initial catalog uses a small in-memory API seed so the primary shopping experience is usable before persistence is added.
+- The frontend consumes generated API hooks from the OpenAPI contract instead of hand-written request types.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Users can browse and search a curated catalog, filter by category or brand, inspect product details and reviews, save products, manage a cart, validate a promo code, sign in or register, and place demo orders.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+The requested storefront direction is premium, calm, responsive, and editorial, with original beauty-brand styling.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Regenerate the API client with `pnpm --filter @workspace/api-spec run codegen` after changing `lib/api-spec/openapi.yaml`.
 
 ## Pointers
 

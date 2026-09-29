@@ -1,0 +1,1 @@
+- [Generated client DOM iterable support](generated-client-dom-iterable.md) — keep `dom.iterable` enabled for Orval fetch helper typings.

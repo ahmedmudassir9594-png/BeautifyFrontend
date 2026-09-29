@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "MyBeautify Cosmetics Store"
+description = "A premium cosmetics storefront for discovering skincare and beauty essentials, browsing products and brands, saving favorites, and managing a shopping cart."
+version = "1.0.0"
+id = "artifacts/mybeautify-store"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23583
+
+[services.development]
+run = "pnpm --filter @workspace/mybeautify-store run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mybeautify-store", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/mybeautify-store/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23583"
+BASE_PATH = "/"
