@@ -11,16 +11,16 @@
   --popover-foreground: 344 24% 23%;
   --primary: 346 30% 39%;
   --primary-foreground: 36 54% 97%;
-  --secondary: 22 43% 83%;
+  --secondary: 350 42% 86%;
   --secondary-foreground: 344 24% 23%;
-  --muted: 30 33% 91%;
+  --muted: 346 28% 93%;
   --muted-foreground: 344 15% 45%;
-  --accent: 14 49% 66%;
+  --accent: 346 42% 62%;
   --accent-foreground: 36 54% 97%;
   --destructive: 0 62% 48%;
   --destructive-foreground: 36 54% 97%;
-  --border: 24 27% 82%;
-  --input: 24 27% 82%;
+  --border: 345 25% 84%;
+  --input: 345 25% 84%;
   --ring: 346 30% 39%;
   --radius: 0.75rem;
   --app-font-sans: 'DM Sans', sans-serif;
@@ -74,7 +74,7 @@ h1, h2, h3, p { margin-top: 0; }
 .hero-art { min-height: 500px; background: hsl(var(--secondary)); position: relative; overflow: hidden; }
 .hero-art:before { content: ''; position: absolute; width: 72%; aspect-ratio: 1; border-radius: 50%; background: hsl(var(--accent)); right: -18%; top: -18%; opacity: .83; }
 .hero-art:after { content: 'MY BEAUTIFY'; position: absolute; font: 11px var(--app-font-mono); letter-spacing: .25em; bottom: 27px; left: 28px; color: hsl(var(--primary)); }
-.hero-bottle { position: absolute; width: 40%; height: 67%; background: linear-gradient(90deg, #c2ad8d, #ead7b3 35%, #a78c6a 92%); left: 28%; bottom: -3%; border-radius: 35px 35px 12px 12px; box-shadow: 18px 26px 30px rgba(45,42,34,.18); transform: rotate(7deg); }
+.hero-bottle { position: absolute; width: 40%; height: 67%; background: linear-gradient(90deg, #a96b7d, #e7b3b9 35%, #7d465a 92%); left: 28%; bottom: -3%; border-radius: 35px 35px 12px 12px; box-shadow: 18px 26px 30px rgba(107,59,79,.18); transform: rotate(7deg); }
 .hero-bottle:before { content: ''; position: absolute; top: -13%; left: 18%; width: 64%; height: 20%; border-radius: 8px 8px 2px 2px; background: hsl(var(--primary)); }
 .hero-bottle:after { content: 'LUNE\\A botanical serum'; white-space: pre; position: absolute; text-align: center; line-height: 1.5; top: 42%; left: 15%; right: 15%; font: 14px var(--app-font-serif); color: hsl(var(--primary)); }
 .section { padding: 90px 0 10px; }
@@ -99,7 +99,7 @@ h1, h2, h3, p { margin-top: 0; }
 .price-old { color: hsl(var(--muted-foreground)); text-decoration: line-through; margin-left: 6px; font-size: 11px; }
 .category-strip { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 15px; }
 .category-tile { min-height: 220px; padding: 21px; display: flex; flex-direction: column; justify-content: end; color: hsl(var(--primary-foreground)); background: hsl(var(--primary)); position: relative; overflow: hidden; }
-.category-tile:nth-child(2) { background: hsl(var(--accent)); }.category-tile:nth-child(3) { background: hsl(218 26% 31%); }.category-tile:nth-child(4) { background: hsl(31 46% 57%); }
+.category-tile:nth-child(2) { background: hsl(var(--accent)); }.category-tile:nth-child(3) { background: hsl(344 28% 34%); }.category-tile:nth-child(4) { background: hsl(347 38% 55%); }
 .category-tile:before { content: ''; position: absolute; width: 170px; height: 170px; background: hsl(var(--secondary) / .55); border-radius: 50%; top: -55px; right: -30px; transition: transform .4s; }.category-tile:hover:before { transform: scale(1.25); }
 .category-tile > * { position: relative; }.category-tile h3 { font: 30px var(--app-font-serif); margin: 0 0 4px; }.category-tile p { font-size: 11px; opacity: .78; margin: 0; }
 .marquee { margin: 80px calc(-5vw); padding: 14px 0; background: hsl(var(--accent)); color: hsl(var(--primary-foreground)); overflow: hidden; white-space: nowrap; font: 13px var(--app-font-mono); letter-spacing: .08em; }
