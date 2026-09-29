@@ -27,6 +27,13 @@ const demoImages = [
 ];
 const imageFor = (image: string, index = 0) => image || demoImages[index % demoImages.length];
 
+function BrandMark({ href = '/', testId = 'link-home' }: { href?: string; testId?: string }) {
+  return <Link href={href} className="brand-lockup" data-testid={testId}>
+    <img className="brand-mark" src="/mybeautify-mark.png" alt="" aria-hidden="true" />
+    <span className="brand-name">MyBeautify</span>
+  </Link>;
+}
+
 function LoadingGrid() {
   return <div className="loading-grid" data-testid="loading-products">{[1, 2, 3, 4].map((item) => <div key={item}><div className="skeleton image" /><div className="skeleton line" /><div className="skeleton line" /></div>)}</div>;
 }
@@ -56,7 +63,7 @@ function Layout({ children }: { children: ReactNode }) {
   return <div className="site-shell">
     <div className="topline">Complimentary shipping on orders over $75 · A considered edit for everyday rituals</div>
     <header className="nav">
-      <Link href="/" className="wordmark" data-testid="link-home">mybeautify</Link>
+      <BrandMark />
       <nav className={`navlinks ${menu ? 'show' : ''}`}>{nav.map(([label, href]) => <Link key={href} href={href} className={location === href ? 'active' : ''} data-testid={`link-nav-${label.toLowerCase().replace(' ', '-')}`}>{label}</Link>)}</nav>
       <div className="nav-actions">
         <Link href="/shop" className="icon-button" aria-label="Search products" data-testid="link-search"><Search size={18} /></Link>
@@ -66,7 +73,7 @@ function Layout({ children }: { children: ReactNode }) {
       </div>
     </header>
     {children}
-    <footer className="footer"><strong>mybeautify</strong><span>Small rituals, beautifully chosen.</span><nav><Link href="/shop" data-testid="link-footer-shop">Shop</Link> &nbsp;·&nbsp; <Link href="/account" data-testid="link-footer-account">Account</Link> &nbsp;·&nbsp; <Link href="/wishlist" data-testid="link-footer-wishlist">Saved items</Link></nav></footer>
+    <footer className="footer"><BrandMark href="/" testId="link-footer-home" /><span>Small rituals, beautifully chosen.</span><nav><Link href="/shop" data-testid="link-footer-shop">Shop</Link> &nbsp;·&nbsp; <Link href="/account" data-testid="link-footer-account">Account</Link> &nbsp;·&nbsp; <Link href="/wishlist" data-testid="link-footer-wishlist">Saved items</Link></nav></footer>
   </div>;
 }
 
@@ -181,7 +188,7 @@ function Auth({ register = false }: { register?: boolean }) {
     if (register) create.mutate({ data: { name, email, password } }, { onSuccess, onError: () => setMessage('We could not create that account. Check your details and try again.') });
     else login.mutate({ data: { email, password } }, { onSuccess, onError: () => setMessage('That email and password did not match. Please try again.') });
   };
-  return <div className="site-shell"><div className="topline">A considered beauty shop, for your considered self.</div><header className="nav"><Link href="/" className="wordmark" data-testid="link-auth-home">mybeautify</Link><Link href="/shop" className="button secondary small" style={{ marginLeft: 'auto' }} data-testid="link-auth-shop">Return to shop</Link></header><main className="auth-wrap"><section className="auth-art"><div className="eyebrow">A little more you</div><h1>Make room<br />for ritual.</h1><p>Save your favorites, keep an eye on orders, and let good formulas find their way back to you.</p></section><section className="auth-form"><div className="eyebrow">{register ? 'Join the edit' : 'Welcome back'}</div><h1>{register ? 'Create your account.' : 'Sign in.'}</h1><p className="section-copy">{register ? 'A softer way to keep track of the things you love.' : 'Your saved pieces and rituals are waiting.'}</p><form onSubmit={submit}>{register && <label className="form-field"><span>Your name</span><input className="input" value={name} onChange={(event) => setName(event.target.value)} required minLength={2} data-testid="input-name" /></label>}<label className="form-field"><span>Email address</span><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-email" /></label><label className="form-field"><span>Password</span><input className="input" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={6} data-testid="input-password" /></label>{message && <div className="form-message" data-testid="status-auth-error">{message}</div>}<button className="button wide" disabled={login.isPending || create.isPending} type="submit" data-testid="button-submit-auth">{login.isPending || create.isPending ? 'One moment…' : register ? 'Create account' : 'Sign in'}</button></form><p style={{ fontSize: 13, marginTop: 22 }}>{register ? 'Already have an account? ' : 'New here? '}<Link href={register ? '/sign-in' : '/register'} style={{ color: 'hsl(var(--accent))' }} data-testid="link-auth-switch">{register ? 'Sign in' : 'Create an account'}</Link></p></section></main></div>;
+  return <div className="site-shell"><div className="topline">A considered beauty shop, for your considered self.</div><header className="nav"><BrandMark testId="link-auth-home" /><Link href="/shop" className="button secondary small" style={{ marginLeft: 'auto' }} data-testid="link-auth-shop">Return to shop</Link></header><main className="auth-wrap"><section className="auth-art"><div className="eyebrow">A little more you</div><h1>Make room<br />for ritual.</h1><p>Save your favorites, keep an eye on orders, and let good formulas find their way back to you.</p></section><section className="auth-form"><div className="eyebrow">{register ? 'Join the edit' : 'Welcome back'}</div><h1>{register ? 'Create your account.' : 'Sign in.'}</h1><p className="section-copy">{register ? 'A softer way to keep track of the things you love.' : 'Your saved pieces and rituals are waiting.'}</p><form onSubmit={submit}>{register && <label className="form-field"><span>Your name</span><input className="input" value={name} onChange={(event) => setName(event.target.value)} required minLength={2} data-testid="input-name" /></label>}<label className="form-field"><span>Email address</span><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-email" /></label><label className="form-field"><span>Password</span><input className="input" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={6} data-testid="input-password" /></label>{message && <div className="form-message" data-testid="status-auth-error">{message}</div>}<button className="button wide" disabled={login.isPending || create.isPending} type="submit" data-testid="button-submit-auth">{login.isPending || create.isPending ? 'One moment…' : register ? 'Create account' : 'Sign in'}</button></form><p style={{ fontSize: 13, marginTop: 22 }}>{register ? 'Already have an account? ' : 'New here? '}<Link href={register ? '/sign-in' : '/register'} style={{ color: 'hsl(var(--accent))' }} data-testid="link-auth-switch">{register ? 'Sign in' : 'Create an account'}</Link></p></section></main></div>;
 }
 
 function Router() {
