@@ -1,9 +1,11 @@
-import { type FormEvent, useMemo, useState } from 'react';
+import { type FormEvent, type ReactNode, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { customFetch } from '@workspace/api-client-react/custom-fetch';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, Gem, Layers3, Package, Pencil, Plus, Sparkles, TrendingDown, Trash2 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { getJewelleryImage } from '@/lib/jewellery-images';
+import '@/styles/admin.css';
 
 type AdminProduct = {
   id: number;
@@ -20,13 +22,7 @@ type AdminProduct = {
   imageUrl?: string;
   active: boolean;
   featured: boolean;
-  ingredients?: string[];
-  benefits?: string[];
-  howToUse?: string;
-  skinType?: string;
-  shade?: string;
   size?: string;
-  expiryDate?: string;
 };
 
 type AdminCategory = {
@@ -53,7 +49,7 @@ type AdminUser = {
   user?: AdminUser;
 };
 
-type PageResult<T> = { items: T[]; totalPages?: number };
+type PageResult<T> = { items: T[]; totalPages?: number; totalItems?: number };
 type InputValue = string | boolean;
 type FormValues = Record<string, InputValue>;
 type FieldSpec = {
@@ -66,7 +62,7 @@ type FieldSpec = {
   step?: string;
   options?: Array<{ value: string; label: string }>;
 };
-type Column<T> = { label: string; render: (item: T) => string };
+type Column<T> = { label: string; render: (item: T) => ReactNode };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -76,7 +72,11 @@ function parseList<T>(value: unknown): PageResult<T> {
   if (Array.isArray(value)) return { items: value as T[] };
   if (!isRecord(value)) throw new Error('The server returned an unexpected list response.');
   if (Array.isArray(value.content)) {
-    return { items: value.content as T[], totalPages: typeof value.totalPages === 'number' ? value.totalPages : undefined };
+    return {
+      items: value.content as T[],
+      totalPages: typeof value.totalPages === 'number' ? value.totalPages : undefined,
+      totalItems: typeof value.totalElements === 'number' ? value.totalElements : undefined,
+    };
   }
   if (Array.isArray(value.data)) return { items: value.data as T[] };
   if (isRecord(value.data)) return parseList<T>(value.data);
@@ -193,6 +193,10 @@ function CrudPanel<T extends { id: number }>({
     setError('');
     try {
       const payload = makePayload(values, fields);
+      const hiddenProductFields = ['ingredients', 'benefits', 'howToUse', 'skinType', 'shade', 'expiryDate'];
+      for (const [key, value] of Object.entries(editing ?? {})) {
+        if (hiddenProductFields.includes(key)) payload[key] = value;
+      }
       mutation.mutate({ method: editing ? 'PUT' : 'POST', id: editing?.id, payload });
     } catch (submitError) {
       setError(getMessage(submitError));
@@ -283,22 +287,51 @@ function AdminConsole() {
     { key: 'shortDescription', label: 'Short description', type: 'textarea' },
     { key: 'description', label: 'Description', type: 'textarea', required: true },
     { key: 'imageUrl', label: 'Image URL', type: 'url' },
-    { key: 'ingredients', label: 'Ingredients (comma-separated)', type: 'list' },
-    { key: 'benefits', label: 'Benefits (comma-separated)', type: 'list' },
-    { key: 'howToUse', label: 'How to use', type: 'textarea' },
-    { key: 'skinType', label: 'Skin type', type: 'text' },
-    { key: 'shade', label: 'Shade', type: 'text' },
-    { key: 'size', label: 'Size', type: 'text' },
-    { key: 'expiryDate', label: 'Expiry date', type: 'datetime-local' },
+    { key: 'size', label: 'Size / dimensions', type: 'text' },
     { key: 'featured', label: 'Featured', type: 'checkbox' },
     { key: 'active', label: 'Active', type: 'checkbox', defaultValue: true },
   ], [brandsQuery.data?.items, categoriesQuery.data?.items]);
 
+  const products = productsQuery.data?.items ?? [];
+  const lowStockCount = products.filter((product) => product.stockQuantity <= product.lowStockThreshold).length;
+  const activeProducts = products.filter((product) => product.active).length;
+
   return <main className="page admin-page">
-    <div className="catalog-head">
-      <div><div className="eyebrow">Authorized access</div><h1>Admin<br />dashboard.</h1></div>
-      <p className="section-copy">Manage products, categories, and brands in your store.</p>
-    </div>
+    <section className="admin-hero">
+      <div className="admin-hero-copy">
+        <div className="admin-hero-brand">
+          <img src="/malka-zai-emblem.png" alt="" width={42} height={42} />
+          <span>MALKAZ <i>Atelier administration</i></span>
+        </div>
+        <div className="admin-hero-eyebrow"><Sparkles size={14} /> ROYAL JEWELS · STORE MANAGEMENT</div>
+        <h1>Curate your<br /><em>jewellery house.</em></h1>
+        <p>Manage the MALKAZ collection, keep an eye on stock, and bring every product detail to life.</p>
+        <Link href="/shop" className="admin-hero-link">View storefront <ArrowRight size={15} /></Link>
+      </div>
+      <div className="admin-hero-image" role="img" aria-label="MALKAZ jewellery collection" />
+    </section>
+    <section className="admin-overview" aria-label="Store overview">
+      <article className="admin-overview-card">
+        <div className="admin-overview-icon"><Package size={19} /></div>
+        <div><span>Products in collection</span><strong>{productsQuery.data?.totalItems ?? (productsQuery.data ? products.length : '—')}</strong></div>
+        <small>{productsQuery.data ? `${activeProducts} active on this page` : 'Inventory summary'}</small>
+      </article>
+      <article className="admin-overview-card">
+        <div className="admin-overview-icon"><Layers3 size={19} /></div>
+        <div><span>Collections</span><strong>{categoriesQuery.data?.items.length ?? '—'}</strong></div>
+        <small>Product categories</small>
+      </article>
+      <article className="admin-overview-card">
+        <div className="admin-overview-icon"><Gem size={19} /></div>
+        <div><span>Featured pieces</span><strong>{productsQuery.data ? products.filter((product) => product.featured).length : '—'}</strong></div>
+        <small>{productsQuery.data ? 'From the current product page' : 'Featured collection'}</small>
+      </article>
+      <article className={`admin-overview-card ${lowStockCount ? 'needs-attention' : ''}`}>
+        <div className="admin-overview-icon"><TrendingDown size={19} /></div>
+        <div><span>Low stock</span><strong>{productsQuery.data ? lowStockCount : '—'}</strong></div>
+        <small>{!productsQuery.data ? 'Stock overview' : lowStockCount ? 'Items to replenish' : 'Stock levels look healthy'}</small>
+      </article>
+    </section>
     <nav className="admin-tabs" aria-label="Admin management sections">
       {(['products', 'categories', 'brands'] as const).map((item) => <button key={item} type="button" className={`admin-tab ${section === item ? 'active' : ''}`} onClick={() => { setSection(item); setPage(0); }}>
         {item[0].toUpperCase() + item.slice(1)}
@@ -311,11 +344,11 @@ function AdminConsole() {
         : section === 'products' && productsQuery.data && categoriesQuery.data && brandsQuery.data
           ? <>
             <CrudPanel title="Product" endpoint="/api/admin/products" queryKey={['admin-products']} items={productsQuery.data.items} fields={productFields} columns={[
-              { label: 'Name', render: (item) => item.name },
+              { label: 'Piece', render: (item) => <div className="admin-product-cell"><img className="admin-product-thumb" src={getJewelleryImage(item.imageUrl, item.name, item.id)} alt="" loading="lazy" onError={(event) => { event.currentTarget.src = getJewelleryImage(null, item.name, item.id); }} /><span>{item.name}</span></div> },
               { label: 'SKU', render: (item) => item.sku },
-              { label: 'Price', render: (item) => `$${Number(item.discountPrice ?? item.price).toFixed(2)}` },
+              { label: 'Price', render: (item) => `₹${Number(item.discountPrice ?? item.price).toLocaleString('en-IN', { maximumFractionDigits: 2 })}` },
               { label: 'Stock', render: (item) => String(item.stockQuantity) },
-              { label: 'Status', render: (item) => item.active ? 'Active' : 'Inactive' },
+              { label: 'Status', render: (item) => <span className={`admin-status ${item.active ? 'is-active' : 'is-inactive'}`}>{item.active ? 'Active' : 'Inactive'}</span> },
             ]} />
             {productsQuery.data.totalPages !== undefined && productsQuery.data.totalPages > 1 && <div className="admin-pagination">
               <button className="button secondary small" disabled={page <= 0} onClick={() => setPage((current) => current - 1)}>Previous</button>

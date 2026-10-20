@@ -33,13 +33,13 @@ export function SiteLayout({ children }: SiteLayoutProps) {
     ['Shop', '/shop'],
     ['Categories', '/categories'],
     ['Brands', '/brands'],
-    ['Our edit', '/#edit'],
+    ['Our collection', '/#edit'],
   ];
 
   return (
     <div className="site-shell">
       <div className="topline">
-        Complimentary shipping on orders over $75 · A considered edit for everyday rituals
+        Discover fine jewellery from MALKAZ Royal Jewels
       </div>
       <header className="nav">
         <BrandMark />
@@ -92,7 +92,7 @@ export function SiteLayout({ children }: SiteLayoutProps) {
       {children}
       <footer className="footer">
         <BrandMark href="/" testId="link-footer-home" />
-        <span>Small rituals, beautifully chosen.</span>
+        <span>Timeless jewellery, thoughtfully chosen.</span>
         <nav>
           <Link href="/shop" data-testid="link-footer-shop">
             Shop

@@ -1,9 +1,7 @@
 /* ==========================================================================
-   MyBeautify Checkout Page Styles
+   MALKAZ Jewellery Checkout Styles
    Matches reference image design:
-   - Soft warm blush background (#FFF9F9 / #FFF8F6)
-   - Deep burgundy primary (#9E1B4C, #83213D, #4A1525)
-   - Rose-gold & blush-pink accents (#FBEBED, #FDE8EE, #F2D5DE)
+   - Warm ivory background with emerald and gold accents
    - Rounded cards (border-radius: 16px - 20px)
    - Stepper: Bag -> Information -> Shipping -> Payment
    - Left column: Shipping Address, Shipping Method, Payment Method
@@ -13,11 +11,11 @@
 
 .mb-checkout-root {
   min-height: 100vh;
-  background-color: #FFF9F9;
+  background-color: #FAF7F2;
   background-image: 
     radial-gradient(circle at 100% 0%, rgba(253, 232, 238, 0.4) 0%, transparent 40%),
     radial-gradient(circle at 0% 100%, rgba(251, 235, 237, 0.45) 0%, transparent 40%);
-  color: #2D121B;
+  color: #123A30;
   font-family: var(--app-font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
   display: flex;
   flex-direction: column;
@@ -30,7 +28,7 @@
    ========================================================================== */
 .mb-checkout-header {
   background: #FFFFFF;
-  border-bottom: 1px solid #F3E2E6;
+  border-bottom: 1px solid #E8DEC8;
   padding: 14px 40px;
   display: flex;
   align-items: center;
@@ -65,7 +63,7 @@
   font-family: var(--app-font-serif, 'Playfair Display', Georgia, serif);
   font-size: 24px;
   font-weight: 700;
-  color: #83213D;
+  color: #063B2F;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -73,7 +71,7 @@
 .mb-checkout-brand-sub {
   font-size: 9px;
   font-weight: 700;
-  color: #9B6271;
+  color: #5A6B64;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   margin-top: 2px;
@@ -91,7 +89,7 @@
 .mb-checkout-search-icon {
   position: absolute;
   left: 16px;
-  color: #9B6271;
+  color: #5A6B64;
   pointer-events: none;
 }
 
@@ -103,17 +101,17 @@
   border-radius: 999px;
   padding: 0 18px 0 44px;
   font-size: 13.5px;
-  color: #2D121B;
+  color: #123A30;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .mb-checkout-search-input::placeholder {
-  color: #A37985;
+  color: #5A6B64;
 }
 
 .mb-checkout-search-input:focus {
-  border-color: #83213D;
+  border-color: #063B2F;
   box-shadow: 0 0 0 3px rgba(131, 33, 61, 0.1);
 }
 
@@ -130,9 +128,9 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   background: #FFFFFF;
-  color: #6A3B49;
+  color: #123A30;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -145,9 +143,9 @@
 
 .mb-checkout-icon-btn:hover,
 .mb-orders-icon-btn:hover {
-  background: #FDF3F5;
-  color: #83213D;
-  border-color: #E6D2D7;
+  background: #F4EBD8;
+  color: #063B2F;
+  border-color: #E8DEC8;
 }
 
 .mb-checkout-badge,
@@ -155,7 +153,7 @@
   position: absolute;
   top: -2px;
   right: -2px;
-  background: #D81B60;
+  background: #063B2F;
   color: #FFFFFF;
   font-size: 11px;
   font-weight: 700;
@@ -173,8 +171,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #FFF0F4;
-  border: 1px solid #F5D3DC;
+  background: #F4EBD8;
+  border: 1px solid #E8DEC8;
   border-radius: 999px;
   padding: 4px 12px 4px 5px;
   cursor: pointer;
@@ -182,15 +180,15 @@
 }
 
 .mb-checkout-user-pill:hover {
-  background: #FDE8EE;
-  border-color: #EBB6C4;
+  background: #F4EBD8;
+  border-color: #D4AF63;
 }
 
 .mb-checkout-avatar-circle {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #D8899E;
+  background: #D4AF63;
   color: #FFFFFF;
   font-size: 11px;
   font-weight: 700;
@@ -202,7 +200,7 @@
 .mb-checkout-user-name {
   font-size: 13px;
   font-weight: 600;
-  color: #4A1525;
+  color: #063B2F;
 }
 
 /* ==========================================================================
@@ -245,26 +243,26 @@
 
 .mb-checkout-step-circle.active,
 .mb-checkout-step-circle.completed {
-  background: #9E1B4C;
+  background: #063B2F;
   color: #FFFFFF;
   box-shadow: 0 4px 10px rgba(158, 27, 76, 0.25);
 }
 
 .mb-checkout-step-circle.pending {
-  background: #F4E8EB;
-  color: #A37985;
+  background: #E8DEC8;
+  color: #5A6B64;
   border: 1px solid #ECD8DD;
 }
 
 .mb-checkout-step-label {
   font-size: 13px;
   font-weight: 500;
-  color: #7A4B58;
+  color: #5A6B64;
 }
 
 .mb-checkout-step-label.active {
   font-weight: 700;
-  color: #9E1B4C;
+  color: #063B2F;
 }
 
 .mb-checkout-step-line {
@@ -276,7 +274,7 @@
 }
 
 .mb-checkout-step-line.completed {
-  background: #9E1B4C;
+  background: #063B2F;
 }
 
 /* ==========================================================================
@@ -310,7 +308,7 @@
 
 .mb-checkout-card {
   background: #FFFFFF;
-  border: 1px solid #F3E0E5;
+  border: 1px solid #E8DEC8;
   border-radius: 18px;
   padding: 24px 28px;
   box-shadow: 0 4px 16px rgba(180, 100, 120, 0.04);
@@ -330,20 +328,20 @@
 }
 
 .mb-checkout-card-icon {
-  color: #9E1B4C;
+  color: #063B2F;
 }
 
 .mb-checkout-card-title {
   font-size: 18px;
   font-weight: 700;
-  color: #38121E;
+  color: #123A30;
   margin: 0;
 }
 
 .mb-checkout-edit-btn {
   background: transparent;
   border: none;
-  color: #9E1B4C;
+  color: #063B2F;
   font-size: 13.5px;
   font-weight: 600;
   display: flex;
@@ -356,13 +354,13 @@
 }
 
 .mb-checkout-edit-btn:hover {
-  background: #FFF1F5;
+  background: #F4EBD8;
 }
 
 /* Shipping Address Box */
 .mb-checkout-address-box {
-  background: #FFFBFB;
-  border: 1px solid #F6E2E7;
+  background: #FAF7F2;
+  border: 1px solid #E8DEC8;
   border-radius: 14px;
   padding: 18px 20px;
   display: flex;
@@ -371,7 +369,7 @@
 }
 
 .mb-checkout-address-pin {
-  color: #9E1B4C;
+  color: #063B2F;
   margin-top: 3px;
   flex-shrink: 0;
 }
@@ -381,24 +379,24 @@
   flex-direction: column;
   gap: 4px;
   font-size: 14px;
-  color: #4A222F;
+  color: #123A30;
 }
 
 .mb-checkout-address-name {
   font-size: 15px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-checkout-address-line {
   line-height: 1.45;
-  color: #4A222F;
+  color: #123A30;
 }
 
 .mb-checkout-address-phone {
   margin-top: 4px;
   font-weight: 500;
-  color: #633240;
+  color: #123A30;
 }
 
 /* Shipping Methods Options */
@@ -412,7 +410,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid #F2D5DE;
+  border: 1px solid #E8DEC8;
   border-radius: 12px;
   padding: 14px 18px;
   background: #FFFFFF;
@@ -421,13 +419,13 @@
 }
 
 .mb-checkout-method-row:hover {
-  border-color: #DDA3B4;
-  background: #FFFDFD;
+  border-color: #D4AF63;
+  background: #FAF7F2;
 }
 
 .mb-checkout-method-row.selected {
   border-color: #E11D48;
-  background: #FFF3F6;
+  background: #F4EBD8;
   box-shadow: 0 2px 8px rgba(225, 29, 72, 0.08);
 }
 
@@ -441,7 +439,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid #CCA0AD;
+  border: 2px solid #D4AF63;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -450,14 +448,14 @@
 }
 
 .mb-checkout-method-row.selected .mb-checkout-radio-circle {
-  border-color: #9E1B4C;
+  border-color: #063B2F;
 }
 
 .mb-checkout-radio-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #9E1B4C;
+  background: #063B2F;
 }
 
 .mb-checkout-method-info {
@@ -469,12 +467,12 @@
 .mb-checkout-method-title {
   font-size: 14.5px;
   font-weight: 600;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-checkout-method-sub {
   font-size: 12.5px;
-  color: #7A4B58;
+  color: #5A6B64;
 }
 
 .mb-checkout-method-price-free {
@@ -486,7 +484,7 @@
 .mb-checkout-method-price {
   font-size: 14.5px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
 }
 
 /* Payment Methods Grid */
@@ -503,7 +501,7 @@
 }
 
 .mb-checkout-payment-card {
-  border: 1px solid #F2D5DE;
+  border: 1px solid #E8DEC8;
   border-radius: 14px;
   padding: 16px 18px;
   background: #FFFFFF;
@@ -515,13 +513,13 @@
 }
 
 .mb-checkout-payment-card:hover {
-  border-color: #DDA3B4;
-  background: #FFFDFD;
+  border-color: #D4AF63;
+  background: #FAF7F2;
 }
 
 .mb-checkout-payment-card.selected {
   border-color: #E11D48;
-  background: #FFF1F5;
+  background: #F4EBD8;
   box-shadow: 0 2px 10px rgba(225, 29, 72, 0.08);
 }
 
@@ -540,12 +538,12 @@
 .mb-checkout-payment-title {
   font-size: 14.5px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-checkout-payment-desc {
   font-size: 12px;
-  color: #7A4B58;
+  color: #5A6B64;
   line-height: 1.35;
 }
 
@@ -564,16 +562,16 @@
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.02em;
-  background: #F3E4E8;
-  color: #633240;
-  border: 1px solid #E8D0D6;
+  background: #E8DEC8;
+  color: #123A30;
+  border: 1px solid #E8DEC8;
 }
 
 /* Primary Action Button */
 .mb-checkout-submit-btn {
   width: 100%;
   height: 52px;
-  background: #9E1B4C;
+  background: #063B2F;
   color: #FFFFFF;
   border: none;
   border-radius: 12px;
@@ -589,7 +587,7 @@
 }
 
 .mb-checkout-submit-btn:hover:not(:disabled) {
-  background: #87143F;
+  background: #063B2F;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(158, 27, 76, 0.35);
 }
@@ -603,7 +601,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #9E1B4C;
+  color: #063B2F;
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
@@ -612,7 +610,7 @@
 }
 
 .mb-checkout-back-link:hover {
-  color: #751136;
+  color: #063B2F;
   text-decoration: underline;
 }
 
@@ -621,7 +619,7 @@
    ========================================================================== */
 .mb-checkout-summary-card {
   background: #FFFFFF;
-  border: 1px solid #F3E0E5;
+  border: 1px solid #E8DEC8;
   border-radius: 20px;
   padding: 24px;
   box-shadow: 0 4px 20px rgba(180, 100, 120, 0.06);
@@ -640,13 +638,13 @@
 }
 
 .mb-checkout-summary-icon {
-  color: #9E1B4C;
+  color: #063B2F;
 }
 
 .mb-checkout-summary-title {
   font-size: 18px;
   font-weight: 700;
-  color: #83213D;
+  color: #063B2F;
   margin: 0;
 }
 
@@ -673,7 +671,7 @@
   border-radius: 10px;
   object-fit: cover;
   background: #F8F1F3;
-  border: 1px solid #F2DFE3;
+  border: 1px solid #E8DEC8;
   flex-shrink: 0;
 }
 
@@ -687,25 +685,25 @@
 .mb-checkout-item-title {
   font-size: 14px;
   font-weight: 600;
-  color: #2D121B;
+  color: #123A30;
   line-height: 1.25;
 }
 
 .mb-checkout-item-qty {
   font-size: 12px;
-  color: #7A4B58;
+  color: #5A6B64;
 }
 
 .mb-checkout-item-price {
   font-size: 14px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-checkout-item-remove-btn {
   background: transparent;
   border: none;
-  color: #C0798C;
+  color: #8B7445;
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;
@@ -717,13 +715,13 @@
 
 .mb-checkout-item-remove-btn:hover {
   color: #E11D48;
-  background: #FFF1F4;
+  background: #F4EBD8;
 }
 
 /* Price rows */
 .mb-checkout-divider {
   height: 1px;
-  background: #F4E4E8;
+  background: #E8DEC8;
   margin: 4px 0;
 }
 
@@ -732,12 +730,12 @@
   align-items: center;
   justify-content: space-between;
   font-size: 14px;
-  color: #552735;
+  color: #123A30;
 }
 
 .mb-checkout-price-val {
   font-weight: 600;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-checkout-price-free {
@@ -768,7 +766,7 @@
 .mb-checkout-coupon-icon {
   position: absolute;
   left: 12px;
-  color: #9E1B4C;
+  color: #063B2F;
   pointer-events: none;
 }
 
@@ -779,19 +777,19 @@
   border-radius: 8px;
   padding: 0 12px 0 36px;
   font-size: 13px;
-  color: #2D121B;
+  color: #123A30;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .mb-checkout-coupon-input:focus {
-  border-color: #9E1B4C;
+  border-color: #063B2F;
 }
 
 .mb-checkout-coupon-apply-btn {
   height: 40px;
   padding: 0 20px;
-  background: #9E1B4C;
+  background: #063B2F;
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -803,7 +801,7 @@
 }
 
 .mb-checkout-coupon-apply-btn:hover {
-  background: #84143D;
+  background: #063B2F;
 }
 
 .mb-checkout-coupon-chip {
@@ -839,13 +837,13 @@
 .mb-checkout-total-label {
   font-size: 20px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-checkout-total-val {
   font-size: 26px;
   font-weight: 800;
-  color: #9E1B4C;
+  color: #063B2F;
   letter-spacing: -0.01em;
 }
 
@@ -876,14 +874,14 @@
   font-family: var(--app-font-serif, 'Playfair Display', Georgia, serif);
   font-size: 17px;
   font-weight: 700;
-  color: #83213D;
+  color: #063B2F;
   letter-spacing: -0.01em;
 }
 
 .mb-checkout-watermark-tagline {
   font-size: 7.5px;
   font-weight: 700;
-  color: #9B6271;
+  color: #5A6B64;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -892,13 +890,13 @@
   font-family: 'Playfair Display', Georgia, cursive, serif;
   font-style: italic;
   font-size: 14px;
-  color: #9E1B4C;
+  color: #063B2F;
   letter-spacing: 0.02em;
   margin-top: 2px;
 }
 
 .mb-checkout-watermark-heart {
-  color: #9E1B4C;
+  color: #063B2F;
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -919,7 +917,7 @@
 .mb-checkout-footer {
   margin-top: auto;
   background: #FFFFFF;
-  border-top: 1px solid #F3E0E5;
+  border-top: 1px solid #E8DEC8;
   padding: 24px 30px;
 }
 
@@ -951,7 +949,7 @@
 }
 
 .mb-checkout-trust-icon {
-  color: #9E1B4C;
+  color: #063B2F;
   flex-shrink: 0;
 }
 
@@ -963,12 +961,12 @@
 .mb-checkout-trust-title {
   font-size: 13.5px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-checkout-trust-sub {
   font-size: 12px;
-  color: #7A4B58;
+  color: #5A6B64;
 }
 
 /* ==========================================================================
@@ -989,7 +987,7 @@
 .mb-checkout-modal-card {
   background: #FFFFFF;
   border-radius: 20px;
-  border: 1px solid #F3E0E5;
+  border: 1px solid #E8DEC8;
   box-shadow: 0 16px 48px rgba(110, 30, 50, 0.18);
   width: 100%;
   max-width: 520px;
@@ -1022,14 +1020,14 @@
 .mb-checkout-modal-title {
   font-size: 20px;
   font-weight: 700;
-  color: #83213D;
+  color: #063B2F;
   margin: 0;
 }
 
 .mb-checkout-modal-close {
   background: transparent;
   border: none;
-  color: #8C5A67;
+  color: #5A6B64;
   cursor: pointer;
   padding: 6px;
   border-radius: 50%;
@@ -1040,8 +1038,8 @@
 }
 
 .mb-checkout-modal-close:hover {
-  background: #FDF2F4;
-  color: #83213D;
+  background: #F4EBD8;
+  color: #063B2F;
 }
 
 .mb-checkout-form-grid {
@@ -1063,7 +1061,7 @@
 .mb-checkout-label {
   font-size: 13px;
   font-weight: 600;
-  color: #4A1525;
+  color: #063B2F;
 }
 
 .mb-checkout-input {
@@ -1072,13 +1070,13 @@
   border-radius: 8px;
   padding: 0 14px;
   font-size: 13.5px;
-  color: #2D121B;
+  color: #123A30;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .mb-checkout-input:focus {
-  border-color: #83213D;
+  border-color: #063B2F;
   box-shadow: 0 0 0 3px rgba(131, 33, 61, 0.1);
 }
 
@@ -1093,8 +1091,8 @@
 .mb-checkout-btn-cancel {
   height: 42px;
   padding: 0 20px;
-  background: #F5EAEF;
-  color: #633240;
+  background: #E8DEC8;
+  color: #123A30;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -1110,7 +1108,7 @@
 .mb-checkout-btn-primary {
   height: 42px;
   padding: 0 24px;
-  background: #9E1B4C;
+  background: #063B2F;
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -1122,5 +1120,5 @@
 }
 
 .mb-checkout-btn-primary:hover {
-  background: #84143D;
+  background: #063B2F;
 }

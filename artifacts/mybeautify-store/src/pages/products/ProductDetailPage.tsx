@@ -28,10 +28,6 @@ import {
   ShieldCheck,
   RotateCcw,
   Banknote,
-  Droplets,
-  Shield,
-  Feather,
-  Smile,
   Edit3,
 } from 'lucide-react';
 import {
@@ -61,17 +57,18 @@ import {
   type CouponResponse,
   type ReviewResponse,
 } from '@/lib/api';
-import MyBeautifyProductCard, {
+import MalkazProductCard, {
   formatCurrency,
   getDiscountPercent,
   getProductBadge,
   getProductSize,
-  getProductReviewCount,
   getProductRating,
-} from '@/components/products/MyBeautifyProductCard';
+} from '@/components/products/MalkazProductCard';
 import '@/styles/customer-dashboard.css';
 import '@/styles/product-detail.css';
 import { HeaderSearchBar } from '@/components/common/HeaderSearchBar';
+import { MalkazSidebar } from '@/components/layout/MalkazSidebar';
+import { getJewelleryImage } from '@/lib/jewellery-images';
 
 export function ProductDetailPage() {
   const params = useParams<{ productId?: string; id?: string }>();
@@ -114,7 +111,7 @@ export function ProductDetailPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Active tab in middle section
-  const [activeTab, setActiveTab] = useState<'details' | 'delivery' | 'reviews' | 'ingredients'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'delivery' | 'reviews' | 'care'>('details');
 
   // Delivery options state
   const [deliveryType, setDeliveryType] = useState<'standard' | 'express'>('standard');
@@ -228,23 +225,7 @@ export function ProductDetailPage() {
   // Gallery images array
   const galleryImages = useMemo(() => {
     if (!product) return [];
-
-    // For product 1 (Dew Cloud Barrier Cream), provide the 4 exact angles matching reference
-    if (product.id === 1) {
-      return [
-        '/products/dew-cloud-cream/1.jpg',
-        '/products/dew-cloud-cream/2.jpg',
-        '/products/dew-cloud-cream/3.jpg',
-        '/products/dew-cloud-cream/4.jpg',
-      ];
-    }
-
-    // For other products, use real imageUrl from backend
-    if (product.imageUrl) {
-      return [product.imageUrl];
-    }
-
-    return ['https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800'];
+    return [getJewelleryImage(product.imageUrl, product.name, product.id)];
   }, [product]);
 
   // Handle next / previous image in gallery
@@ -372,11 +353,11 @@ export function ProductDetailPage() {
 
   // Keyboard navigation for accessible tabs
   const handleTabKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const tabs: Array<'details' | 'delivery' | 'reviews' | 'ingredients'> = [
+    const tabs: Array<'details' | 'delivery' | 'reviews' | 'care'> = [
       'details',
       'delivery',
       'reviews',
-      'ingredients',
+      'care',
     ];
     const currentIndex = tabs.indexOf(activeTab);
     if (e.key === 'ArrowRight') {
@@ -498,16 +479,6 @@ export function ProductDetailPage() {
   };
 
   const customerName = user?.fullName || user?.email || '';
-  const customerInitials = customerName
-    ? customerName
-        .split(' ')
-        .filter(Boolean)
-        .map((w) => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : 'MB';
-
   const cartItemCount = cart?.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
   const wishlistCount = wishlistIds.size;
 
@@ -516,25 +487,21 @@ export function ProductDetailPage() {
   const isWishlisted = product ? wishlistIds.has(product.id) : false;
   const discount = product ? getDiscountPercent(product.price, product.discountPrice) : null;
   const displayPrice = product ? (product.sellingPrice || product.price) : 0;
-  const rating = product ? getProductRating(product) : 4.6;
-  const reviewCount = product ? getProductReviewCount(product) : 20;
-  const displaySize = product ? getProductSize(product) : '50ml';
+  const rating = product ? getProductRating(product) : 0;
+  const reviewCount = reviewsList.length;
+  const displaySize = product ? getProductSize(product) : '—';
 
   // Loading Skeleton State
   if (loading) {
     return (
       <div className="mb-dashboard-layout">
-        <aside className="mb-sidebar">
-          <div className="mb-sidebar-top">
-            <Link href="/" className="mb-sidebar-brand">
-              <img
-                src="/mybeautify-official-logo.png"
-                alt="MyBeautify"
-                className="mb-sidebar-logo-img"
-              />
-            </Link>
-          </div>
-        </aside>
+        <MalkazSidebar
+          activeItem="shop"
+          isOpen={mobileSidebarOpen}
+          isSignedIn={Boolean(getAuthToken())}
+          onClose={() => setMobileSidebarOpen(false)}
+          onLogout={handleLogout}
+        />
         <div className="mb-main-content">
           <header className="mb-top-header" />
           <main className="mb-page-body" style={{ padding: 32 }}>
@@ -554,30 +521,24 @@ export function ProductDetailPage() {
   if (error || !product) {
     return (
       <div className="mb-dashboard-layout">
-        <aside className="mb-sidebar">
-          <div className="mb-sidebar-top">
-            <Link href="/" className="mb-sidebar-brand">
-              <img
-                src="/mybeautify-official-logo.png"
-                alt="MyBeautify"
-                className="mb-sidebar-logo-img"
-              />
-            </Link>
-            <nav>
-              <ul className="mb-sidebar-nav">
-                <li>
-                  <Link href="/shop" className="mb-sidebar-link active">
-                    <ShoppingBag size={18} />
-                    <span>Shop</span>
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </aside>
+        <MalkazSidebar
+          activeItem="shop"
+          isOpen={mobileSidebarOpen}
+          isSignedIn={Boolean(user)}
+          onClose={() => setMobileSidebarOpen(false)}
+          onLogout={handleLogout}
+        />
 
         <div className="mb-main-content">
           <header className="mb-top-header">
+            <button
+              type="button"
+              className="mb-mobile-hamburger"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={24} />
+            </button>
             <HeaderSearchBar
               value=""
               onChange={() => {}}
@@ -595,7 +556,7 @@ export function ProductDetailPage() {
               </div>
               <h3 className="mb-empty-title">Product Not Found</h3>
               <p className="mb-empty-desc">
-                {error || "The cosmetic item you are looking for is unavailable or doesn't exist."}
+                {error || "The jewellery piece you are looking for is unavailable or doesn't exist."}
               </p>
               <Link
                 href="/shop"
@@ -621,208 +582,32 @@ export function ProductDetailPage() {
         </div>
       )}
 
-      {/* Mobile Sidebar Backdrop */}
-      <div
-        className={`mb-sidebar-backdrop ${mobileSidebarOpen ? 'show' : ''}`}
-        onClick={() => setMobileSidebarOpen(false)}
+      <MalkazSidebar
+        activeItem="shop"
+        isOpen={mobileSidebarOpen}
+        isSignedIn={Boolean(user)}
+        onClose={() => setMobileSidebarOpen(false)}
+        onLogout={handleLogout}
+        onAction={(action) => {
+          if (!user) {
+            showToast('Please log in to access your account.');
+            setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
+            return;
+          }
+          if (action === 'addresses') {
+            fetchAddresses()
+              .then(setAddresses)
+              .catch((err) => showToast(err.message || 'Failed to load addresses.'));
+            setActiveModal('addresses');
+          } else if (action === 'reviews') {
+            setActiveTab('reviews');
+            document.getElementById('middle-reviews-section')?.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            setActiveModal(action);
+          }
+        }}
       />
 
-      {/* ====================================================================
-          1. LEFT SIDEBAR (Preserved & Consistent)
-          ==================================================================== */}
-      <aside className={`mb-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>
-        <div className="mb-sidebar-top">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="mb-sidebar-brand"
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-label="MyBeautify - YOUR DAILY GLOW"
-          >
-            <img
-              src="/mybeautify-official-logo.png"
-              alt="MyBeautify - YOUR DAILY GLOW"
-              className="mb-sidebar-logo-img"
-              width={170}
-              height={147}
-            />
-          </Link>
-
-          {/* Navigation Items */}
-          <nav>
-            <ul className="mb-sidebar-nav">
-              <li>
-                <Link
-                  href="/shop"
-                  className="mb-sidebar-link active"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <ShoppingBag size={18} />
-                  <span>Shop</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/orders"
-                  className="mb-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Package size={18} />
-                  <span>My Orders</span>
-                </Link>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link ${activeModal === 'wishlist' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in or create an account to view your wishlist.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    setActiveModal('wishlist');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Heart size={18} />
-                  <span>Wishlist</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link ${activeModal === 'profile' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in to view your profile.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    setActiveModal('profile');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <UserIcon size={18} />
-                  <span>My Profile</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link ${activeModal === 'addresses' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in to manage your addresses.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    fetchAddresses().then((a) => setAddresses(a)).catch(() => {});
-                    setActiveModal('addresses');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <MapPin size={18} />
-                  <span>Addresses</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link ${activeModal === 'coupons' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in to view available coupons and offers.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    setActiveModal('coupons');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Ticket size={18} />
-                  <span>Coupons & Offers</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link ${activeModal === 'reviews' ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveTab('reviews');
-                    const reviewElem = document.getElementById('middle-reviews-section');
-                    if (reviewElem) reviewElem.scrollIntoView({ behavior: 'smooth' });
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Star size={18} />
-                  <span>Reviews</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link ${activeModal === 'support' ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveModal('support');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Headphones size={18} />
-                  <span>Help & Support</span>
-                </button>
-              </li>
-
-              <li style={{ marginTop: 12 }}>
-                {user ? (
-                  <button
-                    type="button"
-                    className="mb-sidebar-link logout-link"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={18} />
-                    <span>Logout</span>
-                  </button>
-                ) : (
-                  <Link
-                    href="/sign-in"
-                    className="mb-sidebar-link login-link"
-                    onClick={() => setMobileSidebarOpen(false)}
-                  >
-                    <UserIcon size={18} />
-                    <span>Sign In</span>
-                  </Link>
-                )}
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        {/* Bottom Decorative Card */}
-        <div className="mb-sidebar-bottom-card">
-          <p className="mb-sidebar-bottom-text">
-            Be your own
-            <br />
-            kind of beautiful
-            <br />
-            <span className="mb-sidebar-bottom-heart">♡</span>
-          </p>
-          <div className="mb-sidebar-bottom-deco">
-            <Sparkles size={64} />
-          </div>
-        </div>
-      </aside>
-
-      {/* ====================================================================
-          MAIN VIEW CONTAINER
-          ==================================================================== */}
       <div className="mb-main-content">
         {/* Top Header */}
         <header className="mb-top-header">
@@ -888,20 +673,15 @@ export function ProductDetailPage() {
             {/* Profile Chip or Sign-In buttons */}
             {user ? (
               <div className="mb-header-profile-wrap">
-                <div
+                <button
+                  type="button"
                   className="mb-header-profile-chip"
                   onClick={() => setProfileDropdownOpen((o) => !o)}
+                  aria-expanded={profileDropdownOpen}
+                  aria-label="User account menu"
                 >
-                  <div className="mb-header-avatar">
-                    {user?.profileImage ? (
-                      <img
-                        src={user.profileImage}
-                        alt={customerName}
-                        style={{ width: '100%', height: '100%', borderRadius: '50%' }}
-                      />
-                    ) : (
-                      customerInitials
-                    )}
+                  <div className="mb-header-avatar" aria-hidden="true">
+                    <UserIcon size={18} />
                   </div>
                   <span className="mb-header-profile-name">{customerName}</span>
                   <ChevronDown
@@ -911,7 +691,7 @@ export function ProductDetailPage() {
                       transform: profileDropdownOpen ? 'rotate(180deg)' : 'none',
                     }}
                   />
-                </div>
+                </button>
 
                 {profileDropdownOpen && (
                   <div className="mb-header-profile-menu">
@@ -989,9 +769,9 @@ export function ProductDetailPage() {
                   style={{
                     padding: '7px 15px',
                     borderRadius: 999,
-                    border: '1px solid #E8B4C0',
-                    color: '#8A1538',
-                    background: '#FFF5F7',
+                    border: '1px solid #D4AF63',
+                    color: '#063B2F',
+                    background: '#F4EBD8',
                     fontWeight: 600,
                     fontSize: 13,
                     textDecoration: 'none',
@@ -1010,7 +790,7 @@ export function ProductDetailPage() {
                   style={{
                     padding: '7px 15px',
                     borderRadius: 999,
-                    background: 'linear-gradient(135deg, #8A1538 0%, #B82E55 100%)',
+                    background: 'linear-gradient(135deg, #063B2F 0%, #063B2F 100%)',
                     color: '#FFFFFF',
                     fontWeight: 600,
                     fontSize: 13,
@@ -1040,9 +820,7 @@ export function ProductDetailPage() {
               {product.categoryName}
             </Link>
             <ChevronRight size={14} className="mb-breadcrumb-sep" />
-            <span className="mb-breadcrumb-link">
-              {product.skinType || 'Moisturizer'}
-            </span>
+            <span className="mb-breadcrumb-link">{product.categoryName || 'Fine Jewellery'}</span>
             <ChevronRight size={14} className="mb-breadcrumb-sep" />
             <span className="mb-breadcrumb-current">{product.name}</span>
           </nav>
@@ -1093,6 +871,9 @@ export function ProductDetailPage() {
                   alt={product.name}
                   className="mb-gallery-main-img"
                   data-testid="main-product-image"
+                  onError={(event) => {
+                    event.currentTarget.src = getJewelleryImage(null, product.name, product.id);
+                  }}
                 />
               </div>
 
@@ -1115,13 +896,13 @@ export function ProductDetailPage() {
 
             {/* RIGHT: PURCHASE INFORMATION */}
             <div className="mb-detail-info">
-              <div className="mb-detail-brand">{product.brandName}</div>
+              <div className="mb-detail-brand">{product.brandName || 'MALKAZ'}</div>
               <h1 className="mb-detail-title">{product.name}</h1>
 
               <div className="mb-detail-specs-row">
-                <span>{product.categoryName}</span>
+                <span>{product.categoryName || 'Fine Jewellery'}</span>
                 <span className="mb-detail-specs-dot">|</span>
-                <span>{product.skinType || 'Moisturizer'}</span>
+                <span>MALKAZ Royal Jewels</span>
                 <span className="mb-detail-specs-dot">|</span>
                 <span>{displaySize}</span>
               </div>
@@ -1137,11 +918,15 @@ export function ProductDetailPage() {
                 }}
                 title="Click to view customer reviews"
               >
-                <span className="mb-detail-stars">
-                  {'★'.repeat(Math.min(5, Math.max(1, Math.round(rating))))}
-                </span>
+                {rating > 0 && (
+                  <span className="mb-detail-stars">
+                    {'★'.repeat(Math.min(5, Math.max(1, Math.round(rating))))}
+                  </span>
+                )}
                 <span className="mb-detail-rating-text">
-                  {rating.toFixed(1)} ({reviewCount} Reviews)
+                  {rating > 0
+                    ? `${rating.toFixed(1)}${reviewCount > 0 ? ` (${reviewCount} Reviews)` : ''}`
+                    : 'No ratings yet'}
                 </span>
               </div>
 
@@ -1161,37 +946,37 @@ export function ProductDetailPage() {
               {/* Short description */}
               <p className="mb-detail-description">
                 {product.description ||
-                  'A lightweight, hydrating moisturizer that strengthens your skin barrier and gives you a healthy, radiant glow. Perfect for daily use.'}
+                  `${product.name} from the MALKAZ fine jewellery collection.`}
               </p>
 
               {/* 4 Benefit Icon Highlights */}
               <div className="mb-benefit-pills-row">
                 <div className="mb-benefit-pill-item">
                   <div className="mb-benefit-pill-icon">
-                    <Droplets size={18} />
+                    <Star size={18} />
                   </div>
-                  <span className="mb-benefit-pill-label">Hydrating Formula</span>
+                  <span className="mb-benefit-pill-label">Timeless design</span>
                 </div>
 
                 <div className="mb-benefit-pill-item">
                   <div className="mb-benefit-pill-icon">
-                    <Shield size={18} />
+                    <ShieldCheck size={18} />
                   </div>
-                  <span className="mb-benefit-pill-label">Skin Barrier Protection</span>
+                  <span className="mb-benefit-pill-label">MALKAZ collection</span>
                 </div>
 
                 <div className="mb-benefit-pill-item">
                   <div className="mb-benefit-pill-icon">
-                    <Feather size={18} />
+                    <Sparkles size={18} />
                   </div>
-                  <span className="mb-benefit-pill-label">Lightweight & Non-Greasy</span>
+                  <span className="mb-benefit-pill-label">Made for meaningful moments</span>
                 </div>
 
                 <div className="mb-benefit-pill-item">
                   <div className="mb-benefit-pill-icon">
-                    <Smile size={18} />
+                    <Heart size={18} />
                   </div>
-                  <span className="mb-benefit-pill-label">Suitable for All Skin Types</span>
+                  <span className="mb-benefit-pill-label">A thoughtful gift</span>
                 </div>
               </div>
 
@@ -1329,16 +1114,16 @@ export function ProductDetailPage() {
                 Reviews ({reviewCount})
               </button>
               <button
-                id="mb-tab-ingredients"
+                id="mb-tab-care"
                 type="button"
                 role="tab"
-                aria-selected={activeTab === 'ingredients'}
-                aria-controls="mb-panel-ingredients"
-                tabIndex={activeTab === 'ingredients' ? 0 : -1}
-                className={`mb-tab-btn ${activeTab === 'ingredients' ? 'active' : ''}`}
-                onClick={() => setActiveTab('ingredients')}
+                aria-selected={activeTab === 'care'}
+                aria-controls="mb-panel-care"
+                tabIndex={activeTab === 'care' ? 0 : -1}
+                className={`mb-tab-btn ${activeTab === 'care' ? 'active' : ''}`}
+                onClick={() => setActiveTab('care')}
               >
-                Ingredients
+                Jewellery Care
               </button>
             </div>
 
@@ -1356,39 +1141,29 @@ export function ProductDetailPage() {
                     <div className="mb-panel-col-main">
                       <h3 className="mb-col-heading">Product Overview</h3>
                       <p className="mb-panel-desc">
-                        {product.description ||
-                          `${product.name} is a lightweight, hydrating formula designed to keep your skin plump, protected, and radiant throughout the day.`}
+                        {product.description || `${product.name} from the MALKAZ fine jewellery collection.`}
                       </p>
 
-                      <h4 className="mb-panel-subheading">Key Benefits</h4>
+                      <h4 className="mb-panel-subheading">The MALKAZ edit</h4>
                       <ul className="mb-feature-checklist">
                         <li className="mb-feature-check-item">
                           <span className="mb-check-icon-circle">✓</span>
-                          <span>Provides long lasting 72-hour hydration</span>
+                          <span>Timeless design for your jewellery collection</span>
                         </li>
                         <li className="mb-feature-check-item">
                           <span className="mb-check-icon-circle">✓</span>
-                          <span>Strengthens and restores natural skin moisture barrier</span>
+                          <span>Thoughtfully selected by MALKAZ Royal Jewels</span>
                         </li>
                         <li className="mb-feature-check-item">
                           <span className="mb-check-icon-circle">✓</span>
-                          <span>Non-greasy, fast-absorbing cloud gel texture</span>
-                        </li>
-                        <li className="mb-feature-check-item">
-                          <span className="mb-check-icon-circle">✓</span>
-                          <span>Dermatologically tested and suitable for sensitive skin</span>
-                        </li>
-                        <li className="mb-feature-check-item">
-                          <span className="mb-check-icon-circle">✓</span>
-                          <span>Free from parabens, sulfates, and synthetic dyes</span>
+                          <span>A considered choice for gifting or keeping</span>
                         </li>
                       </ul>
 
-                      <h4 className="mb-panel-subheading">How to Use</h4>
+                      <h4 className="mb-panel-subheading">Jewellery Care</h4>
                       <div className="mb-how-to-use-box">
                         <p>
-                          {product.howToUse ||
-                            'Apply a coin-sized amount evenly onto cleansed face and neck every morning and evening. Gently massage in upward circular motions until fully absorbed. For optimal hydration, layer over your preferred serum.'}
+                          Store your jewellery in a soft, dry place and avoid direct contact with perfumes, chemicals, and moisture.
                         </p>
                       </div>
                     </div>
@@ -1399,27 +1174,19 @@ export function ProductDetailPage() {
                         <tbody>
                           <tr>
                             <td className="mb-specs-label">Brand</td>
-                            <td className="mb-specs-val">{product.brandName || 'MyBeautify'}</td>
+                            <td className="mb-specs-val">{product.brandName || 'MALKAZ'}</td>
                           </tr>
                           <tr>
                             <td className="mb-specs-label">Category</td>
                             <td className="mb-specs-val">{product.categoryName}</td>
                           </tr>
                           <tr>
-                            <td className="mb-specs-label">Skin Type</td>
-                            <td className="mb-specs-val">{product.skinType || 'All skin types'}</td>
-                          </tr>
-                          <tr>
-                            <td className="mb-specs-label">Size / Volume</td>
+                            <td className="mb-specs-label">Size</td>
                             <td className="mb-specs-val">{displaySize}</td>
                           </tr>
                           <tr>
                             <td className="mb-specs-label">SKU</td>
                             <td className="mb-specs-val">{product.sku}</td>
-                          </tr>
-                          <tr>
-                            <td className="mb-specs-label">Texture</td>
-                            <td className="mb-specs-val">Featherlight Cream-Gel</td>
                           </tr>
                           <tr>
                             <td className="mb-specs-label">Country of Origin</td>
@@ -1431,15 +1198,15 @@ export function ProductDetailPage() {
                       <div className="mb-specs-highlights-card">
                         <div className="mb-specs-highlight-item">
                           <span className="mb-specs-highlight-icon">✦</span>
-                          <span>100% Authentic Quality Guaranteed</span>
+                          <span>MALKAZ Royal Jewels</span>
                         </div>
                         <div className="mb-specs-highlight-item">
                           <span className="mb-specs-highlight-icon">✦</span>
-                          <span>Dermatologist Approved Formulation</span>
+                          <span>Timeless jewellery designs</span>
                         </div>
                         <div className="mb-specs-highlight-item">
                           <span className="mb-specs-highlight-icon">✦</span>
-                          <span>Cruelty-Free & Sustainably Packaged</span>
+                          <span>Thoughtful gifting choices</span>
                         </div>
                       </div>
                     </div>
@@ -1723,136 +1490,56 @@ export function ProductDetailPage() {
                           </div>
                         ))}
 
-                        {/* Reference Review Item */}
-                        <div className="mb-review-card">
-                          <div className="mb-review-user-row">
-                            <div className="mb-review-avatar">A</div>
-                            <div>
-                              <div className="mb-review-user-name">Ananya Verma</div>
-                              <span className="mb-verified-badge">
-                                <CheckCircle2 size={12} /> Verified Purchase
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="mb-review-rating-row">
-                            <span className="mb-review-stars">★★★★★</span>
-                            <span className="mb-review-date">12 Oct 2026</span>
-                          </div>
-
-                          <p className="mb-review-text">
-                            Super light and gives a nice glow. Really loved how hydrated my skin feels throughout the day! Non-comedogenic and works wonders under daily makeup.
-                          </p>
-                        </div>
+                        {!reviewsLoading && reviewsList.length === 0 && (
+                          <p className="mb-review-text">No reviews yet. Be the first to share your experience.</p>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* TAB 4: Ingredients */}
-              {activeTab === 'ingredients' && (
+              {/* Jewellery care */}
+              {activeTab === 'care' && (
                 <div
-                  id="mb-panel-ingredients"
+                  id="mb-panel-care"
                   role="tabpanel"
-                  aria-labelledby="mb-tab-ingredients"
+                  aria-labelledby="mb-tab-care"
                   className="mb-tab-panel mb-tab-panel-ingredients"
                 >
                   <div className="mb-ingredients-panel-view">
                     <div className="mb-ingredients-header">
-                      <h3 className="mb-col-heading">Key Active Ingredients</h3>
+                      <h3 className="mb-col-heading">Caring for your jewellery</h3>
                       <p className="mb-ingredients-sub">
-                        Carefully curated, dermatologically backed clean ingredients to nourish and safeguard your skin barrier.
+                        A few simple steps help keep your MALKAZ pieces looking their best.
                       </p>
                     </div>
 
                     <div className="mb-ingredients-grid">
-                      {/* Hyaluronic Acid */}
                       <div className="mb-ingredient-card">
-                        <div className="mb-ingredient-thumb-wrap">
-                          <img
-                            src="/ingredients/hyaluronic-acid.jpg"
-                            alt="Hyaluronic Acid"
-                            className="mb-ingredient-thumb"
-                          />
-                        </div>
                         <div className="mb-ingredient-info">
-                          <span className="mb-ingredient-title">Hyaluronic Acid (Multi-Molecular)</span>
-                          <span className="mb-ingredient-desc">
-                            Delivers deep multi-layer hydration, plumping the skin and retaining up to 1000x its weight in water.
-                          </span>
+                          <span className="mb-ingredient-title">Store with care</span>
+                          <span className="mb-ingredient-desc">Keep each piece in a soft, dry pouch or jewellery box.</span>
                         </div>
                       </div>
-
-                      {/* Ceramides */}
                       <div className="mb-ingredient-card">
-                        <div className="mb-ingredient-thumb-wrap">
-                          <img
-                            src="/ingredients/ceramides.jpg"
-                            alt="Ceramides"
-                            className="mb-ingredient-thumb"
-                          />
-                        </div>
                         <div className="mb-ingredient-info">
-                          <span className="mb-ingredient-title">Ceramide Complex (NP, AP, EOP)</span>
-                          <span className="mb-ingredient-desc">
-                            Essential skin-identical lipids that replenish moisture barrier integrity and protect against environmental stress.
-                          </span>
+                          <span className="mb-ingredient-title">Avoid contact with chemicals</span>
+                          <span className="mb-ingredient-desc">Apply perfume before putting on your jewellery.</span>
                         </div>
                       </div>
-
-                      {/* Niacinamide */}
                       <div className="mb-ingredient-card">
-                        <div className="mb-ingredient-thumb-wrap">
-                          <img
-                            src="/ingredients/niacinamide.jpg"
-                            alt="Niacinamide"
-                            className="mb-ingredient-thumb"
-                          />
-                        </div>
                         <div className="mb-ingredient-info">
-                          <span className="mb-ingredient-title">Niacinamide (Vitamin B3)</span>
-                          <span className="mb-ingredient-desc">
-                            Clarifies complexion, minimizes the look of pores, balances sebum, and evens overall skin tone.
-                          </span>
+                          <span className="mb-ingredient-title">Wipe gently</span>
+                          <span className="mb-ingredient-desc">Use a clean, soft cloth after wearing to remove everyday residue.</span>
                         </div>
                       </div>
-
-                      {/* Glycerin */}
                       <div className="mb-ingredient-card">
-                        <div className="mb-ingredient-thumb-wrap">
-                          <img
-                            src="/ingredients/glycerin.jpg"
-                            alt="Glycerin"
-                            className="mb-ingredient-thumb"
-                          />
-                        </div>
                         <div className="mb-ingredient-info">
-                          <span className="mb-ingredient-title">Pure Plant Glycerin</span>
-                          <span className="mb-ingredient-desc">
-                            A natural humectant that draws moisture into the skin barrier for all-day softness and suppleness.
-                          </span>
+                          <span className="mb-ingredient-title">Keep pieces separate</span>
+                          <span className="mb-ingredient-desc">Store items separately to help avoid scratches and tangles.</span>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Full Ingredients List from Backend */}
-                    <div className="mb-full-ingredients-box">
-                      <div className="mb-full-ingredients-title">Complete Formulation (INCI):</div>
-                      <p className="mb-full-ingredients-text">
-                        {product.ingredients ||
-                          'Aqua (Water), Glycerin, Butylene Glycol, Caprylic/Capric Triglyceride, Sodium Hyaluronate (Hyaluronic Acid), Ceramide NP, Ceramide AP, Ceramide EOP, Niacinamide, Squalane, Tocopherol (Vitamin E), Centella Asiatica Extract, Carbomer, Phytosphingosine, Cholesterol, Xanthan Gum, Ethylhexylglycerin, Phenoxyethanol, Disodium EDTA.'}
-                      </p>
-                    </div>
-
-                    {/* Clean Beauty Badges */}
-                    <div className="mb-clean-standards-row">
-                      <span className="mb-clean-badge">🌿 100% Vegan</span>
-                      <span className="mb-clean-badge">🐰 Cruelty-Free</span>
-                      <span className="mb-clean-badge">🚫 Paraben-Free</span>
-                      <span className="mb-clean-badge">🚫 Sulfate-Free</span>
-                      <span className="mb-clean-badge">✨ Fragrance-Free</span>
-                      <span className="mb-clean-badge">🔬 Non-Comedogenic</span>
                     </div>
                   </div>
                 </div>
@@ -1892,7 +1579,7 @@ export function ProductDetailPage() {
               {recommendedProducts
                 .slice(recommendedPage * 5, recommendedPage * 5 + 5)
                 .map((rec) => (
-                  <MyBeautifyProductCard
+                  <MalkazProductCard
                     key={rec.id}
                     product={rec}
                     isWishlisted={wishlistIds.has(rec.id)}
@@ -1991,16 +1678,21 @@ export function ProductDetailPage() {
                   <h4 style={{ fontFamily: 'var(--mb-font-serif)', fontSize: 24, margin: '10px 0 0' }}>
                     Your bag is empty
                   </h4>
-                  <p className="mb-empty-desc">Discover glowing essentials from our catalog.</p>
+                  <p className="mb-empty-desc">Discover fine jewellery from the MALKAZ collection.</p>
                 </div>
               ) : (
                 <div>
                   {cart.items.map((item) => (
                     <div key={item.id} className="mb-cart-item-row">
                       <img
-                        src={item.imageUrl || '/products/dew-cloud-cream/1.jpg'}
+                        src={
+                          getJewelleryImage(item.imageUrl, item.productName, item.productId)
+                        }
                         alt={item.productName}
                         className="mb-cart-item-thumb"
+                        onError={(event) => {
+                          event.currentTarget.src = getJewelleryImage(null, item.productName, item.productId);
+                        }}
                       />
                       <div className="mb-cart-item-details">
                         <div className="mb-cart-item-name" title={item.productName}>
@@ -2027,7 +1719,7 @@ export function ProductDetailPage() {
                           </div>
                           <button
                             type="button"
-                            style={{ background: 'none', border: 'none', color: '#B23A4E', cursor: 'pointer' }}
+                            style={{ background: 'none', border: 'none', color: '#063B2F', cursor: 'pointer' }}
                             onClick={() => handleRemoveCartItem(item.id)}
                             title="Remove item"
                           >
@@ -2110,7 +1802,7 @@ export function ProductDetailPage() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         padding: 12,
-                        background: '#FFFDFE',
+                        background: '#FAF7F2',
                         border: '1px solid var(--mb-border)',
                         borderRadius: 12,
                       }}
@@ -2123,9 +1815,14 @@ export function ProductDetailPage() {
                         }}
                       >
                         <img
-                          src={item.imageUrl || '/products/dew-cloud-cream/1.jpg'}
+                          src={
+                            getJewelleryImage(item.imageUrl, item.name, item.id)
+                          }
                           alt={item.name}
                           style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }}
+                          onError={(event) => {
+                            event.currentTarget.src = getJewelleryImage(null, item.name, item.id);
+                          }}
                         />
                         <div>
                           <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--mb-text-dark)' }}>
@@ -2148,7 +1845,7 @@ export function ProductDetailPage() {
                         </button>
                         <button
                           type="button"
-                          style={{ background: 'none', border: 'none', color: '#B23A4E', cursor: 'pointer' }}
+                          style={{ background: 'none', border: 'none', color: '#063B2F', cursor: 'pointer' }}
                           onClick={() => handleToggleRecWishlist(item)}
                           title="Remove from wishlist"
                         >
@@ -2201,7 +1898,7 @@ export function ProductDetailPage() {
                         padding: 16,
                         border: '1px solid var(--mb-border)',
                         borderRadius: 12,
-                        background: '#FFFDFE',
+                        background: '#FAF7F2',
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -2248,7 +1945,7 @@ export function ProductDetailPage() {
                       padding: 14,
                       border: '1px solid var(--mb-border)',
                       borderRadius: 12,
-                      background: addr.postalCode === pincode ? '#FFF7F8' : '#FFFFFF',
+                      background: addr.postalCode === pincode ? '#F4EBD8' : '#FFFFFF',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -2346,7 +2043,7 @@ export function ProductDetailPage() {
                   padding: 16,
                   border: '1.5px dashed var(--mb-primary)',
                   borderRadius: 12,
-                  background: '#FFF8FA',
+                  background: '#FAF7F2',
                   marginBottom: 16,
                 }}
               >
@@ -2365,7 +2062,7 @@ export function ProductDetailPage() {
                   </button>
                 </div>
                 <p style={{ margin: '6px 0 0', fontSize: 13, color: 'var(--mb-text-muted)' }}>
-                  10% off your cosmetics order up to ₹25. Available on all catalog items.
+                  Enjoy available offers on your MALKAZ jewellery order.
                 </p>
               </div>
 
@@ -2407,14 +2104,14 @@ export function ProductDetailPage() {
             <div className="mb-modal-body">
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
                 <div className="mb-header-avatar" style={{ width: 56, height: 56, fontSize: 22 }}>
-                  {customerInitials}
+                    <UserIcon size={25} />
                 </div>
                 <div>
                   <h4 style={{ margin: 0, fontSize: 18, fontFamily: 'var(--mb-font-serif)' }}>
                     {customerName}
                   </h4>
                   <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--mb-text-muted)' }}>
-                    {user?.email || 'customer@mybeautify.com'}
+                    {user?.email || 'MALKAZ customer'}
                   </p>
                   <span style={{ fontSize: 11, background: 'var(--mb-primary-light)', color: 'var(--mb-primary)', padding: '2px 8px', borderRadius: 8, fontWeight: 700 }}>
                     {user?.role || 'CUSTOMER'}
@@ -2445,10 +2142,10 @@ export function ProductDetailPage() {
 
             <div className="mb-modal-body">
               <p style={{ fontSize: 14, color: 'var(--mb-text-muted)', lineHeight: 1.6 }}>
-                Have questions regarding orders, product ingredients, or returns? Our beauty care specialists are here to help.
+                Have questions about your order, jewellery care, sizing, or returns? The MALKAZ Client Care team is here to help.
               </p>
-              <div style={{ padding: 14, background: '#FCF7F8', borderRadius: 12, border: '1px solid var(--mb-border)' }}>
-                <div><strong>Email:</strong> support@mybeautify.com</div>
+              <div style={{ padding: 14, background: '#F4EBD8', borderRadius: 12, border: '1px solid var(--mb-border)' }}>
+                <div><strong>Client Care:</strong> MALKAZ Royal Jewels</div>
                 <div style={{ marginTop: 6 }}><strong>Hours:</strong> Mon – Sat, 9:00 AM – 7:00 PM IST</div>
               </div>
             </div>

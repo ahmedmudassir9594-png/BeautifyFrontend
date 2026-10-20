@@ -25,35 +25,35 @@ export function HomePage() {
       <main className="page">
         <section className="hero">
           <div>
-            <div className="eyebrow">The considered beauty edit / 01</div>
+            <div className="eyebrow">MALKAZ Royal Jewels / 01</div>
             <h1>
-              Beauty that feels like <em>breathing out.</em>
+              Jewellery made for <em>your story.</em>
             </h1>
             <p className="lede">
-              A small, discerning shop for skincare, color, hair, and the quiet things that make a day feel more yours.
+              Discover thoughtfully selected gold, gemstones, and timeless designs from MALKAZ Royal Jewels.
             </p>
             <div className="hero-actions">
               <Link href="/shop" className="button" data-testid="link-hero-shop">
-                Explore the edit <ArrowRight size={15} />
+                Explore jewellery <ArrowRight size={15} />
               </Link>
               <Link href="/categories" className="button secondary" data-testid="link-hero-categories">
-                Browse by ritual
+                Browse collections
               </Link>
             </div>
           </div>
-          <div className="hero-art" aria-label="A warm botanical beauty still life">
-            <div className="hero-bottle" />
+          <div className="hero-art" aria-label="MALKAZ fine jewellery collection">
+            <img src="/hero-jewellery.jpg" alt="MALKAZ fine jewellery collection" />
           </div>
         </section>
 
         <section className="section" id="edit">
           <div className="section-head">
             <div>
-              <div className="eyebrow">In the edit</div>
-              <h2 className="section-title">Quietly exceptional</h2>
+              <div className="eyebrow">MALKAZ collection</div>
+              <h2 className="section-title">Fine jewellery, thoughtfully chosen</h2>
             </div>
             <p className="section-copy">
-              The pieces we reach for most. Ingredient-led, sensorial, and made to live on your shelf.
+              Explore distinctive pieces selected for meaningful moments and everyday elegance.
             </p>
           </div>
           {products.isLoading ? (
@@ -77,18 +77,18 @@ export function HomePage() {
 
         <div className="marquee">
           <span>
-            SKIN / COLOR / HAIR / SELF · SKIN / COLOR / HAIR / SELF · SKIN / COLOR / HAIR / SELF · SKIN / COLOR / HAIR / SELF ·{' '}
+            GOLD / GEMSTONES / KUNDAN / DIAMONDS · GOLD / GEMSTONES / KUNDAN / DIAMONDS · GOLD / GEMSTONES / KUNDAN / DIAMONDS ·{' '}
           </span>
         </div>
 
         <section className="section">
           <div className="section-head">
             <div>
-              <div className="eyebrow">Shop by ritual</div>
-              <h2 className="section-title">Find your way in</h2>
+              <div className="eyebrow">Shop by collection</div>
+              <h2 className="section-title">Find your signature piece</h2>
             </div>
             <Link href="/categories" className="button secondary small" data-testid="link-all-categories">
-              All categories <ArrowRight size={14} />
+              All collections <ArrowRight size={14} />
             </Link>
           </div>
           <div className="category-strip">
@@ -100,7 +100,7 @@ export function HomePage() {
                 data-testid={`card-category-${category.id}`}
               >
                 <h3>{category.name}</h3>
-                <p>{category.description || `${category.productCount || 0} considered pieces`}</p>
+                <p>{category.description || `${category.productCount || 0} fine jewellery pieces`}</p>
               </Link>
             ))}
           </div>

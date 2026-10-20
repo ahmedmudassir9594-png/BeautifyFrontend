@@ -1,19 +1,18 @@
 /* ==========================================================================
-   MyBeautify My Orders Dashboard Styles
+   MALKAZ Customer Orders Styles
    Matches reference image design:
-   - Cream & blush-pink background (#FDF8F7)
-   - Deep burgundy text & icons (#4A1525, #83213D)
-   - Pink active pill accents (#FBEBED)
+   - Warm ivory background with emerald and gold accents
    - Horizontal progress timeline for shipment
    - Clean rounded order cards (border-radius: 18px)
    ========================================================================== */
 
 .mb-orders-page-root {
   min-height: 100vh;
-  background-color: #FDF8F7;
-  color: #2D121B;
+  background-color: #FAF7F2;
+  color: #123A30;
   font-family: var(--mb-font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
   display: flex;
+  overflow-x: clip;
 }
 
 /* ==========================================================================
@@ -23,7 +22,7 @@
   width: 260px;
   min-width: 260px;
   background: #FFFFFF;
-  border-right: 1px solid #ECE0E3;
+  border-right: 1px solid #E8DEC8;
   padding: 24px 18px;
   display: flex;
   flex-direction: column;
@@ -59,7 +58,7 @@
   font-family: var(--mb-font-serif, 'Playfair Display', Georgia, serif);
   font-size: 20px;
   font-weight: 700;
-  color: #4A1525;
+  color: #063B2F;
   letter-spacing: -0.01em;
   line-height: 1.1;
 }
@@ -67,7 +66,7 @@
 .mb-orders-brand-tagline {
   font-size: 8.5px;
   font-weight: 700;
-  color: #9B6271;
+  color: #5A6B64;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   margin-top: 3px;
@@ -97,7 +96,7 @@
   border-radius: 12px;
   border: none;
   background: transparent;
-  color: #6A3B49;
+  color: #123A30;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -107,13 +106,13 @@
 }
 
 .mb-orders-nav-btn:hover {
-  background: #FDF3F5;
-  color: #83213D;
+  background: #F4EBD8;
+  color: #063B2F;
 }
 
 .mb-orders-nav-btn.active {
-  background: #FBEBED;
-  color: #83213D;
+  background: #F4EBD8;
+  color: #063B2F;
   font-weight: 700;
 }
 
@@ -124,8 +123,8 @@
 /* Bottom "Be your own kind of beautiful" card */
 .mb-orders-sidebar-quote-card {
   margin-top: 24px;
-  background: linear-gradient(135deg, #FFF1F3 0%, #FFE6EA 100%);
-  border: 1px solid #F5D3DA;
+  background: linear-gradient(135deg, #F4EBD8 0%, #F4EBD8 100%);
+  border: 1px solid #E8DEC8;
   border-radius: 16px;
   padding: 22px 18px;
   position: relative;
@@ -137,7 +136,7 @@
   font-size: 19px;
   font-style: italic;
   font-weight: 700;
-  color: #83213D;
+  color: #063B2F;
   line-height: 1.35;
   margin-bottom: 10px;
   position: relative;
@@ -146,7 +145,7 @@
 
 .mb-orders-sidebar-quote-heart {
   font-size: 18px;
-  color: #83213D;
+  color: #063B2F;
   display: block;
 }
 
@@ -173,13 +172,13 @@
 
 /* Top Navigation Bar */
 .mb-orders-topbar {
-  background: #FDF8F7;
+  background: #FAF7F2;
   padding: 16px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  border-bottom: 1px solid #F0E2E5;
+  border-bottom: 1px solid #E8DEC8;
   position: sticky;
   top: 0;
   z-index: 30;
@@ -197,7 +196,7 @@
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: #9B6271;
+  color: #5A6B64;
   pointer-events: none;
 }
 
@@ -205,18 +204,18 @@
   width: 100%;
   height: 44px;
   background: #FFFFFF;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   border-radius: 24px;
   padding: 0 20px 0 46px;
   font-size: 13.5px;
-  color: #2D121B;
+  color: #123A30;
   box-sizing: border-box;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .mb-orders-search-input:focus {
-  border-color: #83213D;
+  border-color: #063B2F;
   box-shadow: 0 0 0 3px rgba(131, 33, 61, 0.08);
 }
 
@@ -226,13 +225,24 @@
   gap: 18px;
 }
 
+.mz-orders-mobile-menu {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  color: #123A30;
+  cursor: pointer;
+}
+
 .mb-orders-icon-btn {
   width: 42px;
   height: 42px;
   border-radius: 50%;
   border: none;
   background: #FFFFFF;
-  color: #6A3B49;
+  color: #123A30;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -243,15 +253,15 @@
 }
 
 .mb-orders-icon-btn:hover {
-  background: #FDF3F5;
-  color: #83213D;
+  background: #F4EBD8;
+  color: #063B2F;
 }
 
 .mb-orders-badge-pill {
   position: absolute;
   top: -2px;
   right: -2px;
-  background: #D81B60;
+  background: #063B2F;
   color: #FFFFFF;
   font-size: 11px;
   font-weight: 700;
@@ -277,7 +287,7 @@
 }
 
 .mb-orders-user-chip:hover {
-  background: #F5E8EB;
+  background: #F4EBD8;
 }
 
 .mb-orders-user-avatar {
@@ -285,14 +295,14 @@
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1.5px solid #F5D3DA;
-  background: #FFF1F3;
+  border: 1.5px solid #E8DEC8;
+  background: #F4EBD8;
 }
 
 .mb-orders-user-name {
   font-size: 14px;
   font-weight: 600;
-  color: #2D121B;
+  color: #123A30;
 }
 
 /* ==========================================================================
@@ -308,8 +318,8 @@
 
 /* My Orders Promotional Banner */
 .mb-orders-banner {
-  background: linear-gradient(90deg, #FDF2F4 0%, #FCE8EC 45%, #FCE3E8 100%);
-  border: 1px solid #F5D3DA;
+  background: linear-gradient(90deg, #F4EBD8 0%, #F4EBD8 45%, #F4EBD8 100%);
+  border: 1px solid #E8DEC8;
   border-radius: 18px;
   padding: 28px 36px;
   display: flex;
@@ -331,14 +341,14 @@
   font-family: var(--mb-font-serif, 'Playfair Display', Georgia, serif);
   font-size: 32px;
   font-weight: 800;
-  color: #2E101A;
+  color: #123A30;
   margin: 0 0 6px 0;
   letter-spacing: -0.01em;
 }
 
 .mb-orders-banner-desc {
   font-size: 14px;
-  color: #6B4752;
+  color: #5A6B64;
   margin: 0;
   font-weight: 500;
 }
@@ -371,7 +381,7 @@
   font-size: 22px;
   font-weight: 700;
   font-style: italic;
-  color: #83213D;
+  color: #063B2F;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
   z-index: 3;
   pointer-events: none;
@@ -402,18 +412,18 @@
   width: 100%;
   height: 42px;
   background: #FFFFFF;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   border-radius: 24px;
   padding: 0 18px 0 44px;
   font-size: 13.5px;
-  color: #2D121B;
+  color: #123A30;
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
 .mb-orders-filter-search-input:focus {
-  border-color: #83213D;
+  border-color: #063B2F;
   box-shadow: 0 0 0 3px rgba(131, 33, 61, 0.08);
 }
 
@@ -428,7 +438,7 @@
   align-items: center;
   gap: 8px;
   background: #FFFFFF;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   border-radius: 20px;
   padding: 4px 14px;
   height: 40px;
@@ -437,7 +447,7 @@
 
 .mb-orders-sort-label {
   font-size: 13px;
-  color: #6B4752;
+  color: #5A6B64;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -447,7 +457,7 @@
   background: transparent;
   font-size: 13.5px;
   font-weight: 700;
-  color: #2E101A;
+  color: #123A30;
   outline: none;
   cursor: pointer;
   padding-right: 4px;
@@ -463,9 +473,9 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   background: #FFFFFF;
-  color: #6B4752;
+  color: #5A6B64;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -474,8 +484,8 @@
 }
 
 .mb-orders-view-btn.active {
-  background: #83213D;
-  border-color: #83213D;
+  background: #063B2F;
+  border-color: #063B2F;
   color: #FFFFFF;
 }
 
@@ -496,7 +506,7 @@
 
 .mb-order-card {
   background: #FFFFFF;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   border-radius: 18px;
   padding: 24px;
   display: grid;
@@ -510,7 +520,7 @@
 
 .mb-order-card:hover {
   box-shadow: 0 4px 16px rgba(70, 20, 35, 0.06);
-  border-color: #E2CFD4;
+  border-color: #E8DEC8;
 }
 
 /* SECTION A: ORDER INFO & ITEMS */
@@ -537,8 +547,8 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #FFF0F3;
-  color: #83213D;
+  background: #F4EBD8;
+  color: #063B2F;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -549,14 +559,14 @@
 .mb-order-number-title {
   font-size: 15px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
   line-height: 1.25;
   margin: 0;
 }
 
 .mb-order-placed-date {
   font-size: 12px;
-  color: #7C5B65;
+  color: #5A6B64;
   margin-top: 3px;
 }
 
@@ -605,8 +615,8 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background: #FAF7F8;
-  border: 1px solid #F1E5E7;
+  background: #FAF7F2;
+  border: 1px solid #E8DEC8;
   border-radius: 12px;
   padding: 8px 12px;
   min-width: 170px;
@@ -619,7 +629,7 @@
   border-radius: 10px;
   object-fit: cover;
   background: #FFFFFF;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   flex-shrink: 0;
 }
 
@@ -633,18 +643,18 @@
 .mb-order-item-name {
   font-weight: 700;
   font-size: 13px;
-  color: #2D121B;
+  color: #123A30;
   line-height: 1.2;
 }
 
 .mb-order-item-brand {
   font-size: 11.5px;
-  color: #7C5B65;
+  color: #5A6B64;
 }
 
 .mb-order-item-size {
   font-size: 11px;
-  color: #9B6271;
+  color: #5A6B64;
 }
 
 .mb-order-item-price-row {
@@ -653,7 +663,7 @@
   gap: 8px;
   margin-top: 2px;
   font-size: 12px;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-order-item-price-val {
@@ -688,8 +698,8 @@
   flex-direction: column;
   gap: 16px;
   padding: 0 12px;
-  border-left: 1px solid #F0E2E5;
-  border-right: 1px solid #F0E2E5;
+  border-left: 1px solid #E8DEC8;
+  border-right: 1px solid #E8DEC8;
 }
 
 .mb-order-progress-header {
@@ -698,11 +708,11 @@
   gap: 8px;
   font-size: 13px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
 }
 
 .mb-order-progress-header svg {
-  color: #83213D;
+  color: #063B2F;
 }
 
 /* 5-Stage Horizontal Progress Timeline */
@@ -734,14 +744,14 @@
   font-weight: 700;
   transition: all 0.2s ease;
   background: #FFFFFF;
-  border: 2px solid #E0D0D4;
-  color: #9B6271;
+  border: 2px solid #E8DEC8;
+  color: #5A6B64;
 }
 
 /* Node completed pink */
 .mb-timeline-node.completed {
-  background: #E91E63;
-  border-color: #E91E63;
+  background: #D4AF63;
+  border-color: #D4AF63;
   color: #FFFFFF;
 }
 
@@ -754,8 +764,8 @@
 
 /* Node active (current in-transit step) */
 .mb-timeline-node.active-step {
-  background: #2E101A;
-  border-color: #2E101A;
+  background: #123A30;
+  border-color: #123A30;
   color: #FFFFFF;
   transform: scale(1.15);
 }
@@ -767,20 +777,20 @@
   left: 12%;
   right: 12%;
   height: 2px;
-  background: #E8D9DC;
+  background: #E8DEC8;
   z-index: 1;
 }
 
 .mb-timeline-line-fill {
   height: 100%;
-  background: #E91E63;
+  background: #D4AF63;
   transition: width 0.3s ease;
 }
 
 .mb-timeline-step-label {
   font-size: 10.5px;
   font-weight: 600;
-  color: #4A202C;
+  color: #123A30;
   margin-top: 8px;
   text-align: center;
   white-space: nowrap;
@@ -796,8 +806,8 @@
 
 /* Cancelled Order Notice Box (Section B for Cancelled orders) */
 .mb-cancelled-notice-box {
-  background: #FFF5F7;
-  border: 1px dashed #F5CCD4;
+  background: #F4EBD8;
+  border: 1px dashed #E8DEC8;
   border-radius: 12px;
   padding: 16px 20px;
   display: flex;
@@ -819,14 +829,14 @@
 
 .mb-order-total-label {
   font-size: 12px;
-  color: #7C5B65;
+  color: #5A6B64;
   font-weight: 500;
 }
 
 .mb-order-total-amount {
   font-size: 22px;
   font-weight: 800;
-  color: #2D121B;
+  color: #123A30;
   line-height: 1;
   margin-bottom: 4px;
 }
@@ -835,8 +845,8 @@
   width: 100%;
   height: 38px;
   background: #FFFFFF;
-  border: 1.5px solid #83213D;
-  color: #83213D;
+  border: 1.5px solid #063B2F;
+  color: #063B2F;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
@@ -849,15 +859,15 @@
 }
 
 .mb-order-btn-view-details:hover {
-  background: #FDF3F5;
+  background: #F4EBD8;
 }
 
 .mb-order-btn-cancel-action {
   width: 100%;
   height: 38px;
-  background: #FFF5F7;
-  border: 1px solid #F5CCD4;
-  color: #A01548;
+  background: #F4EBD8;
+  border: 1px solid #E8DEC8;
+  color: #063B2F;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
@@ -871,15 +881,15 @@
 
 .mb-order-btn-cancel-action:hover {
   background: #FEE7EC;
-  color: #83213D;
-  border-color: #EBB0BE;
+  color: #063B2F;
+  border-color: #D4AF63;
 }
 
 
 .mb-order-btn-primary {
   width: 100%;
   height: 38px;
-  background: #83213D;
+  background: #063B2F;
   border: none;
   color: #FFFFFF;
   border-radius: 10px;
@@ -894,17 +904,17 @@
 }
 
 .mb-order-btn-primary:hover {
-  background: #6D1830;
+  background: #063B2F;
 }
 
 .mb-order-cancelled-pill {
   width: 100%;
-  background: #FFF1F3;
-  border: 1px solid #F5CCD4;
+  background: #F4EBD8;
+  border: 1px solid #E8DEC8;
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 12px;
-  color: #83213D;
+  color: #063B2F;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -917,7 +927,7 @@
    ========================================================================== */
 .mb-orders-empty-state {
   background: #FFFFFF;
-  border: 1px solid #ECE0E3;
+  border: 1px solid #E8DEC8;
   border-radius: 18px;
   padding: 60px 24px;
   text-align: center;
@@ -932,8 +942,8 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: #FDF2F4;
-  color: #83213D;
+  background: #F4EBD8;
+  color: #063B2F;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -942,13 +952,13 @@
 .mb-orders-empty-title {
   font-size: 20px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
   margin: 0;
 }
 
 .mb-orders-empty-desc {
   font-size: 14px;
-  color: #7C5B65;
+  color: #5A6B64;
   max-width: 400px;
   margin: 0;
   line-height: 1.5;
@@ -956,7 +966,7 @@
 
 .mb-orders-empty-btn {
   margin-top: 8px;
-  background: #83213D;
+  background: #063B2F;
   color: #FFFFFF;
   border: none;
   border-radius: 12px;
@@ -969,7 +979,7 @@
 }
 
 .mb-orders-empty-btn:hover {
-  background: #6D1830;
+  background: #063B2F;
 }
 
 /* ==========================================================================
@@ -1014,7 +1024,7 @@
 
 .mb-orders-modal-header {
   padding: 20px 24px;
-  border-bottom: 1px solid #F0E2E5;
+  border-bottom: 1px solid #E8DEC8;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1023,14 +1033,14 @@
 .mb-orders-modal-title {
   font-size: 18px;
   font-weight: 700;
-  color: #2D121B;
+  color: #123A30;
   margin: 0;
 }
 
 .mb-orders-modal-close-btn {
   background: none;
   border: none;
-  color: #7C5B65;
+  color: #5A6B64;
   cursor: pointer;
   padding: 4px;
   border-radius: 50%;
@@ -1040,8 +1050,8 @@
 }
 
 .mb-orders-modal-close-btn:hover {
-  background: #FDF2F4;
-  color: #83213D;
+  background: #F4EBD8;
+  color: #063B2F;
 }
 
 .mb-orders-modal-body {
@@ -1054,12 +1064,12 @@
 
 .mb-orders-modal-footer {
   padding: 16px 24px;
-  border-top: 1px solid #F0E2E5;
+  border-top: 1px solid #E8DEC8;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  background: #FAF7F8;
+  background: #FAF7F2;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
 }
@@ -1075,8 +1085,8 @@
   .mb-order-col-progress {
     border-left: none;
     border-right: none;
-    border-top: 1px solid #F0E2E5;
-    border-bottom: 1px solid #F0E2E5;
+    border-top: 1px solid #E8DEC8;
+    border-bottom: 1px solid #E8DEC8;
     padding: 18px 0;
   }
   .mb-order-col-actions {
@@ -1088,6 +1098,9 @@
 @media (max-width: 900px) {
   .mb-orders-sidebar {
     display: none;
+  }
+  .mz-orders-mobile-menu {
+    display: flex;
   }
   .mb-orders-topbar {
     padding: 14px 20px;

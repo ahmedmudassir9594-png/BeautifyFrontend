@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="reset-page-container">
-      {/* Botanical Corner Decorative Line Art (SVG) */}
+      {/* Gold ornamental corner details */}
       <svg
         className="reset-decor-leaf-tr"
         viewBox="0 0 200 200"
@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
       >
         <path
           d="M190 10C150 40 130 90 120 140M190 10C165 30 150 60 148 90C165 75 185 60 190 10ZM120 140C110 110 95 85 70 70C75 100 95 125 120 140ZM148 90C130 75 110 70 85 75C100 95 120 105 148 90ZM120 140C130 165 145 180 170 185C165 160 145 145 120 140Z"
-          stroke="#d2a3ac"
+          stroke="#D4AF63"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -141,7 +141,7 @@ export default function ResetPasswordPage() {
       >
         <path
           d="M10 190C45 155 70 120 95 70M10 190C25 160 35 130 30 100C48 115 65 135 10 190ZM95 70C80 95 65 115 40 125C52 100 70 80 95 70ZM30 100C45 80 65 75 90 80C75 100 55 110 30 100Z"
-          stroke="#d9abb3"
+          stroke="#D4AF63"
           strokeWidth="1.4"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -154,33 +154,33 @@ export default function ResetPasswordPage() {
       <div className="reset-content-wrapper">
         {/* ================= LEFT SECTION: Brand & Reset Hero ================= */}
         <section className="reset-hero-col" aria-label="Brand introduction">
-          <Link href="/" className="reset-brand-lockup" title="Return to MyBeautify Home">
+          <Link href="/" className="reset-brand-lockup" title="Return to MALKAZ Royal Jewels">
             <img
-              src="/mybeautify-mark.png"
-              alt="MyBeautify Brand Mark"
+              src="/malka-zai-emblem.png"
+              alt="MALKAZ emblem"
               className="reset-brand-logo-img"
             />
             <div className="reset-brand-text-block">
-              <span className="reset-brand-title">MyBeautify</span>
-              <span className="reset-brand-tagline">YOUR DAILY GLOW</span>
+              <span className="reset-brand-title">MALKAZ</span>
+              <span className="reset-brand-tagline">ROYAL JEWELS</span>
             </div>
           </Link>
 
           {/* Security lock illustration */}
           <div className="reset-illustration-container">
             <img
-              src="/reset-password-illustration.jpg"
-              alt="Security padlock nestled in rose petals"
+              src="/malka-zai-signup-jewels.jpg"
+              alt="MALKAZ jewellery collection"
               className="reset-illustration-img"
             />
           </div>
 
           <h1 className="reset-hero-heading">Reset Your Password</h1>
           <p className="reset-hero-subtitle">
-            Don’t worry, it happens! Enter your new password below and get back to your beauty journey.
+            Enter a new password to continue shopping with MALKAZ.
           </p>
 
-          {/* Subtle floral decorative divider */}
+          {/* Gold decorative divider */}
           <div className="reset-floral-divider" aria-hidden="true">
             <span className="reset-floral-line" />
             <svg
@@ -191,16 +191,16 @@ export default function ResetPasswordPage() {
             >
               <path
                 d="M12 4C12 4 14.5 8 14.5 11.5C14.5 13.5 13.5 15 12 15C10.5 15 9.5 13.5 9.5 11.5C9.5 8 12 4 12 4Z"
-                fill="#b85a73"
+                fill="#D4AF63"
               />
               <path
                 d="M12 15C9.5 15 6 12 5 10C5 12.5 7 16 12 16.5C17 16 19 12.5 19 10C18 12 14.5 15 12 15Z"
-                fill="#b85a73"
+                fill="#D4AF63"
                 opacity="0.85"
               />
               <path
                 d="M4 17C7 18 10 18.5 12 18.5C14 18.5 17 18 20 17C18 20 14 20.5 12 20.5C10 20.5 6 20 4 17Z"
-                fill="#b85a73"
+                fill="#D4AF63"
                 opacity="0.6"
               />
             </svg>

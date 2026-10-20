@@ -28,6 +28,7 @@ import {
   CreditCard,
   RotateCcw,
   Check,
+  Menu,
 } from 'lucide-react';
 import {
   fetchOrders,
@@ -47,70 +48,24 @@ import {
   type ProductResponse,
 } from '@/lib/api';
 import { CustomerProfilePill, HeaderCartButton } from '@/components/common';
+import { MalkazSidebar } from '@/components/layout/MalkazSidebar';
+import { getJewelleryImage as resolveJewelleryImage } from '@/lib/jewellery-images';
 import '@/styles/my-orders.css';
 
 // Product catalog image & metadata fallbacks for orders
 interface ProductMeta {
   brand: string;
-  size: string;
+  size?: string;
   imageUrl: string;
 }
 
-const PRODUCT_META_LOOKUP: Record<number, ProductMeta> = {
-  1: {
-    brand: "L'Oreal Paris",
-    size: '50ml',
-    imageUrl: '/products/dew-cloud-cream/1.jpg',
-  },
-  2: {
-    brand: "L'Oreal Paris",
-    size: '100ml',
-    imageUrl: '/products/rose-milk-cleanser.jpg',
-  },
-  3: {
-    brand: 'Maybelline New York',
-    size: '6g',
-    imageUrl: '/products/silk-veil-cream-blush.jpg',
-  },
-  4: {
-    brand: 'NYX Professional Makeup',
-    size: 'Tint',
-    imageUrl: '/products/gloss-ritual-lip-oil.jpg',
-  },
-  5: {
-    brand: 'Nectar & Co.',
-    size: '100ml',
-    imageUrl: '/products/dew-cloud-cream/1.jpg',
-  },
-  6: {
-    brand: 'Luminescent Glow',
-    size: '50ml',
-    imageUrl: '/products/dew-cloud-cream/1.jpg',
-  },
-  7: {
-    brand: 'Rose & Petal Organics',
-    size: '160ml',
-    imageUrl: '/products/rose-milk-cleanser.jpg',
-  },
-};
+const getProductMeta = (): ProductMeta => ({
+  brand: 'MALKAZ Royal Jewels',
+  imageUrl: '/products/jewels/royal-emerald-necklace.jpg',
+});
 
-const getProductMeta = (productId: number, fallbackName?: string): ProductMeta => {
-  if (PRODUCT_META_LOOKUP[productId]) {
-    return PRODUCT_META_LOOKUP[productId];
-  }
-  // Fallbacks based on name matching
-  const lower = (fallbackName || '').toLowerCase();
-  if (lower.includes('rose') || lower.includes('cleanser')) {
-    return { brand: "L'Oreal Paris", size: '100ml', imageUrl: '/products/rose-milk-cleanser.jpg' };
-  }
-  if (lower.includes('blush') || lower.includes('veil')) {
-    return { brand: 'Maybelline New York', size: '6g', imageUrl: '/products/silk-veil-cream-blush.jpg' };
-  }
-  if (lower.includes('lip') || lower.includes('oil') || lower.includes('gloss')) {
-    return { brand: 'NYX Professional Makeup', size: 'Tint', imageUrl: '/products/gloss-ritual-lip-oil.jpg' };
-  }
-  return { brand: 'MyBeautify Exclusive', size: '50ml', imageUrl: '/products/dew-cloud-cream/1.jpg' };
-};
+const getJewelleryImage = (imageUrl?: string | null, productName?: string, productId?: number) =>
+  resolveJewelleryImage(imageUrl, productName, productId);
 
 // Currency formatter
 const formatCurrency = (val: number | undefined | null) => {
@@ -170,6 +125,7 @@ export default function MyOrdersPage() {
   // Authentication & User State
   const [user, setUser] = useState<UserResponse | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Cart & Wishlist counters
   const [cartCount, setCartCount] = useState<number>(0);
@@ -482,7 +438,7 @@ export default function MyOrdersPage() {
           position: 'fixed',
           bottom: 24,
           right: 24,
-          background: '#83213D',
+          background: '#063B2F',
           color: '#FFFFFF',
           padding: '12px 22px',
           borderRadius: 24,
@@ -499,127 +455,25 @@ export default function MyOrdersPage() {
         </div>
       )}
 
-      {/* ====================================================================
-          1. LEFT SIDEBAR (Matching reference image)
-          ==================================================================== */}
-      <aside className="mb-orders-sidebar">
-        <Link href="/" className="mb-orders-brand-link" aria-label="MyBeautify - YOUR DAILY GLOW">
-          <img
-            src="/mybeautify-official-logo.png"
-            alt="MyBeautify - YOUR DAILY GLOW"
-            className="mb-orders-brand-logo-img"
-          />
-          <div className="mb-orders-brand-text">
-            <span className="mb-orders-brand-name">MyBeautify</span>
-            <span className="mb-orders-brand-tagline">YOUR DAILY GLOW</span>
-          </div>
-        </Link>
+      <MalkazSidebar
+        activeItem="orders"
+        isOpen={mobileSidebarOpen}
+        isSignedIn={Boolean(user)}
+        onClose={() => setMobileSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
 
-        {/* Sidebar Nav Items */}
-        <ul className="mb-orders-nav-list">
-          <li className="mb-orders-nav-item">
-            <Link href="/shop" className="mb-orders-nav-btn">
-              <ShoppingBag size={18} />
-              <span>Shop</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item">
-            <Link href="/orders" className="mb-orders-nav-btn active">
-              <Package size={18} />
-              <span>My Orders</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item">
-            <Link href="/shop" className="mb-orders-nav-btn">
-              <Heart size={18} />
-              <span>Wishlist</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item">
-            <Link href="/account" className="mb-orders-nav-btn">
-              <UserIcon size={18} />
-              <span>My Profile</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item">
-            <Link href="/account" className="mb-orders-nav-btn">
-              <MapPin size={18} />
-              <span>Addresses</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item">
-            <Link href="/shop" className="mb-orders-nav-btn">
-              <Ticket size={18} />
-              <span>Coupons & Offers</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item">
-            <Link href="/shop" className="mb-orders-nav-btn">
-              <Star size={18} />
-              <span>Reviews</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item">
-            <Link href="/shop" className="mb-orders-nav-btn">
-              <Headphones size={18} />
-              <span>Help & Support</span>
-            </Link>
-          </li>
-
-          <li className="mb-orders-nav-item" style={{ marginTop: 'auto', paddingTop: 12 }}>
-            <button
-              type="button"
-              className="mb-orders-nav-btn"
-              onClick={handleLogout}
-              style={{ color: '#8C4857' }}
-            >
-              <LogOut size={18} />
-              <span>Logout</span>
-            </button>
-          </li>
-        </ul>
-
-        {/* Decorative Quote Card at bottom: "Be your own kind of beautiful ♡" */}
-        <div className="mb-orders-sidebar-quote-card">
-          <div className="mb-orders-sidebar-quote-text">
-            Be your
-            <br />
-            own kind
-            <br />
-            of beautiful
-            <span className="mb-orders-sidebar-quote-heart">♡</span>
-          </div>
-          <svg
-            className="mb-orders-sidebar-leaf-bg"
-            viewBox="0 0 100 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M30 110 C 35 70, 75 60, 90 20 C 70 40, 50 65, 30 110 Z"
-              fill="#83213D"
-            />
-            <path
-              d="M45 80 C 65 65, 80 50, 85 30 C 70 45, 55 60, 45 80 Z"
-              fill="#83213D"
-            />
-          </svg>
-        </div>
-      </aside>
-
-      {/* ====================================================================
-          2. MAIN CONTENT AREA
-          ==================================================================== */}
       <main className="mb-orders-main">
         {/* Top Header Bar */}
         <header className="mb-orders-topbar">
+          <button
+            type="button"
+            className="mz-orders-mobile-menu"
+            onClick={() => setMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={24} />
+          </button>
           <div className="mb-orders-search-wrap">
             <Search size={18} className="mb-orders-search-icon" />
             <input
@@ -667,16 +521,16 @@ export default function MyOrdersPage() {
 
             <div className="mb-orders-banner-visual-wrap">
               <img
-                src="/my-orders-banner.jpg"
-                alt="MyBeautify Cosmetics Banner"
+                src="/hero-jewellery.jpg"
+                alt="MALKAZ fine jewellery collection"
                 className="mb-orders-banner-bg-img"
               />
             </div>
 
             <div className="mb-orders-banner-script">
-              <span>Beauty</span>
-              <span>in every</span>
-              <span>order ♡</span>
+              <span>Jewellery</span>
+              <span>for every</span>
+              <span>occasion</span>
             </div>
           </div>
 
@@ -736,7 +590,7 @@ export default function MyOrdersPage() {
 
           {/* Loading State */}
           {loadingOrders && (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#83213D' }}>
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#063B2F' }}>
               <Loader2 size={36} className="animate-spin" style={{ margin: '0 auto 12px' }} />
               <p style={{ fontWeight: 600, fontSize: 16 }}>Loading your orders...</p>
             </div>
@@ -745,8 +599,8 @@ export default function MyOrdersPage() {
           {/* Error State */}
           {!loadingOrders && orderError && (
             <div style={{
-              background: '#FFF0F3',
-              border: '1px solid #F5CCD4',
+              background: '#F4EBD8',
+              border: '1px solid #E8DEC8',
               borderRadius: 14,
               padding: '20px',
               color: '#C62828',
@@ -782,7 +636,7 @@ export default function MyOrdersPage() {
               <p className="mb-orders-empty-desc">
                 {searchQuery
                   ? `We could not find any order matching "${searchQuery}". Please check the order ID or product name.`
-                  : "You haven't placed any orders yet. Discover our curated cosmetics collection to begin your glow journey."}
+                  : "You haven't placed any orders yet. Explore the MALKAZ fine jewellery collection."}
               </p>
               {searchQuery ? (
                 <button
@@ -863,8 +717,8 @@ export default function MyOrdersPage() {
                       {/* Items Row */}
                       <div className="mb-order-items-row">
                         {(order.items || []).map((item) => {
-                          const meta = getProductMeta(item.productId, item.productName);
-                          const itemImg = item.imageUrl || meta.imageUrl;
+                          const meta = getProductMeta();
+                          const itemImg = getJewelleryImage(item.imageUrl, item.productName, item.productId);
 
                           return (
                             <div key={item.id} className="mb-order-item-chip">
@@ -873,13 +727,13 @@ export default function MyOrdersPage() {
                                 alt={item.productName}
                                 className="mb-order-item-thumb"
                                 onError={(e) => {
-                                  (e.target as HTMLImageElement).src = '/products/dew-cloud-cream/1.jpg';
+                                  (e.target as HTMLImageElement).src = getJewelleryImage(null, item.productName, item.productId);
                                 }}
                               />
                               <div className="mb-order-item-details">
                                 <span className="mb-order-item-name">{item.productName}</span>
                                 <span className="mb-order-item-brand">{meta.brand}</span>
-                                <span className="mb-order-item-size">{meta.size}</span>
+                                {meta.size && <span className="mb-order-item-size">{meta.size}</span>}
                                 <div className="mb-order-item-price-row">
                                   <span>Qty: {item.quantity}</span>
                                   <span className="mb-order-item-price-val">
@@ -1064,29 +918,29 @@ export default function MyOrdersPage() {
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                background: '#FAF7F8',
+                background: '#FAF7F2',
                 padding: '12px 16px',
                 borderRadius: 12,
                 fontSize: 13,
               }}>
                 <div>
-                  <span style={{ color: '#7C5B65' }}>Status: </span>
-                  <strong style={{ color: '#83213D', textTransform: 'capitalize' }}>
+                  <span style={{ color: '#5A6B64' }}>Status: </span>
+                  <strong style={{ color: '#063B2F', textTransform: 'capitalize' }}>
                     {selectedOrderDetails.orderStatus || selectedOrderDetails.status}
                   </strong>
                 </div>
                 <div>
-                  <span style={{ color: '#7C5B65' }}>Placed: </span>
+                  <span style={{ color: '#5A6B64' }}>Placed: </span>
                   <strong>{formatOrderDate(selectedOrderDetails.createdAt)}</strong>
                 </div>
               </div>
 
               {/* Items List */}
               <div>
-                <h4 style={{ margin: '0 0 10px 0', fontSize: 14, color: '#2D121B' }}>Items in this order</h4>
+                <h4 style={{ margin: '0 0 10px 0', fontSize: 14, color: '#123A30' }}>Items in this order</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {(selectedOrderDetails.items || []).map((item) => {
-                    const meta = getProductMeta(item.productId, item.productName);
+                    const meta = getProductMeta();
                     return (
                       <div
                         key={item.id}
@@ -1095,25 +949,25 @@ export default function MyOrdersPage() {
                           alignItems: 'center',
                           gap: 12,
                           padding: '10px 12px',
-                          border: '1px solid #F1E5E7',
+                          border: '1px solid #E8DEC8',
                           borderRadius: 12,
                         }}
                       >
                         <img
-                          src={item.imageUrl || meta.imageUrl}
+                          src={getJewelleryImage(item.imageUrl, item.productName, item.productId)}
                           alt={item.productName}
                           style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }}
                         />
                         <div style={{ flex: 1 }}>
-                          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#2D121B' }}>
+                          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#123A30' }}>
                             {item.productName}
                           </p>
-                          <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#7C5B65' }}>
+                          <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#5A6B64' }}>
                             {meta.brand} • Qty: {item.quantity}
                           </p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: '#2D121B' }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#123A30' }}>
                             {formatCurrency(item.subtotal || item.price * item.quantity)}
                           </span>
                         </div>
@@ -1134,11 +988,11 @@ export default function MyOrdersPage() {
                 gap: 8,
                 fontSize: 13,
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B4752' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#5A6B64' }}>
                   <span>Subtotal</span>
                   <span>{formatCurrency(selectedOrderDetails.subtotal || selectedOrderDetails.totalAmount)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B4752' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#5A6B64' }}>
                   <span>Shipping Fee</span>
                   <span>
                     {(selectedOrderDetails.shippingAmount || selectedOrderDetails.shippingCharge)
@@ -1160,22 +1014,22 @@ export default function MyOrdersPage() {
                   justifyContent: 'space-between',
                   fontWeight: 800,
                   fontSize: 15,
-                  color: '#2D121B',
+                  color: '#123A30',
                 }}>
                   <span>Total Paid</span>
-                  <span style={{ color: '#83213D' }}>{formatCurrency(selectedOrderDetails.totalAmount)}</span>
+                  <span style={{ color: '#063B2F' }}>{formatCurrency(selectedOrderDetails.totalAmount)}</span>
                 </div>
               </div>
 
               {/* Shipping Address Information */}
               <div style={{ fontSize: 13 }}>
-                <h4 style={{ margin: '0 0 6px 0', fontSize: 14, color: '#2D121B' }}>Delivery Address</h4>
-                <div style={{ color: '#6B4752', background: '#FAF7F8', padding: '10px 14px', borderRadius: 10 }}>
+                <h4 style={{ margin: '0 0 6px 0', fontSize: 14, color: '#123A30' }}>Delivery Address</h4>
+                <div style={{ color: '#5A6B64', background: '#FAF7F2', padding: '10px 14px', borderRadius: 10 }}>
                   {typeof selectedOrderDetails.shippingAddress === 'string' ? (
                     <p style={{ margin: 0 }}>{selectedOrderDetails.shippingAddress}</p>
                   ) : selectedOrderDetails.shippingAddress ? (
                     <div>
-                      <p style={{ margin: 0, fontWeight: 600, color: '#2D121B' }}>
+                      <p style={{ margin: 0, fontWeight: 600, color: '#123A30' }}>
                         {selectedOrderDetails.shippingAddress.fullName || user?.fullName || 'Valued Customer'}
                       </p>
                       <p style={{ margin: '3px 0 0 0' }}>
@@ -1247,23 +1101,23 @@ export default function MyOrdersPage() {
                 </div>
               )}
 
-              <p style={{ margin: 0, fontSize: 14, color: '#4A1525', lineHeight: 1.5 }}>
+              <p style={{ margin: 0, fontSize: 14, color: '#063B2F', lineHeight: 1.5 }}>
                 Are you sure you want to cancel this order?
               </p>
 
               <div style={{
-                background: '#FAF7F8',
-                border: '1px solid #ECE0E3',
+                background: '#FAF7F2',
+                border: '1px solid #E8DEC8',
                 borderRadius: 12,
                 padding: '12px 16px',
                 fontSize: 13,
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ color: '#7C5B65' }}>Order Total:</span>
+                  <span style={{ color: '#5A6B64' }}>Order Total:</span>
                   <strong>{formatCurrency(cancellingOrder.totalAmount)}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#7C5B65' }}>Items:</span>
+                  <span style={{ color: '#5A6B64' }}>Items:</span>
                   <span>{cancellingOrder.items?.length || 0} product(s)</span>
                 </div>
               </div>
@@ -1333,51 +1187,51 @@ export default function MyOrdersPage() {
 
             <div className="mb-orders-modal-body">
               <div style={{
-                background: '#FDF2F4',
-                border: '1px solid #F5CCD4',
+                background: '#F4EBD8',
+                border: '1px solid #E8DEC8',
                 borderRadius: 12,
                 padding: '14px 16px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
               }}>
-                <Truck size={24} style={{ color: '#83213D' }} />
+                <Truck size={24} style={{ color: '#063B2F' }} />
                 <div>
-                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#2D121B' }}>
-                    Carrier: Express Beauty Logistics (EBL)
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#123A30' }}>
+                    Carrier: MALKAZ delivery partner
                   </p>
-                  <p style={{ margin: '2px 0 0 0', fontSize: 12, color: '#7C5B65' }}>
-                    Tracking ID: EBL-{trackingOrder.id}-948102 • Status: In Transit
+                  <p style={{ margin: '2px 0 0 0', fontSize: 12, color: '#5A6B64' }}>
+                    Status: In Transit
                   </p>
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '8px 0' }}>
                 <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#83213D', marginTop: 4 }} />
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#063B2F', marginTop: 4 }} />
                   <div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#2D121B' }}>Package In Transit</span>
-                    <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#7C5B65' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#123A30' }}>Package In Transit</span>
+                    <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#5A6B64' }}>
                       Departed sorting facility • {addDaysToDate(trackingOrder.createdAt, 2)}
                     </p>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#E91E63', marginTop: 4 }} />
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#D4AF63', marginTop: 4 }} />
                   <div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#2D121B' }}>Order Dispatched & Packed</span>
-                    <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#7C5B65' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#123A30' }}>Order Dispatched & Packed</span>
+                    <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#5A6B64' }}>
                       Package verified at central warehouse • {addDaysToDate(trackingOrder.createdAt, 1)}
                     </p>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#E91E63', marginTop: 4 }} />
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#D4AF63', marginTop: 4 }} />
                   <div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#2D121B' }}>Order Confirmed</span>
-                    <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#7C5B65' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#123A30' }}>Order Confirmed</span>
+                    <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#5A6B64' }}>
                       Payment captured successfully • {formatShortDate(trackingOrder.createdAt)}
                     </p>
                   </div>
@@ -1434,7 +1288,7 @@ export default function MyOrdersPage() {
                 {/* Select Product from Order */}
                 {reviewOrder.items && reviewOrder.items.length > 1 && (
                   <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#2D121B' }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#123A30' }}>
                       Choose Product to Review:
                     </label>
                     <select
@@ -1444,10 +1298,10 @@ export default function MyOrdersPage() {
                         width: '100%',
                         height: 40,
                         borderRadius: 10,
-                        border: '1px solid #ECE0E3',
+                        border: '1px solid #E8DEC8',
                         padding: '0 12px',
                         fontSize: 13,
-                        color: '#2D121B',
+                        color: '#123A30',
                       }}
                     >
                       {reviewOrder.items.map((item) => (
@@ -1461,7 +1315,7 @@ export default function MyOrdersPage() {
 
                 {/* Star Rating Picker */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 8, color: '#2D121B' }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 8, color: '#123A30' }}>
                     Rating:
                   </label>
                   <div style={{ display: 'flex', gap: 8 }}>
@@ -1479,8 +1333,8 @@ export default function MyOrdersPage() {
                       >
                         <Star
                           size={28}
-                          fill={star <= reviewRating ? '#D81B60' : 'none'}
-                          stroke={star <= reviewRating ? '#D81B60' : '#C4A9B0'}
+                          fill={star <= reviewRating ? '#063B2F' : 'none'}
+                          stroke={star <= reviewRating ? '#063B2F' : '#8B7445'}
                         />
                       </button>
                     ))}
@@ -1489,22 +1343,22 @@ export default function MyOrdersPage() {
 
                 {/* Review Text Area */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#2D121B' }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#123A30' }}>
                     Your Experience:
                   </label>
                   <textarea
                     rows={4}
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
-                    placeholder="Describe how the cosmetic formula felt, the texture, and the results..."
+                    placeholder="Share what you love about this jewellery piece..."
                     style={{
                       width: '100%',
                       padding: '12px',
                       borderRadius: 12,
-                      border: '1px solid #ECE0E3',
+                      border: '1px solid #E8DEC8',
                       fontSize: 13.5,
                       boxSizing: 'border-box',
-                      color: '#2D121B',
+                      color: '#123A30',
                       outline: 'none',
                     }}
                   />

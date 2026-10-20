@@ -27,6 +27,7 @@ export interface ProductResponse {
   skinType?: string;
   shade?: string;
   size?: string;
+  reviewCount?: number;
   expiryDate?: string | null;
   averageRating: number;
 }

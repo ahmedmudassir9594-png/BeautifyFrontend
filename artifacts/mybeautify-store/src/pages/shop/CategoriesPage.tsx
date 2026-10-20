@@ -20,15 +20,15 @@ export function CategoriesPage() {
       <main className="page">
         <div className="catalog-head">
           <div>
-            <div className="eyebrow">Browse by ritual</div>
+            <div className="eyebrow">MALKAZ collections</div>
             <h1>
-              Start with what
+              Discover your
               <br />
-              you need.
+              signature piece.
             </h1>
           </div>
           <p className="section-copy">
-            A softer way to shop. Begin with the ritual, then discover the pieces that belong in it.
+            Explore fine jewellery collections, from timeless everyday designs to pieces for special occasions.
           </p>
         </div>
         {query.isLoading ? (
@@ -48,7 +48,7 @@ export function CategoriesPage() {
                 <h3>{category.name}</h3>
                 <p>{category.description}</p>
                 <span className="eyebrow">
-                  View pieces <ArrowRight size={13} />
+                  Explore collection <ArrowRight size={13} />
                 </span>
               </Link>
             ))}

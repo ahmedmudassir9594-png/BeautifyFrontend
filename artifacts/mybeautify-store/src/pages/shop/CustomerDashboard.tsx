@@ -62,7 +62,9 @@ import {
 } from '@/lib/api';
 import '@/styles/customer-dashboard.css';
 import { HeaderSearchBar } from '@/components/common/HeaderSearchBar';
-import MyBeautifyProductCard from '@/components/products/MyBeautifyProductCard';
+import MalkazProductCard from '@/components/products/MalkazProductCard';
+import { MalkazSidebar } from '@/components/layout/MalkazSidebar';
+import { getJewelleryImage } from '@/lib/jewellery-images';
 
 // Currency formatting with Rupee symbol as per reference design
 const formatCurrency = (val: number | undefined | null) => {
@@ -77,40 +79,8 @@ const getDiscountPercent = (price: number, discountPrice?: number) => {
   return pct > 0 ? `${pct}% OFF` : null;
 };
 
-// Get badge based on product attributes
-const getProductBadge = (product: ProductResponse) => {
-  const discount = product.discountPrice ? (product.price - product.discountPrice) / product.price : 0;
-  if (discount >= 0.25) return { text: 'Hot Deal', type: 'mb-badge-hotdeal' };
-  if (product.featured) return { text: 'Best Seller', type: 'mb-badge-bestseller' };
-  if (product.id % 4 === 0) return { text: 'Trending', type: 'mb-badge-trending' };
-  if (product.id >= 4) return { text: 'New', type: 'mb-badge-new' };
-  return { text: 'Bestseller', type: 'mb-badge-bestseller' };
-};
-
-// Get display size
-const getProductSize = (product: ProductResponse) => {
-  if (product.size) return product.size;
-  if (product.id === 1) return '50ml';
-  if (product.id === 2) return '100ml';
-  if (product.id === 3) return '6g';
-  if (product.id === 4) return '7ml';
-  if (product.id === 5) return '100ml';
-  if (product.id === 6) return '50ml';
-  if (product.id === 7) return '160ml';
-  return '50ml';
-};
-
-// Get display review count matching reference design
-const getProductReviewCount = (product: ProductResponse) => {
-  const lookup: Record<number, number> = { 1: 124, 2: 98, 3: 76, 4: 83, 5: 54, 6: 43, 7: 67, 8: 48 };
-  return lookup[product.id] || 65;
-};
-
-// Get display rating matching reference design
 const getProductRating = (product: ProductResponse) => {
-  if (product.averageRating && product.averageRating > 0) return product.averageRating;
-  const lookup: Record<number, number> = { 1: 4.8, 2: 4.6, 3: 4.7, 4: 4.5, 5: 4.6, 6: 4.5, 7: 4.7, 8: 4.4 };
-  return lookup[product.id] || 4.6;
+  return Number.isFinite(product.averageRating) ? product.averageRating : 0;
 };
 
 export default function CustomerDashboard() {
@@ -129,10 +99,21 @@ export default function CustomerDashboard() {
   // Active sub-view modal (orders, profile, addresses, coupons, reviews, support, cart)
   const [activeModal, setActiveModal] = useState<
     'orders' | 'wishlist' | 'profile' | 'addresses' | 'coupons' | 'reviews' | 'support' | 'cart' | null
-  >(null);
+  >(() => {
+    const panel = new URLSearchParams(window.location.search).get('panel');
+    return panel === 'wishlist' ||
+      panel === 'profile' ||
+      panel === 'addresses' ||
+      panel === 'coupons' ||
+      panel === 'reviews' ||
+      panel === 'support'
+      ? panel
+      : null;
+  });
 
   // Catalog Data from Backend
   const [products, setProducts] = useState<ProductResponse[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [brands, setBrands] = useState<BrandResponse[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -179,6 +160,28 @@ export default function CustomerDashboard() {
     }, 3200);
   }, []);
 
+  useEffect(() => {
+    const panel = new URLSearchParams(location.split('?')[1] ?? '').get('panel');
+    if (
+      panel === 'wishlist' ||
+      panel === 'profile' ||
+      panel === 'addresses' ||
+      panel === 'coupons' ||
+      panel === 'reviews' ||
+      panel === 'support'
+    ) {
+      setActiveModal(panel);
+      if (panel === 'addresses' && getAuthToken()) {
+        fetchAddresses()
+          .then(setAddresses)
+          .catch((err) => {
+            console.error('Error fetching addresses:', err);
+            showToast('Unable to load your addresses. Please try again.');
+          });
+      }
+    }
+  }, [location, showToast]);
+
   // Debounce search query input (300ms)
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -192,7 +195,12 @@ export default function CustomerDashboard() {
     const token = getAuthToken();
     if (!token) {
       // If visitor navigated directly to protected sub-routes, redirect to sign-in
-      if (location === '/account' || location === '/cart' || location === '/wishlist') {
+      const protectedPath = location.split('?')[0];
+      if (
+        protectedPath === '/account' ||
+        protectedPath === '/cart' ||
+        protectedPath === '/wishlist'
+      ) {
         setLocation('/sign-in?redirect=' + encodeURIComponent(location));
         return;
       }
@@ -272,6 +280,7 @@ export default function CustomerDashboard() {
     })
       .then((page) => {
         setProducts(page.content || []);
+        setTotalProducts(page.totalElements ?? page.content?.length ?? 0);
       })
       .catch((err) => {
         console.error('Error loading products from Spring Boot:', err);
@@ -344,17 +353,8 @@ export default function CustomerDashboard() {
   // Order products to match reference display when on default popularity sort
   const sortedAndFilteredProducts = useMemo(() => {
     const list = [...filteredProducts];
-    if (sortBy === 'popularity') {
-      const preferredOrder = [1, 2, 3, 4, 5, 6, 7, 8];
-      list.sort((a, b) => {
-        const idxA = preferredOrder.indexOf(a.id);
-        const idxB = preferredOrder.indexOf(b.id);
-        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-        if (idxA !== -1) return -1;
-        if (idxB !== -1) return 1;
-        return 0;
-      });
-    }
+    if (sortBy === 'price-asc') list.sort((a, b) => (a.sellingPrice || a.price) - (b.sellingPrice || b.price));
+    if (sortBy === 'price-desc') list.sort((a, b) => (b.sellingPrice || b.price) - (a.sellingPrice || a.price));
     return list;
   }, [filteredProducts, sortBy]);
 
@@ -533,16 +533,6 @@ export default function CustomerDashboard() {
   }
 
   const customerName = user?.fullName || user?.email || '';
-  const customerInitials = customerName
-    ? customerName
-        .split(' ')
-        .filter(Boolean)
-        .map((w) => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : 'MB';
-
   return (
     <div className="mb-dashboard-layout">
       {/* Toast notification */}
@@ -553,222 +543,34 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-      {/* Mobile Sidebar Backdrop */}
-      <div
-        className={`mb-sidebar-backdrop ${mobileSidebarOpen ? 'show' : ''}`}
-        onClick={() => setMobileSidebarOpen(false)}
+      <MalkazSidebar
+        activeItem={activeModal ?? 'home'}
+        isOpen={mobileSidebarOpen}
+        isSignedIn={Boolean(user)}
+        onClose={() => setMobileSidebarOpen(false)}
+        onLogout={handleLogout}
+        onAction={(action) => {
+          if (!user) {
+            const messages = {
+              wishlist: 'Please log in or create an account to view your wishlist.',
+              profile: 'Please log in to view your profile.',
+              addresses: 'Please log in to manage your addresses.',
+              coupons: 'Please log in to view available coupons and offers.',
+              reviews: 'Please log in to view your reviews.',
+              support: 'Please log in to contact support.',
+            };
+            showToast(messages[action]);
+            setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
+            return;
+          }
+          if (action === 'addresses') {
+            void handleOpenAddresses();
+          } else {
+            setActiveModal(action);
+          }
+        }}
       />
 
-      {/* ====================================================================
-          1. LEFT SIDEBAR
-          ==================================================================== */}
-      <aside className={`mb-sidebar mz-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>
-        <div className="mb-sidebar-top mz-sidebar-top">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="mb-sidebar-brand mz-sidebar-brand"
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-label="MALKAZ Royal Jewels"
-          >
-            <img
-              src="/malka-zai-emblem.png"
-              alt="MALKAZ"
-              className="mb-sidebar-logo-img mz-sidebar-logo-emblem"
-              width={110}
-              height={95}
-            />
-            <span className="mz-sidebar-brand-name">MALKAZ</span>
-          </Link>
-
-          {/* Navigation Items */}
-          <nav>
-            <ul className="mb-sidebar-nav mz-sidebar-nav">
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link mz-sidebar-link ${activeModal === null ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveModal(null);
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Home size={18} />
-                  <span>Home</span>
-                </button>
-              </li>
-
-              <li>
-                <Link
-                  href="/orders"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Package size={18} />
-                  <span>My Orders</span>
-                </Link>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link mz-sidebar-link ${activeModal === 'wishlist' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in or create an account to view your wishlist.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    setActiveModal('wishlist');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Heart size={18} />
-                  <span>Wishlist</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link mz-sidebar-link ${activeModal === 'profile' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in to view your profile.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    setActiveModal('profile');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <UserIcon size={18} />
-                  <span>My Profile</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link mz-sidebar-link ${activeModal === 'addresses' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in to manage your addresses.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    handleOpenAddresses();
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <MapPin size={18} />
-                  <span>Addresses</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link mz-sidebar-link ${activeModal === 'coupons' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in to view available coupons and offers.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    setActiveModal('coupons');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Ticket size={18} />
-                  <span>Coupons & Offers</span>
-                </button>
-              </li>
-
-              <li>
-                <Link
-                  href="/share-referral"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Share2 size={18} />
-                  <span>Share & Referral</span>
-                </Link>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link mz-sidebar-link ${activeModal === 'reviews' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (!user) {
-                      showToast('Please log in to view your reviews.');
-                      setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      return;
-                    }
-                    setActiveModal('reviews');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Star size={18} />
-                  <span>Reviews</span>
-                </button>
-              </li>
-
-              <li>
-                <button
-                  type="button"
-                  className={`mb-sidebar-link mz-sidebar-link ${activeModal === 'support' ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveModal('support');
-                    setMobileSidebarOpen(false);
-                  }}
-                >
-                  <Headphones size={18} />
-                  <span>Help & Support</span>
-                </button>
-              </li>
-
-              <li style={{ marginTop: 12 }}>
-                {user ? (
-                  <button
-                    type="button"
-                    className="mb-sidebar-link mz-sidebar-link logout-link"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={18} />
-                    <span>Logout</span>
-                  </button>
-                ) : (
-                  <Link
-                    href="/sign-in"
-                    className="mb-sidebar-link mz-sidebar-link login-link"
-                    onClick={() => setMobileSidebarOpen(false)}
-                  >
-                    <UserIcon size={18} />
-                    <span>Sign In</span>
-                  </Link>
-                )}
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        {/* Bottom Royal Ornament */}
-        <div className="mz-sidebar-bottom-ornament">
-          <div className="mz-sidebar-deco-ornament">✦ ❖ ✦</div>
-          <div className="mz-sidebar-tagline-text">
-            Timeless Beauty
-            <br />
-            Forever Jewellery
-          </div>
-          <div className="mz-sidebar-deco-ornament">✦ ❖ ✦</div>
-        </div>
-      </aside>
-
-      {/* ====================================================================
-          MAIN DASHBOARD BODY
-          ==================================================================== */}
       <div className="mb-main-content">
         {/* ==================================================================
             2. TOP HEADER
@@ -817,9 +619,9 @@ export default function CustomerDashboard() {
               data-testid="header-wishlist-btn"
             >
               <Heart size={20} />
-              <span className="mb-header-badge mz-header-badge">
-                {wishlistCount > 0 ? wishlistCount : 3}
-              </span>
+              {wishlistCount > 0 && (
+                <span className="mb-header-badge mz-header-badge">{wishlistCount}</span>
+              )}
             </button>
 
             {/* Cart icon button */}
@@ -838,53 +640,26 @@ export default function CustomerDashboard() {
               data-testid="header-cart-btn"
             >
               <ShoppingCart size={20} />
-              <span className="mb-header-badge mz-header-badge">
-                {cartItemCount > 0 ? cartItemCount : 2}
-              </span>
+              {cartItemCount > 0 && (
+                <span className="mb-header-badge mz-header-badge">{cartItemCount}</span>
+              )}
             </button>
 
             {/* Customer profile dropdown */}
             <div className="mb-header-profile-wrap mz-header-profile-wrap">
-              <div
+              <button
+                type="button"
                 className="mb-header-profile-chip mz-header-profile-chip mb-customer-profile-pill"
                 onClick={() => setProfileDropdownOpen((o) => !o)}
-                role="button"
-                tabIndex={0}
+                aria-expanded={profileDropdownOpen}
                 aria-label="User account menu"
                 data-testid="header-profile-chip"
               >
                 <div className="mb-header-avatar mz-header-avatar mb-customer-avatar-circle">
-                  {user?.profileImage ? (
-                    <img
-                      src={user.profileImage}
-                      alt={customerName || 'Customer'}
-                      className="mz-avatar-img"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/customer-avatar.jpg';
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src="/customer-avatar.jpg"
-                      alt={customerName || 'Customer'}
-                      className="mz-avatar-img"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const fallback = target.parentElement?.querySelector('.mz-avatar-initials');
-                        if (fallback) (fallback as HTMLElement).style.display = 'block';
-                      }}
-                    />
-                  )}
-                  <span
-                    className="mz-avatar-initials"
-                    style={{ display: 'none' }}
-                  >
-                    {customerInitials}
-                  </span>
+                  <UserIcon size={18} aria-hidden="true" />
                 </div>
                 <span className="mb-header-profile-name mz-header-profile-name mb-customer-profile-name">
-                  {customerName || 'Mubashir Ahmed'}
+                  {customerName || 'Sign in'}
                 </span>
                 <ChevronDown
                   size={15}
@@ -894,13 +669,13 @@ export default function CustomerDashboard() {
                     transition: 'transform 0.2s ease',
                   }}
                 />
-              </div>
+              </button>
 
               {profileDropdownOpen && (
                 <div className="mb-header-profile-menu mz-header-profile-menu">
                   <div className="mb-profile-menu-header">
-                    <div className="mb-profile-menu-name">{customerName || 'Mubashir Ahmed'}</div>
-                    <div className="mb-profile-menu-email">{user?.email || 'mubashir.royal@malkaz.com'}</div>
+                    <div className="mb-profile-menu-name">{customerName || 'Welcome to MALKAZ'}</div>
+                    {user?.email && <div className="mb-profile-menu-email">{user.email}</div>}
                   </div>
 
                   <button
@@ -923,7 +698,11 @@ export default function CustomerDashboard() {
                     type="button"
                     className="mb-profile-menu-item"
                     onClick={() => {
-                      handleOpenOrders();
+                      if (user) {
+                        void handleOpenOrders();
+                      } else {
+                        setLocation('/sign-in?redirect=' + encodeURIComponent('/orders'));
+                      }
                       setProfileDropdownOpen(false);
                     }}
                   >
@@ -935,7 +714,11 @@ export default function CustomerDashboard() {
                     type="button"
                     className="mb-profile-menu-item"
                     onClick={() => {
-                      handleOpenAddresses();
+                      if (user) {
+                        void handleOpenAddresses();
+                      } else {
+                        setLocation('/sign-in?redirect=' + encodeURIComponent('/account?panel=addresses'));
+                      }
                       setProfileDropdownOpen(false);
                     }}
                   >
@@ -947,7 +730,11 @@ export default function CustomerDashboard() {
                     type="button"
                     className="mb-profile-menu-item"
                     onClick={() => {
-                      setActiveModal('wishlist');
+                      if (user) {
+                        setActiveModal('wishlist');
+                      } else {
+                        setLocation('/sign-in?redirect=' + encodeURIComponent('/account?panel=wishlist'));
+                      }
                       setProfileDropdownOpen(false);
                     }}
                   >
@@ -1026,17 +813,13 @@ export default function CustomerDashboard() {
               JEWELLERY CATEGORY SHORTCUTS
               ================================================================ */}
           <section className="mz-category-shortcuts-row">
-            {[
-              { name: 'Necklaces', img: '/cat-necklaces.jpg' },
-              { name: 'Earrings', img: '/cat-earrings.jpg' },
-              { name: 'Rings', img: '/cat-rings.jpg' },
-              { name: 'Bangles', img: '/cat-bangles.jpg' },
-              { name: 'Bracelets', img: '/cat-bracelets.jpg' },
-            ].map((cat) => {
+            {categories
+              .filter((category) => category.active !== false)
+              .map((cat) => {
               const isSelected = selectedCategory === cat.name;
               return (
                 <button
-                  key={cat.name}
+                  key={cat.id}
                   type="button"
                   className={`mz-category-card ${isSelected ? 'active' : ''}`}
                   onClick={() => {
@@ -1045,7 +828,11 @@ export default function CustomerDashboard() {
                   }}
                 >
                   <div className="mz-cat-card-img-wrap">
-                    <img src={cat.img} alt={cat.name} className="mz-cat-card-img" />
+                    <img
+                      src={getJewelleryImage(cat.imageUrl, cat.name, cat.id)}
+                      alt={cat.name}
+                      className="mz-cat-card-img"
+                    />
                   </div>
                   <span className="mz-cat-card-name">{cat.name}</span>
                   <ArrowRight size={13} className="mz-cat-card-arrow" />
@@ -1082,26 +869,11 @@ export default function CustomerDashboard() {
 
                 {categoryOpen && (
                   <div className="mb-filter-options">
-                    {(() => {
-                      const referenceCounts: Record<string, number> = {
-                        Necklaces: 12,
-                        Earrings: 15,
-                        Rings: 10,
-                        Bangles: 8,
-                        Bracelets: 6,
-                      };
-                      const activeCategories = categories.filter((c) => c.active !== false);
-                      const displayCats = activeCategories.length > 0 ? activeCategories : [
-                        { id: 1, name: 'Necklaces' },
-                        { id: 2, name: 'Earrings' },
-                        { id: 3, name: 'Rings' },
-                        { id: 4, name: 'Bangles' },
-                        { id: 5, name: 'Bracelets' },
-                      ];
-
-                      return displayCats.map((cat) => {
+                    {categories
+                      .filter((category) => category.active !== false)
+                      .map((cat) => {
+                        const count = categoryCounts[cat.name] || 0;
                         const isChecked = selectedCategory === cat.name;
-                        const count = categoryCounts[cat.name] || referenceCounts[cat.name] || 0;
                         return (
                           <label key={cat.id} className="mb-filter-checkbox-row mz-checkbox-row">
                             <span className="mb-filter-label-group">
@@ -1116,8 +888,7 @@ export default function CustomerDashboard() {
                             <span className="mb-filter-count mz-filter-count">({count})</span>
                           </label>
                         );
-                      });
-                    })()}
+                      })}
                   </div>
                 )}
               </div>
@@ -1164,24 +935,23 @@ export default function CustomerDashboard() {
 
                 {ratingOpen && (
                   <div className="mb-filter-options">
-                    {[
-                      { rating: 4, label: '4 & above', count: 28 },
-                      { rating: 3, label: '3 & above', count: 45 },
-                      { rating: 2, label: '2 & above', count: 62 },
-                    ].map((row) => (
-                      <label key={row.rating} className="mb-filter-checkbox-row mz-checkbox-row">
-                        <span className="mb-filter-label-group">
-                          <input
-                            type="checkbox"
-                            className="mb-checkbox mz-checkbox"
-                            checked={minRating === row.rating}
-                            onChange={() => setMinRating(minRating === row.rating ? null : row.rating)}
-                          />
-                          <span>{row.label}</span>
-                        </span>
-                        <span className="mb-filter-count mz-filter-count">({row.count})</span>
-                      </label>
-                    ))}
+                    {[4, 3, 2].map((rating) => {
+                      const count = products.filter((product) => getProductRating(product) >= rating).length;
+                      return (
+                        <label key={rating} className="mb-filter-checkbox-row mz-checkbox-row">
+                          <span className="mb-filter-label-group">
+                            <input
+                              type="checkbox"
+                              className="mb-checkbox mz-checkbox"
+                              checked={minRating === rating}
+                              onChange={() => setMinRating(minRating === rating ? null : rating)}
+                            />
+                            <span>{rating} & above</span>
+                          </span>
+                          <span className="mb-filter-count mz-filter-count">({count})</span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1199,24 +969,27 @@ export default function CustomerDashboard() {
 
                 {discountOpen && (
                   <div className="mb-filter-options">
-                    {[
-                      { pct: 10, label: '10% or more', count: 18 },
-                      { pct: 20, label: '20% or more', count: 32 },
-                      { pct: 30, label: '30% or more', count: 21 },
-                    ].map((row) => (
-                      <label key={row.pct} className="mb-filter-checkbox-row mz-checkbox-row">
-                        <span className="mb-filter-label-group">
-                          <input
-                            type="checkbox"
-                            className="mb-checkbox mz-checkbox"
-                            checked={minDiscount === row.pct}
-                            onChange={() => setMinDiscount(minDiscount === row.pct ? null : row.pct)}
-                          />
-                          <span>{row.label}</span>
-                        </span>
-                        <span className="mb-filter-count mz-filter-count">({row.count})</span>
-                      </label>
-                    ))}
+                    {[10, 20, 30].map((pct) => {
+                      const count = products.filter((product) => {
+                        const discountPrice = product.discountPrice;
+                        if (!discountPrice || discountPrice >= product.price) return false;
+                        return ((product.price - discountPrice) / product.price) * 100 >= pct;
+                      }).length;
+                      return (
+                        <label key={pct} className="mb-filter-checkbox-row mz-checkbox-row">
+                          <span className="mb-filter-label-group">
+                            <input
+                              type="checkbox"
+                              className="mb-checkbox mz-checkbox"
+                              checked={minDiscount === pct}
+                              onChange={() => setMinDiscount(minDiscount === pct ? null : pct)}
+                            />
+                            <span>{pct}% or more</span>
+                          </span>
+                          <span className="mb-filter-count mz-filter-count">({count})</span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1235,7 +1008,7 @@ export default function CustomerDashboard() {
 
                 <div className="mz-controls-right-wrap">
                   <div className="mb-products-count-text mz-products-count-text">
-                    Showing 1–{sortedAndFilteredProducts.length} of {products.length > 8 ? products.length : 32} products
+                    Showing {sortedAndFilteredProducts.length ? 1 : 0}–{sortedAndFilteredProducts.length} of {totalProducts} products
                   </div>
 
                   {/* Accessible sort dropdown */}
@@ -1305,7 +1078,7 @@ export default function CustomerDashboard() {
               ) : (
                 <div className="mb-product-grid mz-product-grid">
                   {sortedAndFilteredProducts.map((product) => (
-                    <MyBeautifyProductCard
+                    <MalkazProductCard
                       key={product.id}
                       product={product}
                       isWishlisted={wishlistIds.has(product.id)}
@@ -1346,7 +1119,7 @@ export default function CustomerDashboard() {
                     Your bag is empty
                   </h4>
                   <p className="mb-empty-desc">
-                    Discover glowing essentials from our catalog and add them here.
+                    Discover MALKAZ jewellery and add your favourite pieces here.
                   </p>
                   <button
                     type="button"
@@ -1558,7 +1331,7 @@ export default function CustomerDashboard() {
                   </div>
                   <h4 className="mb-empty-title">No orders yet</h4>
                   <p className="mb-empty-desc">
-                    Your beauty purchases will be displayed here as soon as you checkout.
+                    Your jewellery purchases will appear here after checkout.
                   </p>
                 </div>
               ) : (
@@ -1616,8 +1389,9 @@ export default function CustomerDashboard() {
                 <div
                   className="mb-header-avatar"
                   style={{ width: 64, height: 64, fontSize: 22 }}
+                  aria-hidden="true"
                 >
-                  {customerInitials}
+                  <UserIcon size={28} />
                 </div>
                 <div>
                   <h4 style={{ margin: 0, fontSize: 20, color: 'var(--mb-text-dark)' }}>
@@ -1942,17 +1716,17 @@ export default function CustomerDashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ padding: 16, background: '#FCF6F4', borderRadius: 12 }}>
                   <h4 style={{ margin: '0 0 6px', fontSize: 15, color: 'var(--mb-primary)' }}>
-                    MyBeautify Customer Concierge
+                    MALKAZ Client Care
                   </h4>
                   <p style={{ margin: 0, fontSize: 13, color: 'var(--mb-text-muted)' }}>
-                    Our dedicated beauty specialists are here to assist you with inquiries regarding orders, skincare recommendations, and product ingredients.
+                    Our client care team can help with orders, jewellery care, sizing, and collection questions.
                   </p>
                 </div>
 
                 <div style={{ fontSize: 13.5, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div><strong>Email:</strong> support@mybeautify.com</div>
+                  <div><strong>Client Care:</strong> MALKAZ Royal Jewels</div>
                   <div><strong>Phone:</strong> +91 98765 43210 (Mon–Fri, 9am–6pm IST)</div>
-                  <div><strong>Storefront:</strong> Luxury Cosmetics Collection</div>
+                  <div><strong>Store:</strong> Fine Jewellery Collection</div>
                 </div>
 
                 <button

@@ -20,15 +20,15 @@ export function BrandsPage() {
       <main className="page">
         <div className="catalog-head">
           <div>
-            <div className="eyebrow">The makers</div>
+            <div className="eyebrow">MALKAZ designers</div>
             <h1>
-              Good people,
+              Discover the
               <br />
-              good formulas.
+              collections.
             </h1>
           </div>
           <p className="section-copy">
-            Independent houses and thoughtful laboratories we are happy to put our name beside.
+            Browse the jewellery houses and makers featured in the MALKAZ collection.
           </p>
         </div>
         {query.isLoading ? (

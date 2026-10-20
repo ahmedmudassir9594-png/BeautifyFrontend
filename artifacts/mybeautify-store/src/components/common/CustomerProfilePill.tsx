@@ -1,6 +1,6 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { ChevronDown, PackageCheck, User as UserIcon, Lock } from 'lucide-react';
+import { ChevronDown, Lock, PackageCheck, User as UserIcon } from 'lucide-react';
 import type { UserResponse } from '@/types/auth.types';
 
 interface CustomerProfilePillProps {
@@ -10,6 +10,21 @@ interface CustomerProfilePillProps {
   onClose: () => void;
   onLogout: () => void;
 }
+
+const menuItemStyle: React.CSSProperties = {
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  padding: '10px 16px',
+  border: 0,
+  background: 'transparent',
+  color: '#063B2F',
+  fontSize: 13,
+  textAlign: 'left',
+  textDecoration: 'none',
+  cursor: 'pointer',
+};
 
 export function CustomerProfilePill({
   user,
@@ -32,20 +47,7 @@ export function CustomerProfilePill({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, onClose]);
 
-  // Compute initials dynamically based on real user data
-  const initials = useMemo(() => {
-    if (!user || !user.fullName) {
-      if (user?.email) return user.email.substring(0, 2).toUpperCase();
-      return 'MB';
-    }
-    const parts = user.fullName.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return user.fullName.substring(0, 2).toUpperCase();
-  }, [user]);
-
-  const displayName = user?.fullName || user?.email || 'Customer';
+  const displayName = user?.fullName || user?.email || 'Sign in';
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
@@ -58,8 +60,8 @@ export function CustomerProfilePill({
           display: 'inline-flex',
           alignItems: 'center',
           gap: 8,
-          background: '#FFF0F4',
-          border: '1px solid #F5D3DC',
+          background: '#F8F4EB',
+          border: '1px solid #E8DEC8',
           borderRadius: 999,
           padding: '4px 12px 4px 5px',
           cursor: 'pointer',
@@ -73,8 +75,8 @@ export function CustomerProfilePill({
             width: 28,
             height: 28,
             borderRadius: '50%',
-            background: '#D8899E',
-            color: '#FFFFFF',
+            background: '#063B2F',
+            color: '#D4AF63',
             fontSize: 11,
             fontWeight: 700,
             display: 'flex',
@@ -84,15 +86,7 @@ export function CustomerProfilePill({
             flexShrink: 0,
           }}
         >
-          {user?.profileImage ? (
-            <img
-              src={user.profileImage}
-              alt={displayName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <span>{initials}</span>
-          )}
+          <UserIcon size={16} aria-hidden="true" />
         </div>
 
         <span
@@ -100,14 +94,14 @@ export function CustomerProfilePill({
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: '#4A1525',
+            color: '#063B2F',
             whiteSpace: 'nowrap',
           }}
         >
           {displayName}
         </span>
 
-        <ChevronDown size={14} style={{ color: '#8C5A67' }} />
+        <ChevronDown size={14} style={{ color: '#806A3E' }} />
       </button>
 
       {isOpen && (
@@ -117,74 +111,50 @@ export function CustomerProfilePill({
             right: 0,
             top: '115%',
             background: '#FFFFFF',
-            border: '1px solid #ECE0E3',
+            border: '1px solid #E8DEC8',
             borderRadius: 12,
-            boxShadow: '0 8px 24px rgba(70, 20, 35, 0.12)',
+            boxShadow: '0 8px 24px rgba(6, 59, 47, 0.12)',
             minWidth: 180,
             zIndex: 60,
             padding: '6px 0',
           }}
         >
-          <Link
-            href="/orders"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '10px 16px',
-              fontSize: 13,
-              color: '#4A1525',
-              textDecoration: 'none',
-              transition: 'background 0.15s ease',
-            }}
-            onClick={onClose}
-          >
-            <PackageCheck size={16} />
-            <span>My Orders</span>
-          </Link>
-
-          <Link
-            href="/account"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '10px 16px',
-              fontSize: 13,
-              color: '#4A1525',
-              textDecoration: 'none',
-              transition: 'background 0.15s ease',
-            }}
-            onClick={onClose}
-          >
-            <UserIcon size={16} />
-            <span>My Profile</span>
-          </Link>
-
-          <button
-            type="button"
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '10px 16px',
-              fontSize: 13,
-              color: '#A01548',
-              background: 'transparent',
-              border: 'none',
-              textAlign: 'left',
-              cursor: 'pointer',
-              transition: 'background 0.15s ease',
-            }}
-            onClick={() => {
-              onClose();
-              onLogout();
-            }}
-          >
-            <Lock size={16} />
-            <span>Logout</span>
-          </button>
+          {user ? (
+            <>
+              <Link
+                href="/orders"
+                style={menuItemStyle}
+                onClick={onClose}
+              >
+                <PackageCheck size={16} />
+                <span>My Orders</span>
+              </Link>
+              <Link
+                href="/account"
+                style={menuItemStyle}
+                onClick={onClose}
+              >
+                <UserIcon size={16} />
+                <span>My Profile</span>
+              </Link>
+              <button
+                type="button"
+                style={{ ...menuItemStyle, color: '#9A4D3F' }}
+                onClick={() => {
+                  onClose();
+                  onLogout();
+                }}
+              >
+                <Lock size={16} />
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <Link href="/sign-in" style={menuItemStyle} onClick={onClose}>
+              <UserIcon size={16} />
+              <span>Sign in to your account</span>
+            </Link>
+          )}
         </div>
       )}
     </div>

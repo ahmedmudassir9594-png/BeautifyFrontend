@@ -1,31 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
 :root {
-  --background: 36 54% 97%;
-  --foreground: 344 24% 23%;
-  --card: 32 58% 99%;
-  --card-foreground: 344 24% 23%;
-  --popover: 32 58% 99%;
-  --popover-foreground: 344 24% 23%;
-  --primary: 346 30% 39%;
-  --primary-foreground: 36 54% 97%;
-  --secondary: 350 42% 86%;
-  --secondary-foreground: 344 24% 23%;
-  --muted: 346 28% 93%;
-  --muted-foreground: 344 15% 45%;
-  --accent: 346 42% 62%;
-  --accent-foreground: 36 54% 97%;
+  --background: 42 36% 97%;
+  --foreground: 157 51% 14%;
+  --card: 42 40% 99%;
+  --card-foreground: 157 51% 14%;
+  --popover: 42 40% 99%;
+  --popover-foreground: 157 51% 14%;
+  --primary: 160 82% 14%;
+  --primary-foreground: 42 50% 96%;
+  --secondary: 42 46% 88%;
+  --secondary-foreground: 157 51% 14%;
+  --muted: 42 30% 92%;
+  --muted-foreground: 157 18% 40%;
+  --accent: 42 55% 60%;
+  --accent-foreground: 160 82% 14%;
   --destructive: 0 62% 48%;
   --destructive-foreground: 36 54% 97%;
-  --border: 345 25% 84%;
-  --input: 345 25% 84%;
-  --ring: 346 30% 39%;
+  --border: 42 28% 82%;
+  --input: 42 28% 82%;
+  --ring: 42 55% 60%;
   --radius: 0.75rem;
   --app-font-sans: 'DM Sans', sans-serif;
-  --app-font-serif: 'Instrument Serif', Georgia, serif;
-  --app-font-mono: 'DM Mono', monospace;
+  --app-font-serif: 'Cormorant Garamond', Georgia, serif;
+  --app-font-mono: 'Cinzel', Georgia, serif;
 }
 
 * { box-sizing: border-box; }
@@ -72,11 +72,7 @@ h1, h2, h3, p { margin-top: 0; }
 .button.wide { width: 100%; }
 .hero-actions { display: flex; gap: 12px; margin-top: 30px; }
 .hero-art { min-height: 500px; background: hsl(var(--secondary)); position: relative; overflow: hidden; }
-.hero-art:before { content: ''; position: absolute; width: 72%; aspect-ratio: 1; border-radius: 50%; background: hsl(var(--accent)); right: -18%; top: -18%; opacity: .83; }
-.hero-art:after { content: 'MY BEAUTIFY'; position: absolute; font: 11px var(--app-font-mono); letter-spacing: .25em; bottom: 27px; left: 28px; color: hsl(var(--primary)); }
-.hero-bottle { position: absolute; width: 40%; height: 67%; background: linear-gradient(90deg, #a96b7d, #e7b3b9 35%, #7d465a 92%); left: 28%; bottom: -3%; border-radius: 35px 35px 12px 12px; box-shadow: 18px 26px 30px rgba(107,59,79,.18); transform: rotate(7deg); }
-.hero-bottle:before { content: ''; position: absolute; top: -13%; left: 18%; width: 64%; height: 20%; border-radius: 8px 8px 2px 2px; background: hsl(var(--primary)); }
-.hero-bottle:after { content: 'LUNE\\A botanical serum'; white-space: pre; position: absolute; text-align: center; line-height: 1.5; top: 42%; left: 15%; right: 15%; font: 14px var(--app-font-serif); color: hsl(var(--primary)); }
+.hero-art img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; }
 .section { padding: 90px 0 10px; }
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 25px; }
 .section-title { font: 46px/.98 var(--app-font-serif); letter-spacing: -.04em; margin: 10px 0 0; }

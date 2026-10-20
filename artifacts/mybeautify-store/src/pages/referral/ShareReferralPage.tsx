@@ -40,6 +40,7 @@ import { fetchCart } from '@/services/cart/cart.service';
 import { fetchWishlist } from '@/services/wishlist/wishlist.service';
 import type { UserResponse } from '@/types/auth.types';
 import HeaderSearchBar from '@/components/common/HeaderSearchBar';
+import { MalkazSidebar } from '@/components/layout/MalkazSidebar';
 import '@/styles/customer-dashboard.css';
 
 export function ShareReferralPage() {
@@ -123,13 +124,7 @@ export function ShareReferralPage() {
     };
   }, []);
 
-  const customerName = user?.fullName || user?.email || 'Mubashir Ahmed';
-  const customerInitials = useMemo(() => {
-    if (!customerName) return 'MA';
-    const parts = customerName.trim().split(/\s+/);
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    return customerName.substring(0, 2).toUpperCase();
-  }, [customerName]);
+  const customerName = user?.fullName || user?.email || 'Sign in';
 
   // Dynamic referral link constructed from production/browser origin
   const fullReferralLink = useMemo(() => {
@@ -207,171 +202,14 @@ export function ShareReferralPage() {
 
   return (
     <div className="mb-dashboard-layout">
-      {/* ====================================================================
-          1. LEFT SIDEBAR (Matching Dashboard with Share & Referral Active)
-          ==================================================================== */}
-      <aside className={`mb-sidebar mz-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>
-        <div className="mb-sidebar-top mz-sidebar-top">
-          {/* Logo with Original Artwork and MALKAZ Brand Text */}
-          <Link
-            href="/"
-            className="mb-sidebar-brand mz-sidebar-brand"
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-label="MALKAZ Royal Jewels"
-          >
-            <img
-              src="/malka-zai-emblem.png"
-              alt="MALKAZ"
-              className="mb-sidebar-logo-img mz-sidebar-logo-emblem"
-              width={110}
-              height={95}
-            />
-            <span className="mz-sidebar-brand-name">MALKAZ</span>
-          </Link>
+      <MalkazSidebar
+        activeItem="referral"
+        isOpen={mobileSidebarOpen}
+        isSignedIn={Boolean(user)}
+        onClose={() => setMobileSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
 
-          {/* Navigation Items */}
-          <nav>
-            <ul className="mb-sidebar-nav mz-sidebar-nav">
-              <li>
-                <Link
-                  href="/"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Home size={18} />
-                  <span>Home</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/orders"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Package size={18} />
-                  <span>My Orders</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/wishlist"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Heart size={18} />
-                  <span>Wishlist</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/account"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <UserIcon size={18} />
-                  <span>My Profile</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/account"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <MapPin size={18} />
-                  <span>Addresses</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Ticket size={18} />
-                  <span>Coupons & Offers</span>
-                </Link>
-              </li>
-
-              {/* Share & Referral Active Item */}
-              <li>
-                <Link
-                  href="/share-referral"
-                  className="mb-sidebar-link mz-sidebar-link active"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Share2 size={18} />
-                  <span>Share & Referral</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Star size={18} />
-                  <span>Reviews</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/"
-                  className="mb-sidebar-link mz-sidebar-link"
-                  onClick={() => setMobileSidebarOpen(false)}
-                >
-                  <Headphones size={18} />
-                  <span>Help & Support</span>
-                </Link>
-              </li>
-
-              <li style={{ marginTop: 12 }}>
-                {user ? (
-                  <button
-                    type="button"
-                    className="mb-sidebar-link mz-sidebar-link logout-link"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={18} />
-                    <span>Logout</span>
-                  </button>
-                ) : (
-                  <Link
-                    href="/sign-in"
-                    className="mb-sidebar-link mz-sidebar-link login-link"
-                    onClick={() => setMobileSidebarOpen(false)}
-                  >
-                    <UserIcon size={18} />
-                    <span>Sign In</span>
-                  </Link>
-                )}
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        {/* Bottom Tagline Exact Match */}
-        <div className="mz-sidebar-bottom-ornament">
-          <div className="mz-sidebar-deco-ornament">✦ ❖ ✦</div>
-          <div className="mz-sidebar-tagline-text">
-            Timeless Beauty
-            <br />
-            Forever Jewellery
-          </div>
-          <div className="mz-sidebar-deco-ornament">✦ ❖ ✦</div>
-        </div>
-      </aside>
-
-      {/* ====================================================================
-          MAIN CONTENT AREA
-          ==================================================================== */}
       <div className="mb-main-content">
         {/* Top Header */}
         <header className="mb-top-header mz-top-header">
@@ -422,28 +260,15 @@ export function ShareReferralPage() {
 
             {/* Neutral Customer profile dropdown */}
             <div className="mb-header-profile-wrap mz-header-profile-wrap">
-              <div
+              <button
+                type="button"
                 className="mb-header-profile-chip mz-header-profile-chip mb-customer-profile-pill"
                 onClick={() => setProfileDropdownOpen((o) => !o)}
-                role="button"
-                tabIndex={0}
+                aria-expanded={profileDropdownOpen}
                 aria-label="User account menu"
               >
                 <div className="mb-header-avatar mz-header-avatar mb-customer-avatar-circle">
-                  <img
-                    src="/customer-avatar.jpg"
-                    alt={customerName}
-                    className="mz-avatar-img"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const fallback = target.parentElement?.querySelector('.mz-avatar-initials');
-                      if (fallback) (fallback as HTMLElement).style.display = 'block';
-                    }}
-                  />
-                  <span className="mz-avatar-initials" style={{ display: 'none' }}>
-                    {customerInitials}
-                  </span>
+                  <UserIcon size={18} aria-hidden="true" />
                 </div>
                 <span className="mb-header-profile-name mz-header-profile-name mb-customer-profile-name">
                   {customerName}
@@ -456,13 +281,13 @@ export function ShareReferralPage() {
                     transition: 'transform 0.2s ease',
                   }}
                 />
-              </div>
+              </button>
 
               {profileDropdownOpen && (
                 <div className="mb-header-profile-menu mz-header-profile-menu">
                   <div className="mb-profile-menu-header">
                     <div className="mb-profile-menu-name">{customerName}</div>
-                    <div className="mb-profile-menu-email">{user?.email || 'mubashir.royal@malkaz.com'}</div>
+                    {user?.email && <div className="mb-profile-menu-email">{user.email}</div>}
                   </div>
 
                   <Link

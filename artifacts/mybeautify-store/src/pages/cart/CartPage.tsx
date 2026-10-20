@@ -61,8 +61,8 @@ export function CartPage() {
         <main className="page">
           <div className="empty-state" style={{ marginTop: 80 }}>
             <div className="eyebrow">Order {ordered.id}</div>
-            <h2>Beautifully done.</h2>
-            <p>Your order is on its way to becoming part of your ritual.</p>
+            <h2>Thank you for choosing MALKAZ.</h2>
+            <p>Your jewellery order has been received.</p>
             <Link href="/account" className="button" data-testid="link-order-account">
               View order history
             </Link>
@@ -91,7 +91,7 @@ export function CartPage() {
             <h1>Take a moment.</h1>
           </div>
           <p className="section-copy">
-            {items.length} pieces selected · Review your ritual before you go.
+            {items.length} pieces selected · Review your jewellery before checkout.
           </p>
         </div>
 

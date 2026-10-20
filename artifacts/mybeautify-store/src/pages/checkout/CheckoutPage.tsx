@@ -43,29 +43,11 @@ import {
   type CouponResponse,
 } from '@/lib/api';
 import { CustomerProfilePill, HeaderCartButton } from '@/components/common';
+import { getJewelleryImage } from '@/lib/jewellery-images';
 import '@/styles/checkout.css';
 
-// Product Image metadata fallback
-const PRODUCT_IMAGES: Record<number, string> = {
-  1: '/products/dew-cloud-cream/1.jpg',
-  2: '/products/rose-milk-cleanser.jpg',
-  3: '/products/silk-veil-cream-blush.jpg',
-  4: '/products/gloss-ritual-lip-oil.jpg',
-  5: '/products/dew-cloud-cream/1.jpg',
-  6: '/products/dew-cloud-cream/1.jpg',
-  7: '/products/rose-milk-cleanser.jpg',
-};
-
-const getProductImage = (productId: number, fallbackUrl?: string, productName?: string) => {
-  if (fallbackUrl && fallbackUrl.startsWith('http')) return fallbackUrl;
-  if (fallbackUrl && fallbackUrl.startsWith('/')) return fallbackUrl;
-  if (PRODUCT_IMAGES[productId]) return PRODUCT_IMAGES[productId];
-  const lower = (productName || '').toLowerCase();
-  if (lower.includes('rose') || lower.includes('cleanser')) return '/products/rose-milk-cleanser.jpg';
-  if (lower.includes('blush')) return '/products/silk-veil-cream-blush.jpg';
-  if (lower.includes('lip') || lower.includes('oil')) return '/products/gloss-ritual-lip-oil.jpg';
-  return '/products/rose-milk-cleanser.jpg';
-};
+const getProductImage = (productId: number, imageUrl?: string, productName?: string) =>
+  getJewelleryImage(imageUrl, productName, productId);
 
 // Currency formatter
 const formatCurrency = (val: number | undefined | null) => {
@@ -427,7 +409,7 @@ export default function CheckoutPage() {
   if (authLoading) {
     return (
       <div className="mb-checkout-root" style={{ display: 'grid', placeItems: 'center', height: '100vh' }}>
-        <div style={{ textAlign: 'center', color: '#83213D' }}>
+        <div style={{ textAlign: 'center', color: '#063B2F' }}>
           <Loader2 size={38} className="animate-spin" style={{ margin: '0 auto 14px' }} />
           <p style={{ fontWeight: 600 }}>Loading checkout experience…</p>
         </div>
@@ -444,7 +426,7 @@ export default function CheckoutPage() {
             position: 'fixed',
             bottom: 24,
             right: 24,
-            background: '#83213D',
+            background: '#063B2F',
             color: '#FFFFFF',
             padding: '12px 22px',
             borderRadius: 24,
@@ -464,21 +446,21 @@ export default function CheckoutPage() {
 
       {/* ====================================================================
           1. HEADER (Exact match to reference mockup)
-          - Logo with MyBeautify & YOUR DAILY GLOW
+          - MALKAZ Royal Jewels branding
           - Center search bar
           - Wishlist, Cart with count, Profile icon & User initials pill
           - NO general navigation links!
           ==================================================================== */}
       <header className="mb-checkout-header">
-        <Link href="/" className="mb-checkout-logo-link" aria-label="MyBeautify - YOUR DAILY GLOW">
+        <Link href="/" className="mb-checkout-logo-link" aria-label="MALKAZ Royal Jewels">
           <img
-            src="/mybeautify-official-logo.png"
-            alt="MyBeautify"
+            src="/malka-zai-emblem.png"
+            alt="MALKAZ"
             className="mb-checkout-logo-img"
           />
           <div className="mb-checkout-brand-info">
-            <span className="mb-checkout-brand-title">MyBeautify</span>
-            <span className="mb-checkout-brand-sub">YOUR DAILY GLOW</span>
+            <span className="mb-checkout-brand-title">MALKAZ</span>
+            <span className="mb-checkout-brand-sub">ROYAL JEWELS</span>
           </div>
         </Link>
 
@@ -660,7 +642,7 @@ export default function CheckoutPage() {
                   <div className="mb-checkout-radio-circle">
                     {shippingMethod === 'standard' && <div className="mb-checkout-radio-dot" />}
                   </div>
-                  <Truck size={20} style={{ color: '#9E1B4C' }} />
+                  <Truck size={20} style={{ color: '#063B2F' }} />
                   <div className="mb-checkout-method-info">
                     <span className="mb-checkout-method-title">Standard Delivery</span>
                     <span className="mb-checkout-method-sub">3-5 business days</span>
@@ -714,7 +696,7 @@ export default function CheckoutPage() {
                   <div className="mb-checkout-radio-circle" style={{ marginTop: 2 }}>
                     {paymentMethod === 'COD' && <div className="mb-checkout-radio-dot" />}
                   </div>
-                  <Banknote size={22} style={{ color: '#9E1B4C', flexShrink: 0 }} />
+                  <Banknote size={22} style={{ color: '#063B2F', flexShrink: 0 }} />
                   <div className="mb-checkout-payment-card-details">
                     <span className="mb-checkout-payment-title">Cash on Delivery (COD)</span>
                     <span className="mb-checkout-payment-desc">Pay when you receive your order</span>
@@ -734,7 +716,7 @@ export default function CheckoutPage() {
                   <div className="mb-checkout-radio-circle" style={{ marginTop: 2 }}>
                     {paymentMethod === 'ONLINE' && <div className="mb-checkout-radio-dot" />}
                   </div>
-                  <CreditCard size={22} style={{ color: '#9E1B4C', flexShrink: 0 }} />
+                  <CreditCard size={22} style={{ color: '#063B2F', flexShrink: 0 }} />
                   <div className="mb-checkout-payment-card-details">
                     <span className="mb-checkout-payment-title">Online Payment</span>
                     <span className="mb-checkout-payment-desc">
@@ -853,7 +835,7 @@ export default function CheckoutPage() {
                         alt={item.productName}
                         className="mb-checkout-item-img"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/products/rose-milk-cleanser.jpg';
+                          (e.target as HTMLImageElement).src = getProductImage(item.productId, undefined, item.productName);
                         }}
                       />
                       <div className="mb-checkout-item-details">
@@ -962,16 +944,16 @@ export default function CheckoutPage() {
             <div className="mb-checkout-summary-watermark">
               <div className="mb-checkout-watermark-logo">
                 <img
-                  src="/mybeautify-official-logo.png"
-                  alt="MyBeautify"
+                  src="/malka-zai-emblem.png"
+                  alt="MALKAZ"
                   className="mb-checkout-watermark-img"
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
-                  <span className="mb-checkout-watermark-brand">MyBeautify</span>
-                  <span className="mb-checkout-watermark-tagline">YOUR DAILY GLOW</span>
+                  <span className="mb-checkout-watermark-brand">MALKAZ</span>
+                  <span className="mb-checkout-watermark-tagline">ROYAL JEWELS</span>
                 </div>
               </div>
-              <div className="mb-checkout-watermark-slogan">Pure beauty, delivered to you</div>
+              <div className="mb-checkout-watermark-slogan">MALKAZ jewellery, delivered with care</div>
               <div className="mb-checkout-watermark-heart">♥</div>
             </div>
           </div>
@@ -1007,22 +989,22 @@ export default function CheckoutPage() {
             <Headphones size={28} className="mb-checkout-trust-icon" />
             <div className="mb-checkout-trust-text">
               <span className="mb-checkout-trust-title">Customer Support</span>
-              <span className="mb-checkout-trust-sub">support@mybeautify.com</span>
+              <span className="mb-checkout-trust-sub">MALKAZ Client Care</span>
             </div>
           </div>
 
           <div className="mb-checkout-trust-item" style={{ justifyContent: 'flex-end' }}>
             <img
-              src="/mybeautify-official-logo.png"
-              alt="MyBeautify"
+              src="/malka-zai-emblem.png"
+              alt="MALKAZ"
               style={{ width: 34, height: 34, objectFit: 'contain' }}
             />
             <div className="mb-checkout-trust-text">
               <span className="mb-checkout-trust-title" style={{ fontFamily: 'var(--app-font-serif, Georgia, serif)', fontSize: 16 }}>
-                MyBeautify
+                MALKAZ
               </span>
               <span className="mb-checkout-trust-sub" style={{ fontSize: 9, letterSpacing: '0.12em' }}>
-                YOUR DAILY GLOW
+                ROYAL JEWELS
               </span>
             </div>
           </div>
@@ -1206,7 +1188,7 @@ export default function CheckoutPage() {
                         key={addr.id}
                         onClick={() => setSelectedAddress(addr)}
                         style={{
-                          border: isSelected ? '2px solid #9E1B4C' : '1px solid #ECD8DD',
+                          border: isSelected ? '2px solid #063B2F' : '1px solid #E8DEC8',
                           background: isSelected ? '#FFF1F5' : '#FFFFFF',
                           borderRadius: 12,
                           padding: '14px 16px',
@@ -1222,19 +1204,19 @@ export default function CheckoutPage() {
                             {isSelected && <div className="mb-checkout-radio-dot" />}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, fontSize: 13.5 }}>
-                            <span style={{ fontWeight: 700, color: '#2D121B' }}>
+                            <span style={{ fontWeight: 700, color: '#123A30' }}>
                               {addr.fullName || user?.fullName}
                               {addr.isDefault && (
-                                <span style={{ marginLeft: 8, fontSize: 11, background: '#FBE4EC', color: '#83213D', padding: '2px 6px', borderRadius: 4 }}>
+                                <span style={{ marginLeft: 8, fontSize: 11, background: '#F4EBD8', color: '#063B2F', padding: '2px 6px', borderRadius: 4 }}>
                                   Default
                                 </span>
                               )}
                             </span>
-                            <span style={{ color: '#552735' }}>
+                            <span style={{ color: '#123A30' }}>
                               {addr.addressLine1 || addr.street}
                               {addr.addressLine2 ? `, ${addr.addressLine2}` : ''}
                             </span>
-                            <span style={{ color: '#552735' }}>
+                            <span style={{ color: '#123A30' }}>
                               {addr.city}, {addr.state} - {addr.postalCode || addr.zipCode}
                             </span>
                             <span style={{ color: '#7A4B58', fontWeight: 500 }}>
@@ -1252,7 +1234,7 @@ export default function CheckoutPage() {
                           style={{
                             background: 'transparent',
                             border: 'none',
-                            color: '#9E1B4C',
+                            color: '#063B2F',
                             cursor: 'pointer',
                             padding: 6,
                           }}
@@ -1271,7 +1253,7 @@ export default function CheckoutPage() {
                   style={{
                     border: '1.5px dashed #DDA3B4',
                     background: '#FFF9FB',
-                    color: '#9E1B4C',
+                    color: '#063B2F',
                     padding: '12px',
                     borderRadius: 12,
                     fontWeight: 600,
@@ -1316,7 +1298,7 @@ export default function CheckoutPage() {
           >
             <div className="mb-checkout-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <ShieldCheck size={22} style={{ color: '#9E1B4C' }} />
+                <ShieldCheck size={22} style={{ color: '#063B2F' }} />
                 <h3 className="mb-checkout-modal-title">Complete Payment</h3>
               </div>
               <button
@@ -1330,7 +1312,7 @@ export default function CheckoutPage() {
 
             <div style={{ background: '#FFF1F5', borderRadius: 12, padding: 16, border: '1px solid #F5D3DC' }}>
               <div style={{ fontSize: 13, color: '#7A4B58' }}>Payable Amount</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#9E1B4C', marginTop: 2 }}>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#063B2F', marginTop: 2 }}>
                 {formatCurrency(finalTotal)}
               </div>
               <div style={{ fontSize: 12, color: '#633240', marginTop: 4 }}>
@@ -1349,9 +1331,9 @@ export default function CheckoutPage() {
                   borderRadius: 8,
                   fontSize: 13,
                   fontWeight: 600,
-                  border: selectedOnlineChannel === 'upi' ? '2px solid #9E1B4C' : '1px solid #ECD8DD',
+                  border: selectedOnlineChannel === 'upi' ? '2px solid #063B2F' : '1px solid #E8DEC8',
                   background: selectedOnlineChannel === 'upi' ? '#FFF3F6' : '#FFFFFF',
-                  color: selectedOnlineChannel === 'upi' ? '#9E1B4C' : '#552735',
+                  color: selectedOnlineChannel === 'upi' ? '#063B2F' : '#123A30',
                   cursor: 'pointer',
                 }}
               >
@@ -1366,9 +1348,9 @@ export default function CheckoutPage() {
                   borderRadius: 8,
                   fontSize: 13,
                   fontWeight: 600,
-                  border: selectedOnlineChannel === 'card' ? '2px solid #9E1B4C' : '1px solid #ECD8DD',
+                  border: selectedOnlineChannel === 'card' ? '2px solid #063B2F' : '1px solid #E8DEC8',
                   background: selectedOnlineChannel === 'card' ? '#FFF3F6' : '#FFFFFF',
-                  color: selectedOnlineChannel === 'card' ? '#9E1B4C' : '#552735',
+                  color: selectedOnlineChannel === 'card' ? '#063B2F' : '#123A30',
                   cursor: 'pointer',
                 }}
               >
@@ -1383,9 +1365,9 @@ export default function CheckoutPage() {
                   borderRadius: 8,
                   fontSize: 13,
                   fontWeight: 600,
-                  border: selectedOnlineChannel === 'wallet' ? '2px solid #9E1B4C' : '1px solid #ECD8DD',
+                  border: selectedOnlineChannel === 'wallet' ? '2px solid #063B2F' : '1px solid #E8DEC8',
                   background: selectedOnlineChannel === 'wallet' ? '#FFF3F6' : '#FFFFFF',
-                  color: selectedOnlineChannel === 'wallet' ? '#9E1B4C' : '#552735',
+                  color: selectedOnlineChannel === 'wallet' ? '#063B2F' : '#123A30',
                   cursor: 'pointer',
                 }}
               >
@@ -1505,12 +1487,12 @@ export default function CheckoutPage() {
               <CheckCircle2 size={36} />
             </div>
 
-            <h3 style={{ fontSize: 22, fontWeight: 700, color: '#83213D', margin: '4px 0 0' }}>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: '#063B2F', margin: '4px 0 0' }}>
               Order Placed Successfully!
             </h3>
 
             <p style={{ fontSize: 14, color: '#633240', lineHeight: 1.4, margin: 0 }}>
-              Thank you for choosing MyBeautify. Your order has been registered in our database and will be delivered shortly.
+              Thank you for choosing MALKAZ. Your jewellery order has been received and will be delivered shortly.
             </p>
 
             <div
@@ -1529,12 +1511,12 @@ export default function CheckoutPage() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#7A4B58' }}>Order Number:</span>
-                <strong style={{ color: '#83213D' }}>#{confirmedOrder.orderNumber || confirmedOrder.id}</strong>
+                <strong style={{ color: '#063B2F' }}>#{confirmedOrder.orderNumber || confirmedOrder.id}</strong>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#7A4B58' }}>Payment Method:</span>
-                <strong style={{ color: '#2D121B' }}>
+                <strong style={{ color: '#123A30' }}>
                   {confirmedOrder.paymentMethod === 'COD' ? 'Cash on Delivery (COD)' : 'Online Payment'}
                 </strong>
               </div>
@@ -1548,14 +1530,14 @@ export default function CheckoutPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#7A4B58' }}>Total Amount:</span>
-                <strong style={{ color: '#83213D', fontSize: 16 }}>
+                <strong style={{ color: '#063B2F', fontSize: 16 }}>
                   {formatCurrency(confirmedOrder.totalAmount)}
                 </strong>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#7A4B58' }}>Estimated Delivery:</span>
-                <span style={{ color: '#2D121B', fontWeight: 600 }}>
+                <span style={{ color: '#123A30', fontWeight: 600 }}>
                   {shippingMethod === 'express' ? '1-2 business days' : '3-5 business days'}
                 </span>
               </div>

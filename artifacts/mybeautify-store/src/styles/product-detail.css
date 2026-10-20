@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MyBeautify Product Details Page Styles
+   MALKAZ Jewellery Product Details Styles
    Matching exact reference image design & brand aesthetics
    ========================================================================== */
 
@@ -63,7 +63,7 @@
   aspect-ratio: 1 / 1;
   border-radius: 18px;
   overflow: hidden;
-  background: #FFF5F7;
+  background: #F4EBD8;
   border: 1px solid var(--mb-border);
   display: flex;
   align-items: center;
@@ -292,7 +292,7 @@
 .mb-detail-description {
   font-size: 14.5px;
   line-height: 1.6;
-  color: #4A353E;
+  color: #123A30;
   margin: 0 0 24px 0;
 }
 
@@ -309,8 +309,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  background: #FFF8F9;
-  border: 1px solid #F8E3E7;
+  background: #F4EBD8;
+  border: 1px solid #E8DEC8;
   border-radius: 14px;
   padding: 12px 8px;
   gap: 8px;
@@ -507,7 +507,7 @@
   display: flex;
   border-bottom: 1px solid var(--mb-border);
   padding: 0 24px;
-  background: #FCF7F8;
+  background: #F4EBD8;
   gap: 36px;
   overflow-x: auto;
 }
@@ -575,7 +575,7 @@
 .mb-panel-desc {
   font-size: 14.5px;
   line-height: 1.65;
-  color: #4A353E;
+  color: #123A30;
   margin: 0 0 20px 0;
 }
 
@@ -587,13 +587,13 @@
 }
 
 .mb-how-to-use-box {
-  background: #FCF7F8;
+  background: #F4EBD8;
   border-left: 3px solid var(--mb-primary);
   padding: 14px 18px;
   border-radius: 6px;
   font-size: 13.5px;
   line-height: 1.6;
-  color: #4A353E;
+  color: #123A30;
 }
 
 .mb-how-to-use-box p {
@@ -601,7 +601,7 @@
 }
 
 .mb-specs-highlights-card {
-  background: #FAF7F8;
+  background: #FAF7F2;
   border: 1px solid var(--mb-border);
   border-radius: 12px;
   padding: 16px 18px;
@@ -627,7 +627,7 @@
 
 /* Return Policy Card in Delivery Tab */
 .mb-return-policy-card {
-  background: #FCF9F9;
+  background: #FAF7F2;
   border: 1px solid var(--mb-border);
   border-radius: 14px;
   padding: 22px;
@@ -692,7 +692,7 @@
 }
 
 .mb-reviews-summary-card {
-  background: #FCF9F9;
+  background: #FAF7F2;
   border: 1px solid var(--mb-border);
   border-radius: 14px;
   padding: 24px;
@@ -744,7 +744,7 @@
 }
 
 .mb-clean-badge {
-  background: #FDF4F6;
+  background: #F4EBD8;
   border: 1px solid var(--mb-border);
   border-radius: 20px;
   padding: 6px 14px;
@@ -783,7 +783,7 @@
 .mb-product-details-body {
   font-size: 13.5px;
   line-height: 1.6;
-  color: #4A353E;
+  color: #123A30;
 }
 
 .mb-product-details-body p {
@@ -845,7 +845,7 @@
 
 /* COLUMN 2: DELIVERY INFORMATION */
 .mb-delivery-panel {
-  background: #FCF9F9;
+  background: #FAF7F2;
   border: 1px solid var(--mb-border);
   border-radius: 14px;
   padding: 18px;
@@ -937,7 +937,7 @@
 
 .mb-del-option-card.selected {
   border-color: var(--mb-primary);
-  background: #FFFDFE;
+  background: #FAF7F2;
 }
 
 .mb-del-radio {
@@ -1049,7 +1049,7 @@
 .mb-dist-bar-bg {
   flex: 1;
   height: 6px;
-  background: #EFE2DF;
+  background: #E8DEC8;
   border-radius: 3px;
   overflow: hidden;
 }
@@ -1098,7 +1098,7 @@
 }
 
 .mb-review-card {
-  background: #FCF9F9;
+  background: #FAF7F2;
   border: 1px solid var(--mb-border);
   border-radius: 12px;
   padding: 14px;
@@ -1159,7 +1159,7 @@
 .mb-review-text {
   font-size: 12.5px;
   line-height: 1.45;
-  color: #4A353E;
+  color: #123A30;
   margin: 0;
 }
 
@@ -1184,7 +1184,7 @@
   overflow: hidden;
   border: 1.5px solid var(--mb-border);
   flex-shrink: 0;
-  background: #FFF7F8;
+  background: #F4EBD8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1215,7 +1215,7 @@
 }
 
 .mb-full-ingredients-box {
-  background: #FCF9F9;
+  background: #FAF7F2;
   border: 1px dashed var(--mb-border);
   border-radius: 10px;
   padding: 12px;
@@ -1323,7 +1323,7 @@
   background: none;
   border: none;
   font-size: 26px;
-  color: #D5C2C6;
+  color: #E8DEC8;
   cursor: pointer;
   transition: transform 0.15s ease, color 0.15s ease;
   padding: 0;

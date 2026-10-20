@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MyBeautify Customer Shop / Dashboard Styles
+   MALKAZ Customer Shop / Dashboard Styles
    Exact visual and UX match to reference image
    ========================================================================== */
 
@@ -39,7 +39,7 @@
   color: var(--mb-text-dark);
   font-family: var(--mb-font-sans);
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* ==========================================================================
@@ -445,16 +445,19 @@
   align-items: center;
   gap: 10px;
   background: #FFFFFF;
-  border: 1px solid #EFE4E0;
+  border: 1px solid var(--mb-gold-border);
   border-radius: 999px;
   padding: 4px 14px 4px 4px;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
+  color: var(--mb-text-dark);
+  font: inherit;
+  text-align: left;
 }
 
 .mb-header-profile-chip:hover {
   border-color: var(--mb-primary-pill);
-  box-shadow: 0 2px 10px rgba(167, 39, 78, 0.08);
+  box-shadow: 0 2px 10px rgba(6, 59, 47, 0.08);
 }
 
 .mb-header-avatar {
@@ -462,7 +465,7 @@
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(135deg, #FAD4DF 0%, #D48C9D 100%);
+  background: linear-gradient(135deg, #0B473A 0%, #063B2F 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2902,5 +2905,261 @@
   margin-bottom: 4px;
 }
 
+.mz-referral-page {
+  width: min(100%, 1400px);
+  padding: 24px clamp(18px, 3.2vw, 48px) 64px;
+  gap: 22px;
+}
 
+.mz-referral-hero {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(30px, 4.2vw, 54px);
+  border-radius: 22px;
+  background:
+    linear-gradient(90deg, rgba(4, 37, 29, 0.98) 0%, rgba(6, 59, 47, 0.92) 44%, rgba(6, 59, 47, 0.28) 100%),
+    url('/hero-jewellery.jpg') center 43% / cover;
+  box-shadow: 0 18px 42px rgba(6, 59, 47, 0.18);
+}
 
+.mz-referral-hero::before {
+  top: auto;
+  right: 8%;
+  bottom: -138px;
+  width: 310px;
+  height: 310px;
+  border: 1px solid rgba(212, 175, 99, 0.28);
+  background: radial-gradient(circle, rgba(212, 175, 99, 0.18), transparent 68%);
+}
+
+.mz-referral-hero-title {
+  max-width: 720px;
+  font-size: clamp(35px, 4vw, 52px);
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.mz-referral-hero-desc {
+  max-width: 570px;
+  font-size: 14px;
+}
+
+.mz-referral-main-grid {
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: 18px;
+}
+
+.mz-referral-card,
+.mz-promo-highlight-card {
+  border-radius: 17px;
+  box-shadow: 0 9px 26px rgba(6, 59, 47, 0.055);
+}
+
+.mz-referral-card {
+  padding: clamp(20px, 2.4vw, 30px);
+}
+
+.mz-referral-card-header {
+  gap: 14px;
+  padding-bottom: 17px;
+}
+
+.mz-referral-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+}
+
+.mz-referral-card-title {
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.mz-referral-code-pill,
+.mz-referral-input-wrap {
+  width: 100%;
+  min-height: 54px;
+}
+
+.mz-referral-code-val {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(16px, 2vw, 21px);
+}
+
+.mz-referral-input {
+  min-width: 0;
+}
+
+.mz-promo-highlight-card {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(212, 175, 99, 0.48);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(212, 175, 99, 0.2), transparent 34%),
+    linear-gradient(145deg, #074537 0%, #063b2f 68%, #04251d 100%);
+}
+
+.mz-promo-highlight-card::after {
+  content: '✦';
+  position: absolute;
+  top: 18px;
+  right: 25px;
+  color: rgba(212, 175, 99, 0.32);
+  font-size: 56px;
+  pointer-events: none;
+}
+
+.mz-referral-stats-grid {
+  gap: 13px;
+}
+
+.mz-stat-card {
+  min-width: 0;
+  padding: 17px;
+  border-radius: 13px;
+}
+
+.mz-stat-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+}
+
+.mz-stat-number {
+  overflow-wrap: anywhere;
+  font-size: 23px;
+}
+
+.mz-how-it-works-grid {
+  gap: 13px;
+}
+
+.mz-step-card {
+  border-radius: 13px;
+  background: linear-gradient(145deg, #fff 0%, #fcfaf5 100%);
+}
+
+.mz-step-num {
+  box-shadow: 0 4px 12px rgba(212, 175, 99, 0.2);
+}
+
+.mz-referral-table th:first-child,
+.mz-referral-table td:first-child {
+  padding-left: 18px;
+}
+
+.mz-referral-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.mz-referral-table tbody tr:hover {
+  background: #fcfaf5;
+}
+
+.mz-btn-gold,
+.mz-btn-emerald-outline {
+  min-height: 42px;
+}
+
+.mz-btn-gold:focus-visible,
+.mz-btn-emerald-outline:focus-visible,
+.mz-referral-input:focus-visible {
+  outline: 3px solid rgba(212, 175, 99, 0.45);
+  outline-offset: 2px;
+}
+
+@media (max-width: 992px) {
+  .mz-referral-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mz-promo-highlight-card {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mz-referral-page {
+    padding: 18px 14px 42px;
+    gap: 16px;
+  }
+
+  .mz-referral-hero {
+    min-height: 280px;
+    padding: 26px 22px;
+    background:
+      linear-gradient(90deg, rgba(4, 37, 29, 0.98), rgba(6, 59, 47, 0.84)),
+      url('/hero-jewellery.jpg') center / cover;
+  }
+
+  .mz-referral-hero-badge {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .mz-referral-hero-title {
+    font-size: 34px;
+  }
+
+  .mz-referral-hero-desc {
+    font-size: 13px;
+  }
+
+  .mz-referral-card {
+    padding: 19px;
+  }
+
+  .mz-referral-code-pill {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mz-referral-code-val {
+    text-align: center;
+  }
+
+  .mz-referral-input-wrap {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .mz-referral-input {
+    min-height: 36px;
+  }
+
+  .mz-referral-btn-group {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .mz-referral-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .mz-stat-card {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .mz-stat-icon-wrap {
+    width: 36px;
+    height: 36px;
+  }
+
+  .mz-stat-number {
+    font-size: 19px;
+  }
+
+  .mz-stat-label {
+    font-size: 10px;
+  }
+
+  .mz-referral-table {
+    min-width: 610px;
+  }
+}

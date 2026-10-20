@@ -2,8 +2,9 @@ import React from 'react';
 import { useLocation } from 'wouter';
 import { Heart, ShoppingCart } from 'lucide-react';
 import type { ProductResponse } from '@/types/product.types';
+import { getJewelleryImage } from '@/lib/jewellery-images';
 
-export interface MyBeautifyProductCardProps {
+export interface MalkazProductCardProps {
   product: ProductResponse;
   isWishlisted?: boolean;
   onToggleWishlist?: (product: ProductResponse) => void;
@@ -33,34 +34,21 @@ export const getProductBadge = (product: ProductResponse) => {
   return null;
 };
 
-// Get display review count matching reference design
 export const getProductReviewCount = (product: ProductResponse) => {
-  const lookup: Record<number, number> = { 1: 124, 2: 98, 3: 76, 4: 83, 5: 54, 6: 43, 7: 67, 8: 48 };
-  return lookup[product.id] || 65;
+  return typeof product.reviewCount === 'number' && product.reviewCount > 0
+    ? product.reviewCount
+    : 0;
 };
 
-// Get display size
 export const getProductSize = (product: ProductResponse) => {
-  if (product.size) return product.size;
-  if (product.id === 1) return 'Adjustable 16-18"';
-  if (product.id === 2) return '2.8" drop';
-  if (product.id === 3) return 'US Size 7';
-  if (product.id === 4) return 'Size 2.6';
-  if (product.id === 5) return '7 inches';
-  if (product.id === 6) return '18" + 2"';
-  if (product.id === 7) return '9mm diameter';
-  if (product.id === 8) return 'US Size 6.5';
-  return 'Standard Size';
+  return product.size || 'Details available on product page';
 };
 
-// Get display rating matching reference design
 export const getProductRating = (product: ProductResponse) => {
-  if (product.averageRating && product.averageRating > 0) return product.averageRating;
-  const lookup: Record<number, number> = { 1: 4.8, 2: 4.6, 3: 4.7, 4: 4.5, 5: 4.6, 6: 4.5, 7: 4.7, 8: 4.4 };
-  return lookup[product.id] || 4.6;
+  return Number.isFinite(product.averageRating) ? product.averageRating : 0;
 };
 
-export const MyBeautifyProductCard: React.FC<MyBeautifyProductCardProps> = ({
+export const MalkazProductCard: React.FC<MalkazProductCardProps> = ({
   product,
   isWishlisted = false,
   onToggleWishlist,
@@ -75,6 +63,7 @@ export const MyBeautifyProductCard: React.FC<MyBeautifyProductCardProps> = ({
   const displayPrice = product.discountPrice || product.sellingPrice || product.price;
   const rating = getProductRating(product);
   const reviews = getProductReviewCount(product);
+  const productImage = getJewelleryImage(product.imageUrl, product.name, product.id);
 
   const handleCardNavigate = () => {
     setLocation(`/products/${product.id}`);
@@ -109,13 +98,12 @@ export const MyBeautifyProductCard: React.FC<MyBeautifyProductCardProps> = ({
         </button>
 
         <img
-          src={product.imageUrl || '/products/jewels/royal-emerald-necklace.jpg'}
+          src={productImage}
           alt={product.name}
           className="mb-card-img mz-card-img"
           loading="lazy"
           onError={(e) => {
-            // graceful fallback to local jewel photo
-            (e.target as HTMLImageElement).src = '/products/jewels/royal-emerald-necklace.jpg';
+            (e.target as HTMLImageElement).src = getJewelleryImage(null, product.name, product.id);
           }}
         />
       </div>
@@ -135,11 +123,15 @@ export const MyBeautifyProductCard: React.FC<MyBeautifyProductCardProps> = ({
 
         {/* Rating Row */}
         <div className="mb-card-rating-row mz-card-rating-row">
-          <span className="mz-card-stars">{'★'.repeat(Math.min(5, Math.max(1, Math.round(rating))))}</span>
-          <span className="mz-card-rating-num">
-            {rating.toFixed(1)}
-          </span>
-          <span className="mz-card-reviews-count">({reviews})</span>
+          {rating > 0 ? (
+            <>
+              <span className="mz-card-stars">{'★'.repeat(Math.min(5, Math.max(1, Math.round(rating))))}</span>
+              <span className="mz-card-rating-num">{rating.toFixed(1)}</span>
+              {reviews > 0 && <span className="mz-card-reviews-count">({reviews})</span>}
+            </>
+          ) : (
+            <span className="mz-card-reviews-count">Not yet rated</span>
+          )}
         </div>
 
         {/* Price Row */}
@@ -178,4 +170,4 @@ export const MyBeautifyProductCard: React.FC<MyBeautifyProductCardProps> = ({
   );
 };
 
-export default MyBeautifyProductCard;
+export default MalkazProductCard;

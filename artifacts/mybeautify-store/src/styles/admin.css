@@ -1,0 +1,355 @@
+.admin-page {
+  max-width: 1500px;
+  padding-top: 34px;
+  color: #123a30;
+}
+
+.admin-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.8fr);
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 99, 0.34);
+  border-radius: 22px;
+  background: #063b2f;
+  box-shadow: 0 18px 48px rgba(6, 59, 47, 0.14);
+}
+
+.admin-hero-copy {
+  position: relative;
+  z-index: 1;
+  padding: clamp(26px, 4vw, 50px);
+  color: #faf7f2;
+  background: linear-gradient(110deg, #063b2f 0%, #063b2f 68%, rgba(6, 59, 47, 0.86) 100%);
+}
+
+.admin-hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 30px;
+  color: #f8f1e5;
+  font: 700 14px 'Cinzel', Georgia, serif;
+  letter-spacing: 0.1em;
+}
+
+.admin-hero-brand img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.admin-hero-brand i {
+  display: block;
+  margin-top: 3px;
+  color: #d4af63;
+  font: 500 9px 'DM Sans', sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.admin-hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #e3c47f;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.admin-hero h1 {
+  margin: 12px 0;
+  color: #faf7f2;
+  font: 500 clamp(35px, 4.3vw, 58px)/1.02 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -0.025em;
+}
+
+.admin-hero h1 em {
+  color: #e3c47f;
+  font-weight: 500;
+}
+
+.admin-hero-copy > p {
+  max-width: 470px;
+  margin: 0;
+  color: rgba(250, 247, 242, 0.76);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.admin-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: #e3c47f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-hero-link:hover {
+  color: #fff3d2;
+}
+
+.admin-hero-image {
+  min-height: 300px;
+  background:
+    linear-gradient(90deg, rgba(6, 59, 47, 0.4), rgba(6, 59, 47, 0.02)),
+    url('/hero-jewellery.jpg') center 42% / cover;
+}
+
+.admin-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0 30px;
+}
+
+.admin-overview-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 0 12px;
+  min-height: 100px;
+  padding: 17px;
+  border: 1px solid #e8dec8;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 6px 20px rgba(6, 59, 47, 0.04);
+}
+
+.admin-overview-icon {
+  display: grid;
+  grid-row: span 2;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(212, 175, 99, 0.38);
+  border-radius: 12px;
+  background: #f7f0df;
+  color: #8c7139;
+}
+
+.admin-overview-card > div:nth-child(2) span {
+  display: block;
+  color: #6e7a73;
+  font-size: 10px;
+}
+
+.admin-overview-card strong {
+  display: block;
+  margin-top: 3px;
+  color: #063b2f;
+  font: 600 24px/1 'Cormorant Garamond', Georgia, serif;
+}
+
+.admin-overview-card small {
+  grid-column: 2;
+  margin-top: 4px;
+  color: #8a958e;
+  font-size: 9px;
+}
+
+.admin-overview-card.needs-attention .admin-overview-icon {
+  border-color: #ead2a2;
+  background: #fff5df;
+  color: #9a6c19;
+}
+
+.admin-tabs {
+  gap: 7px;
+  margin: 28px 0 20px;
+  border: 0;
+}
+
+.admin-tab {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 12px;
+  transition: background 160ms ease, color 160ms ease, border 160ms ease;
+}
+
+.admin-tab:hover {
+  color: #063b2f;
+  background: #f1eadb;
+}
+
+.admin-tab.active {
+  border-color: #063b2f;
+  background: #063b2f;
+  color: #faf7f2;
+}
+
+.admin-management {
+  gap: 18px;
+}
+
+.admin-card {
+  padding: clamp(18px, 2.5vw, 30px);
+  border-color: #e8dec8;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(6, 59, 47, 0.045);
+}
+
+.admin-card-heading {
+  margin-bottom: 24px;
+}
+
+.admin-card-heading h2 {
+  color: #063b2f;
+  font: 600 27px 'Cormorant Garamond', Georgia, serif;
+}
+
+.admin-form .form-field > span {
+  color: #58675f;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-form .form-field .input,
+.admin-form .form-field .select {
+  border-color: #e3dac9;
+  border-radius: 9px;
+  background: #fffefa;
+}
+
+.admin-form .form-field .input:focus,
+.admin-form .form-field .select:focus {
+  border-color: #b8954e;
+  outline-color: rgba(212, 175, 99, 0.2);
+}
+
+.admin-form-actions .button:not(.secondary) {
+  border-color: #063b2f;
+  background: #063b2f;
+}
+
+.admin-form-actions .button:not(.secondary):hover {
+  border-color: #b8954e;
+  background: #b8954e;
+  color: #063b2f;
+}
+
+.admin-table th {
+  background: #f8f4eb;
+  color: #52665c;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-table td {
+  color: #263f34;
+  font-size: 12px;
+}
+
+.admin-table tbody tr:hover {
+  background: #fbf8f1;
+}
+
+.admin-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 190px;
+  font-weight: 600;
+}
+
+.admin-product-thumb {
+  width: 42px;
+  height: 48px;
+  flex: 0 0 auto;
+  border: 1px solid #e8dec8;
+  border-radius: 7px;
+  background: #f8f4eb;
+  object-fit: cover;
+}
+
+.admin-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 99px;
+  padding: 5px 9px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.admin-status.is-active {
+  background: #e8f3ed;
+  color: #1d6948;
+}
+
+.admin-status.is-inactive {
+  background: #f3ece5;
+  color: #80644b;
+}
+
+.admin-actions .icon-button {
+  color: #063b2f;
+}
+
+.admin-actions .admin-delete {
+  color: #9f4e45;
+}
+
+.admin-back a {
+  color: #876c36;
+}
+
+@media (max-width: 900px) {
+  .admin-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .admin-page {
+    padding-top: 20px;
+  }
+
+  .admin-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-hero-copy {
+    padding: 25px;
+  }
+
+  .admin-hero-brand {
+    margin-bottom: 24px;
+  }
+
+  .admin-hero-image {
+    min-height: 170px;
+    background-position: center 38%;
+  }
+
+  .admin-overview {
+    gap: 9px;
+    margin: 14px 0 23px;
+  }
+
+  .admin-overview-card {
+    grid-template-columns: 36px minmax(0, 1fr);
+    min-height: 86px;
+    gap: 0 9px;
+    padding: 12px;
+  }
+
+  .admin-overview-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .admin-overview-card strong {
+    font-size: 21px;
+  }
+
+  .admin-tabs {
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+}

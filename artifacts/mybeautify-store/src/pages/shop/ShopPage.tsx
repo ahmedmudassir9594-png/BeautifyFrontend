@@ -37,8 +37,8 @@ export function ShopPage() {
       <main className="page">
         <div className="catalog-head">
           <div>
-            <div className="eyebrow">The storefront</div>
-            <h1>Everything good.</h1>
+            <div className="eyebrow">MALKAZ Royal Jewels</div>
+            <h1>Explore fine jewellery.</h1>
           </div>
           <div className="catalog-tools">
             <input
@@ -68,7 +68,7 @@ export function ShopPage() {
         <div className="catalog-layout">
           <aside className="filters">
             <div className="filter-group">
-              <h3 className="filter-title">Filter by ritual</h3>
+              <h3 className="filter-title">Filter by collection</h3>
               <label className="filter-label">
                 <input
                   type="radio"
@@ -112,8 +112,8 @@ export function ShopPage() {
             ) : (
               <div className="empty-state">
                 <Search size={24} />
-                <h2>No perfect match yet.</h2>
-                <p>Try a broader search or browse the full edit.</p>
+                <h2>No jewellery found.</h2>
+                <p>Try a broader search or explore all MALKAZ collections.</p>
                 <button
                   className="button secondary"
                   onClick={() => {
@@ -122,7 +122,7 @@ export function ShopPage() {
                   }}
                   data-testid="button-clear-filters"
                 >
-                  Clear filters
+                  Clear search
                 </button>
               </div>
             )}
