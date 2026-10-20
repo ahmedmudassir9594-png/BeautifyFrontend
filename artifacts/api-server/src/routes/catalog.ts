@@ -302,6 +302,32 @@ const reviews = {
 } as const;
 
 type CartItemState = { productId: string; quantity: number };
+type UserRole = "USER" | "ADMIN";
+type AppUser = {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+};
+
+const users: AppUser[] = [
+  {
+    id: "demo-user",
+    name: "Alicia Bloom",
+    email: "customer@mybeautify.com",
+    password: "password123",
+    role: "USER",
+  },
+  {
+    id: "demo-admin",
+    name: "Maya Hart",
+    email: "admin@mybeautify.com",
+    password: "admin123",
+    role: "ADMIN",
+  },
+];
+
 let cartItems: CartItemState[] = [];
 let wishlistIds: string[] = ["dew-cream"];
 let orders = [
@@ -316,6 +342,73 @@ let orders = [
 
 function findProduct(id: string) {
   return products.find((product) => product.id === id);
+}
+
+function getUserByCredentials(emailOrUsername: string, password: string) {
+  const cleanedEmail = emailOrUsername.trim().toLowerCase();
+  return users.find(
+    (user) =>
+      (user.email.toLowerCase() === cleanedEmail ||
+        user.name.toLowerCase() === cleanedEmail ||
+        user.id.toLowerCase() === cleanedEmail) &&
+      user.password === password,
+  );
+}
+
+function getUserFromRequest(req: { headers: Record<string, string | string[] | undefined> }) {
+  const header = req.headers.authorization;
+  const tokenValue = Array.isArray(header) ? header[0] : header;
+  if (!tokenValue || !tokenValue.startsWith("Bearer ")) return null;
+  const token = tokenValue.slice("Bearer ".length).trim();
+  const user = users.find((candidate) => {
+    if (candidate.role === "ADMIN") return token === "demo-admin-token";
+    return token === "demo-user-token";
+  });
+  return user ?? null;
+}
+
+function toAdminProductPayload(payload: Record<string, unknown>) {
+  const productId = String(payload.id ?? payload.slug ?? `product-${Date.now()}`)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || `product-${Date.now()}`;
+
+  const mapped = {
+    id: productId,
+    name: String(payload.name ?? "Untitled product"),
+    brand: String(payload.brand ?? payload.brandId ?? "MyBeautify"),
+    category: String(payload.category ?? payload.categoryId ?? "Skincare"),
+    description: String(payload.description ?? "Premium beauty essentials."),
+    price: Number(payload.price ?? 0),
+    compareAtPrice: payload.compareAtPrice != null ? Number(payload.compareAtPrice) : null,
+    rating: Number(payload.rating ?? 4.8),
+    reviews: Number(payload.reviews ?? 0),
+    image:
+      typeof payload.imageUrl === "string" && payload.imageUrl
+        ? payload.imageUrl
+        : typeof payload.image === "string" && payload.image
+          ? payload.image
+          : "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80",
+    badge: payload.badge ? String(payload.badge) : null,
+    stock: Number(payload.stockQuantity ?? payload.stock ?? 0),
+    ingredients: Array.isArray(payload.ingredients)
+      ? payload.ingredients.map((item) => String(item))
+      : typeof payload.ingredients === "string"
+        ? payload.ingredients.split(",").map((item) => item.trim()).filter(Boolean)
+        : [],
+    benefits: Array.isArray(payload.benefits)
+      ? payload.benefits.map((item) => String(item))
+      : typeof payload.benefits === "string"
+        ? payload.benefits.split(",").map((item) => item.trim()).filter(Boolean)
+        : [],
+    sizes: Array.isArray(payload.sizes)
+      ? payload.sizes.map((item) => String(item))
+      : typeof payload.size === "string" && payload.size
+        ? [payload.size]
+        : ["Standard"],
+  };
+
+  return mapped;
 }
 
 function buildCart() {
