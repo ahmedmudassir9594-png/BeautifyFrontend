@@ -8,3 +8,4 @@ export * from './wishlist/wishlist.service';
 export * from './orders/orders.service';
 export * from './addresses/addresses.service';
 export * from './coupons/coupons.service';
+export * from './referral/referral.service';

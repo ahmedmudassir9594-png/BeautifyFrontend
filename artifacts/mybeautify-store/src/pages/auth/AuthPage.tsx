@@ -41,6 +41,14 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [referralCode, setReferralCode] = useState(() => {
+    try {
+      const urlParam = new URLSearchParams(window.location.search).get('ref');
+      return urlParam || localStorage.getItem('malkaz_referral_code') || '';
+    } catch {
+      return '';
+    }
+  });
 
   // Password Visibility toggles (independent for password and confirmPassword)
   const [showPassword, setShowPassword] = useState(false);
@@ -107,11 +115,16 @@ export default function AuthPage({ mode }: AuthPageProps) {
             email: cleanEmail.toLowerCase(),
             password,
             phoneNumber: phoneNumber.trim() || undefined,
+            referralCode: referralCode.trim() || undefined,
           },
           rememberMe
         );
 
-        setSuccessMessage('Account created successfully! Welcome to Malka Zai.');
+        if (referralCode.trim()) {
+          try { localStorage.removeItem('malkaz_referral_code'); } catch {}
+        }
+
+        setSuccessMessage('Account created successfully! Welcome to MALKAZ.');
         setTimeout(() => {
           setLocation(hasAdminRole(res.user?.role) ? '/admin' : (safeRedirect || '/'));
         }, 600);
@@ -125,7 +138,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
           rememberMe
         );
 
-        setSuccessMessage('Login successful! Welcome back to Malka Zai.');
+        setSuccessMessage('Login successful! Welcome back to MALKAZ.');
         setTimeout(() => {
           setLocation(hasAdminRole(res.user?.role) ? '/admin' : (safeRedirect || '/'));
         }, 500);
@@ -220,15 +233,15 @@ export default function AuthPage({ mode }: AuthPageProps) {
       </svg>
 
       <div className="auth-luxury-card">
-        {/* ================= LEFT SIDE: Malka Zai Branding & Jewellery Visual ================= */}
+        {/* ================= LEFT SIDE: MALKAZ Branding & Jewellery Visual ================= */}
         <div className="auth-visual-col">
-          <Link href="/" className="auth-brand-lockup" title="Return to Malka Zai Home">
+          <Link href="/" className="auth-brand-lockup" title="Return to MALKAZ Home">
             <img
               src="/malka-zai-emblem.png"
-              alt="Malka Zai Monogram and Crown"
+              alt="MALKAZ Monogram and Crown"
               className="auth-brand-logo-img"
             />
-            <h2 className="auth-brand-title">MALKA ZAI</h2>
+            <h2 className="auth-brand-title">MALKAZ</h2>
           </Link>
 
           {/* Thin gold ornamental divider beneath brand name */}
@@ -242,7 +255,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
           <div className="auth-visual-media-box">
             <img
               src="/malka-zai-signup-jewels.jpg"
-              alt="Malka Zai Fine Jewellery Collection"
+              alt="MALKAZ Fine Jewellery Collection"
               className="auth-visual-media-img"
               loading="lazy"
             />
@@ -282,7 +295,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
             </h1>
             <p className="auth-main-subtitle">
               {isRegister
-                ? 'Begin your Malka Zai journey.'
+                ? 'Begin your MALKAZ journey.'
                 : 'Enter your email and password to access your account.'}
             </p>
           </div>
@@ -420,6 +433,26 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Optional Referral Code (Register only) */}
+            {isRegister && (
+              <div className="auth-input-group">
+                <label className="auth-label" htmlFor="auth-referral-code">
+                  Referral Code <span style={{ color: '#D4AF63', fontSize: 11, fontWeight: 500 }}>(Optional - Friend Discount)</span>
+                </label>
+                <div className="auth-input-wrapper">
+                  <input
+                    id="auth-referral-code"
+                    type="text"
+                    className="auth-input"
+                    placeholder="e.g. MZ-AB12CD"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    autoComplete="off"
+                  />
                 </div>
               </div>
             )}

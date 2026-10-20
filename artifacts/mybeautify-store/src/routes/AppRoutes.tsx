@@ -9,6 +9,7 @@ import AuthPage from '@/pages/auth/AuthPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import MyOrdersPage from '@/pages/orders/MyOrdersPage';
 import CheckoutPage from '@/pages/checkout/CheckoutPage';
+import ShareReferralPage from '@/pages/referral/ShareReferralPage';
 import NotFoundPage from '@/pages/not-found/NotFoundPage';
 
 export function AppRoutes() {
@@ -21,6 +22,8 @@ export function AppRoutes() {
         <Route path="/shop" component={CustomerDashboard} />
         <Route path="/dashboard" component={CustomerDashboard} />
         <Route path="/account" component={CustomerDashboard} />
+        <Route path="/share-referral" component={ShareReferralPage} />
+        <Route path="/referral" component={ShareReferralPage} />
         <Route path="/checkout" component={CheckoutPage} />
         <Route path="/products/:productId" component={ProductDetailPage} />
         <Route path="/products/:id" component={ProductDetailPage} />

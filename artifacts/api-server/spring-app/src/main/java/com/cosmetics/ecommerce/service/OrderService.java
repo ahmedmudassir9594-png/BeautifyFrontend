@@ -28,11 +28,14 @@ public class OrderService {
     private final PaymentGateway paymentGateway;
     private final ProductRepository products;
     private final EmailService emailService;
+    private final ReferralService referralService;
 
     public OrderService(OrderRepository orders, CartService cartService, AddressRepository addresses, CouponRepository coupons,
-                        PaymentRepository payments, PaymentGateway paymentGateway, ProductRepository products, EmailService emailService) {
+                        PaymentRepository payments, PaymentGateway paymentGateway, ProductRepository products, EmailService emailService,
+                        ReferralService referralService) {
         this.orders = orders; this.cartService = cartService; this.addresses = addresses; this.coupons = coupons;
         this.payments = payments; this.paymentGateway = paymentGateway; this.products = products; this.emailService = emailService;
+        this.referralService = referralService;
     }
 
     @Transactional
@@ -55,11 +58,32 @@ public class OrderService {
         Coupon coupon = null;
         BigDecimal discount = BigDecimal.ZERO;
         if (request.couponCode() != null && !request.couponCode().isBlank()) {
-            coupon = coupons.findByCodeIgnoreCase(request.couponCode().trim()).orElseThrow(() -> new InvalidCouponException("Coupon is invalid."));
-            if (!coupon.availableAt(java.time.Instant.now()) || subtotal.compareTo(coupon.getMinimumOrderAmount()) < 0)
-                throw new InvalidCouponException("Coupon is expired, unavailable, or does not meet the minimum order amount.");
-            discount = calculateDiscount(coupon, subtotal);
+            String code = request.couponCode().trim();
+            var couponOpt = coupons.findByCodeIgnoreCase(code);
+            if (couponOpt.isPresent()) {
+                coupon = couponOpt.get();
+                if (!coupon.availableAt(java.time.Instant.now()) || subtotal.compareTo(coupon.getMinimumOrderAmount()) < 0)
+                    throw new InvalidCouponException("Coupon is expired, unavailable, or does not meet the minimum order amount.");
+                discount = calculateDiscount(coupon, subtotal);
+            } else {
+                var validation = referralService.validateReferralCode(code, user);
+                if (validation.valid()) {
+                    if (subtotal.compareTo(referralService.getMinimumOrderAmount()) < 0) {
+                        throw new InvalidCouponException("Order does not meet the referral minimum order amount of " + referralService.getMinimumOrderAmount() + ".");
+                    }
+                    if (orders.countByUserId(user.getId()) > 0) {
+                        throw new BadRequestException("Friend referral discount is only valid for your first order.");
+                    }
+                    discount = subtotal.multiply(referralService.getDiscountPercent()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                    referralService.linkReferralOnRegister(user, code);
+                } else {
+                    throw new InvalidCouponException(validation.message());
+                }
+            }
+        } else if (user.getReferredBy() != null && orders.countByUserId(user.getId()) == 0 && subtotal.compareTo(referralService.getMinimumOrderAmount()) >= 0) {
+            discount = subtotal.multiply(referralService.getDiscountPercent()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         }
+
         BigDecimal shipping = new BigDecimal(System.getenv().getOrDefault("CHECKOUT_SHIPPING", "8.99"));
         BigDecimal taxRate = new BigDecimal(System.getenv().getOrDefault("CHECKOUT_TAX_RATE", "0.08"));
         BigDecimal taxable = subtotal.subtract(discount).max(BigDecimal.ZERO);
@@ -85,6 +109,7 @@ public class OrderService {
         if (coupon != null) coupon.incrementUsedCount();
         Order saved = orders.save(order);
         payments.save(new Payment(saved, result.transactionId(), result.gateway(), total, request.paymentMethod(), saved.getPaymentStatus()));
+        referralService.recordQualifyingPurchase(saved);
         cart.getItems().clear(); cart.touch();
         emailService.sendOrderConfirmation(user.getEmail(), saved.getOrderNumber(), saved.getTotalAmount());
         return OrderResponse.from(saved);

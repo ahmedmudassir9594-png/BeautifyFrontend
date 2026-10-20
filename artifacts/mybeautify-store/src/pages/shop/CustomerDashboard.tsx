@@ -28,6 +28,7 @@ import {
   Loader2,
   Trash2,
   SlidersHorizontal,
+  Share2,
 } from 'lucide-react';
 import {
   fetchProducts,
@@ -525,7 +526,7 @@ export default function CustomerDashboard() {
       <div className="mb-dashboard-layout" style={{ alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center', color: 'var(--mb-primary)' }}>
           <Loader2 size={36} className="animate-spin" style={{ margin: '0 auto 16px' }} />
-          <h2 style={{ fontFamily: 'var(--mb-font-serif)', fontSize: 26, margin: 0 }}>Opening Malka Zai...</h2>
+          <h2 style={{ fontFamily: 'var(--mb-font-serif)', fontSize: 26, margin: 0 }}>Opening MALKAZ...</h2>
         </div>
       </div>
     );
@@ -568,15 +569,16 @@ export default function CustomerDashboard() {
             href="/"
             className="mb-sidebar-brand mz-sidebar-brand"
             onClick={() => setMobileSidebarOpen(false)}
-            aria-label="Malka Zai Royal Jewels"
+            aria-label="MALKAZ Royal Jewels"
           >
             <img
-              src="/malka-zai-brand.png"
-              alt="Malka Zai Royal Jewels"
-              className="mb-sidebar-logo-img mz-sidebar-logo-img"
-              width={180}
-              height={155}
+              src="/malka-zai-emblem.png"
+              alt="MALKAZ"
+              className="mb-sidebar-logo-img mz-sidebar-logo-emblem"
+              width={110}
+              height={95}
             />
+            <span className="mz-sidebar-brand-name">MALKAZ</span>
           </Link>
 
           {/* Navigation Items */}
@@ -684,6 +686,17 @@ export default function CustomerDashboard() {
               </li>
 
               <li>
+                <Link
+                  href="/share-referral"
+                  className="mb-sidebar-link mz-sidebar-link"
+                  onClick={() => setMobileSidebarOpen(false)}
+                >
+                  <Share2 size={18} />
+                  <span>Share & Referral</span>
+                </Link>
+              </li>
+
+              <li>
                 <button
                   type="button"
                   className={`mb-sidebar-link mz-sidebar-link ${activeModal === 'reviews' ? 'active' : ''}`}
@@ -743,13 +756,13 @@ export default function CustomerDashboard() {
 
         {/* Bottom Royal Ornament */}
         <div className="mz-sidebar-bottom-ornament">
-          <div className="mz-sidebar-deco-ornament">― ❖ ―</div>
+          <div className="mz-sidebar-deco-ornament">✦ ❖ ✦</div>
           <div className="mz-sidebar-tagline-text">
             Timeless Beauty
             <br />
-            Forever Yours
+            Forever Jewellery
           </div>
-          <div className="mz-sidebar-deco-ornament">― ❖ ―</div>
+          <div className="mz-sidebar-deco-ornament">✦ ❖ ✦</div>
         </div>
       </aside>
 
@@ -887,7 +900,7 @@ export default function CustomerDashboard() {
                 <div className="mb-header-profile-menu mz-header-profile-menu">
                   <div className="mb-profile-menu-header">
                     <div className="mb-profile-menu-name">{customerName || 'Mubashir Ahmed'}</div>
-                    <div className="mb-profile-menu-email">{user?.email || 'mubashir.royal@malkazai.com'}</div>
+                    <div className="mb-profile-menu-email">{user?.email || 'mubashir.royal@malkaz.com'}</div>
                   </div>
 
                   <button

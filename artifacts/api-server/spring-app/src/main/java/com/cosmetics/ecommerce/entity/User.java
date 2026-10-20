@@ -40,6 +40,11 @@ public class User implements UserDetails {
     private Instant createdAt;
     @UpdateTimestamp
     private Instant updatedAt;
+    @Column(name = "referral_code", unique = true, length = 40)
+    private String referralCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "referred_by_id")
+    private User referredBy;
 
     protected User() {}
 
@@ -105,4 +110,8 @@ public class User implements UserDetails {
     public void setPassword(String password) { this.password = password; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
     public void setRole(Role role) { this.role = role; }
+    public String getReferralCode() { return referralCode; }
+    public void setReferralCode(String referralCode) { this.referralCode = referralCode; }
+    public User getReferredBy() { return referredBy; }
+    public void setReferredBy(User referredBy) { this.referredBy = referredBy; }
 }

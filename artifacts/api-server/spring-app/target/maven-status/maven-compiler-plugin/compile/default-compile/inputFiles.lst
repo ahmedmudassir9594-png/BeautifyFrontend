@@ -10,6 +10,7 @@ C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-s
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\controller\HealthController.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\controller\OrderController.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\controller\ProductController.java
+C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\controller\ReferralController.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\controller\ReviewController.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\controller\WishlistController.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\CosmeticsEcommerceApplication.java
@@ -22,6 +23,7 @@ C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-s
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\dto\OrderDtos.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\dto\PageResponse.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\dto\ProfileDtos.java
+C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\dto\ReferralDtos.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\dto\ReviewDtos.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\dto\UserResponse.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\email\EmailService.java
@@ -38,6 +40,7 @@ C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-s
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\entity\Product.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\entity\ProductImage.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\entity\ProductVariant.java
+C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\entity\Referral.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\entity\Review.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\entity\User.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\entity\Wishlist.java
@@ -46,6 +49,7 @@ C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-s
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\enums\OrderStatus.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\enums\PaymentMethod.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\enums\PaymentStatus.java
+C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\enums\ReferralStatus.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\enums\Role.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\exception\BadRequestException.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\exception\DuplicateResourceException.java
@@ -67,6 +71,7 @@ C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-s
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\repository\PasswordResetTokenRepository.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\repository\PaymentRepository.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\repository\ProductRepository.java
+C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\repository\ReferralRepository.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\repository\ReviewRepository.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\repository\UserRepository.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\repository\WishlistRepository.java
@@ -80,6 +85,7 @@ C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-s
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\service\DashboardService.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\service\OrderService.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\service\ProductService.java
+C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\service\ReferralService.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\service\ReviewService.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\service\UserAdminService.java
 C:\Users\HP\OneDrive\Desktop\masterim\MyBeautify-cosmetics-store\artifacts\api-server\spring-app\src\main\java\com\cosmetics\ecommerce\service\WishlistService.java

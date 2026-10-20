@@ -1649,11 +1649,12 @@
   margin-bottom: 16px !important;
 }
 
-.mz-sidebar-logo-img {
+.mz-sidebar-logo-img,
+.mz-sidebar-logo-emblem {
   width: 100%;
-  max-width: 175px;
+  max-width: 110px;
   height: auto;
-  max-height: 150px;
+  max-height: 95px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
@@ -1661,8 +1662,29 @@
   transition: transform 0.25s ease;
 }
 
-.mz-sidebar-brand:hover .mz-sidebar-logo-img {
-  transform: scale(1.02);
+.mz-sidebar-brand:hover .mz-sidebar-logo-img,
+.mz-sidebar-brand:hover .mz-sidebar-logo-emblem {
+  transform: scale(1.03);
+}
+
+.mz-sidebar-brand-name {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #D4AF63;
+  text-transform: uppercase;
+  margin-top: 10px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45), 0 0 15px rgba(212, 175, 99, 0.25);
+  text-align: center;
+  display: block;
+  line-height: 1.1;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.mz-sidebar-brand:hover .mz-sidebar-brand-name {
+  color: #F1D489;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6), 0 0 18px rgba(212, 175, 99, 0.45);
 }
 
 .mz-sidebar-nav {
@@ -2439,5 +2461,446 @@
 .mz-add-cart-icon {
   color: #063B2F !important;
 }
+
+/* ==========================================================================
+   MALKAZ SHARE & REFERRAL PAGE STYLES
+   ========================================================================== */
+.mz-referral-page {
+  padding: 28px 32px 60px 32px;
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Hero Section */
+.mz-referral-hero {
+  position: relative;
+  background: linear-gradient(135deg, #074537 0%, #063B2F 50%, #04251D 100%);
+  border: 1px solid rgba(212, 175, 99, 0.35);
+  border-radius: 18px;
+  padding: 40px 48px;
+  color: #FAF7F2;
+  box-shadow: 0 12px 36px rgba(6, 59, 47, 0.22);
+  overflow: hidden;
+}
+
+.mz-referral-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 99, 0.22) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.mz-referral-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  background: rgba(212, 175, 99, 0.16);
+  border: 1px solid rgba(212, 175, 99, 0.4);
+  border-radius: 999px;
+  color: #D4AF63;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.mz-referral-hero-title {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #FAF7F2;
+  letter-spacing: 0.03em;
+  margin: 0 0 12px 0;
+  line-height: 1.25;
+}
+
+.mz-referral-hero-desc {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #E2D7C3;
+  max-width: 680px;
+  margin: 0;
+}
+
+/* Two-column Main Grid */
+.mz-referral-main-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 24px;
+}
+
+@media (max-width: 992px) {
+  .mz-referral-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mz-referral-card {
+  background: #FFFFFF;
+  border: 1px solid #EAE0D0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(6, 59, 47, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.mz-referral-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #F1E9DC;
+  padding-bottom: 14px;
+}
+
+.mz-referral-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(212, 175, 99, 0.14);
+  border: 1px solid rgba(212, 175, 99, 0.35);
+  color: #B58D3D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mz-referral-card-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: #063B2F;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.mz-referral-code-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FAF7F2;
+  border: 1.5px dashed #D4AF63;
+  border-radius: 12px;
+  padding: 12px 18px;
+  gap: 12px;
+}
+
+.mz-referral-code-val {
+  font-family: 'Cinzel', monospace, serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #063B2F;
+}
+
+/* Link Share Row */
+.mz-referral-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #FAF7F2;
+  border: 1px solid #DCD0BD;
+  border-radius: 10px;
+  padding: 4px 6px 4px 14px;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.mz-referral-input-wrap:focus-within {
+  border-color: #D4AF63;
+  box-shadow: 0 0 0 3px rgba(212, 175, 99, 0.18);
+}
+
+.mz-referral-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13.5px;
+  color: #063B2F;
+  width: 100%;
+  font-family: inherit;
+}
+
+.mz-referral-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mz-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  background: #D4AF63;
+  color: #063B2F;
+  border: 1px solid #C29B38;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 10px rgba(212, 175, 99, 0.28);
+}
+
+.mz-btn-gold:hover {
+  background: #DFBA6B;
+  color: #04241C;
+  border-color: #D4AF63;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(212, 175, 99, 0.38);
+}
+
+.mz-btn-emerald-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  background: transparent;
+  color: #063B2F;
+  border: 1.5px solid #063B2F;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mz-btn-emerald-outline:hover {
+  background: rgba(6, 59, 47, 0.08);
+  border-color: #04241C;
+  transform: translateY(-1px);
+}
+
+/* Friend Discount Card */
+.mz-promo-highlight-card {
+  background: linear-gradient(135deg, #074537 0%, #063B2F 100%);
+  border: 1px solid rgba(212, 175, 99, 0.4);
+  border-radius: 16px;
+  padding: 28px;
+  color: #FAF7F2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 8px 24px rgba(6, 59, 47, 0.16);
+}
+
+.mz-promo-discount-num {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 44px;
+  font-weight: 700;
+  color: #D4AF63;
+  line-height: 1;
+}
+
+.mz-promo-desc-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #E2D7C3;
+  margin: 0;
+}
+
+/* Statistics Grid */
+.mz-referral-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .mz-referral-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .mz-referral-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mz-stat-card {
+  background: #FFFFFF;
+  border: 1px solid #EAE0D0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 3px 12px rgba(6, 59, 47, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mz-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(6, 59, 47, 0.08);
+  border-color: rgba(212, 175, 99, 0.4);
+}
+
+.mz-stat-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(212, 175, 99, 0.14);
+  color: #B58D3D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mz-stat-number {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #063B2F;
+  line-height: 1.1;
+}
+
+.mz-stat-label {
+  font-size: 12.5px;
+  color: #7A6F62;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+/* How It Works Section */
+.mz-how-it-works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .mz-how-it-works-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mz-step-card {
+  background: #FFFFFF;
+  border: 1px solid #EAE0D0;
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+.mz-step-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #D4AF63;
+  color: #063B2F;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mz-step-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #063B2F;
+  margin: 0;
+}
+
+.mz-step-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #6E6659;
+  margin: 0;
+}
+
+/* Table and Empty State */
+.mz-referral-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.mz-referral-table th {
+  background: #FAF7F2;
+  color: #063B2F;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid #EAE0D0;
+}
+
+.mz-referral-table td {
+  padding: 14px 16px;
+  font-size: 13.5px;
+  color: #4A4036;
+  border-bottom: 1px solid #F1EAE0;
+}
+
+.mz-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.mz-status-registered {
+  background: #FFF4E5;
+  color: #B56A00;
+  border: 1px solid #FFD8A8;
+}
+
+.mz-status-completed {
+  background: #E6F7F0;
+  color: #097A54;
+  border: 1px solid #A3E5C8;
+}
+
+.mz-referral-empty-state {
+  text-align: center;
+  padding: 44px 20px;
+  color: #7A6F62;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.mz-referral-empty-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(212, 175, 99, 0.14);
+  color: #B58D3D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
 
 

@@ -23,9 +23,16 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordResetTokenRepository resetTokens;
     private final EmailService emailService;
+    private final ReferralService referralService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, PasswordResetTokenRepository resetTokens, EmailService emailService) {
-        this.userRepository = userRepository; this.passwordEncoder = passwordEncoder; this.jwtService = jwtService; this.resetTokens = resetTokens; this.emailService = emailService;
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
+                       PasswordResetTokenRepository resetTokens, EmailService emailService, ReferralService referralService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.resetTokens = resetTokens;
+        this.emailService = emailService;
+        this.referralService = referralService;
     }
 
     @Transactional
@@ -39,6 +46,11 @@ public class AuthService {
         user.setFullName(fullName);
         user.setPhoneNumber(request.phoneNumber());
         userRepository.save(user);
+
+        if (request.referralCode() != null && !request.referralCode().isBlank()) {
+            referralService.linkReferralOnRegister(user, request.referralCode());
+        }
+
         emailService.sendWelcome(user.getEmail(), user.getFirstName());
         return tokens(user);
     }

@@ -35,6 +35,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phoneNumber?: string;
+  referralCode?: string;
 }
 
 export interface ForgotPasswordRequest {

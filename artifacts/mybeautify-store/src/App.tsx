@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { setBaseUrl, setAuthTokenGetter } from '@workspace/api-client-react';
 import { Toaster } from '@/components/ui/toaster';
@@ -19,6 +20,16 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (ref && ref.trim()) {
+        localStorage.setItem('malkaz_referral_code', ref.trim().toUpperCase());
+      }
+    } catch {}
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

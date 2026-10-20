@@ -9,9 +9,14 @@ public final class AuthDtos {
                                   String fullName,
                                   @NotBlank @Email @Size(max = 190) String email,
                                   @NotBlank @Size(min = 8, max = 72) String password,
-                                  @Size(max = 30) String phoneNumber) {
+                                  @Size(max = 30) String phoneNumber,
+                                  String referralCode) {
         public RegisterRequest(String firstName, String lastName, String email, String password, String phoneNumber) {
-            this(firstName, lastName, null, email, password, phoneNumber);
+            this(firstName, lastName, null, email, password, phoneNumber, null);
+        }
+
+        public RegisterRequest(String firstName, String lastName, String fullName, String email, String password, String phoneNumber) {
+            this(firstName, lastName, fullName, email, password, phoneNumber, null);
         }
 
         public String effectiveFirstName() {

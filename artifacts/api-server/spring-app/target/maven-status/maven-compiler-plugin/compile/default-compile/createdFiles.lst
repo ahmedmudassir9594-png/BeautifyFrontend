@@ -1,0 +1,10 @@
+com\cosmetics\ecommerce\dto\ReferralDtos$ValidateReferralResponse.class
+com\cosmetics\ecommerce\dto\ReferralDtos$ReferralItemDto.class
+com\cosmetics\ecommerce\enums\ReferralStatus.class
+com\cosmetics\ecommerce\dto\ReferralDtos$ReferralDiscountInfo.class
+com\cosmetics\ecommerce\dto\ReferralDtos.class
+com\cosmetics\ecommerce\dto\ReferralDtos$ReferralSummaryResponse.class
+com\cosmetics\ecommerce\entity\Referral.class
+com\cosmetics\ecommerce\repository\ReferralRepository.class
+com\cosmetics\ecommerce\controller\ReferralController.class
+com\cosmetics\ecommerce\service\ReferralService.class
