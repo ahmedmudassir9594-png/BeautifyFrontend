@@ -92,6 +92,33 @@ export async function register(
   return res;
 }
 
+export async function loginWithGoogle(
+  credential: string,
+  remember = false
+): Promise<AuthResponse> {
+  if (!credential.trim()) {
+    throw new Error('Google did not return an identity token.');
+  }
+
+  const res = await request<AuthResponse>('/auth/google', {
+    method: 'POST',
+    body: JSON.stringify({ credential }),
+  });
+  const token = res.accessToken || res.token;
+
+  if (!token || !res.user) {
+    throw new Error('The server returned an incomplete Google sign-in response.');
+  }
+
+  setAuthToken(token, remember);
+  if (res.refreshToken) {
+    setRefreshToken(res.refreshToken, remember);
+  }
+  setCachedUser(res.user);
+
+  return { ...res, accessToken: token };
+}
+
 export async function forgotPassword(
   payload: ForgotPasswordRequest
 ): Promise<{ success?: boolean; message?: string }> {

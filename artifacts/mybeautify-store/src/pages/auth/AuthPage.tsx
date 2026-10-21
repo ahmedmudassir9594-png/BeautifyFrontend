@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
   Mail,
@@ -13,11 +13,41 @@ import {
   CheckCircle2,
   Loader2,
   X,
+  ShieldCheck,
 } from 'lucide-react';
-import { login, register, forgotPassword } from '@/services/auth/auth.service';
+import { login, loginWithGoogle, register, forgotPassword } from '@/services/auth/auth.service';
 import { hasAdminRole } from '@/utils/auth';
 export { hasAdminRole };
 import '@/styles/auth.css';
+
+const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  '406643680175-rsvath699gbutrptvm32ju56sf3mopb3.apps.googleusercontent.com';
+
+interface GoogleCredentialResponse {
+  credential?: string;
+}
+
+interface GoogleIdentityApi {
+  initialize: (options: {
+    client_id: string;
+    callback: (response: GoogleCredentialResponse) => void;
+  }) => void;
+  renderButton: (
+    element: HTMLElement,
+    options: { theme: 'outline'; size: 'large'; shape: 'pill'; text: 'continue_with'; width: string }
+  ) => void;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: GoogleIdentityApi;
+      };
+    };
+  }
+}
 
 interface AuthPageProps {
   mode: 'login' | 'register';
@@ -25,6 +55,7 @@ interface AuthPageProps {
 
 export default function AuthPage({ mode }: AuthPageProps) {
   const [, setLocation] = useLocation();
+  const googleButtonRef = useRef<HTMLDivElement>(null);
   const isRegister = mode === 'register';
 
   // Extract redirect target safely (prevent open redirect attacks)
@@ -58,6 +89,76 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogleCredential = useCallback(async (response: GoogleCredentialResponse) => {
+    setErrorMessage('');
+    setSuccessMessage('');
+    if (!response.credential) {
+      setErrorMessage('Google did not return an identity token. Please try again.');
+      return;
+    }
+
+    setGoogleLoading(true);
+    try {
+      const result = await loginWithGoogle(response.credential, rememberMe);
+      setSuccessMessage('Google sign-in successful. Welcome to MALKAZ.');
+      setTimeout(() => {
+        setLocation(hasAdminRole(result.user?.role) ? '/admin' : (safeRedirect || '/'));
+      }, 500);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Google sign-in could not be completed.';
+      setErrorMessage(
+        `${message} If the Google sign-in endpoint is not available, the backend must verify the Google ID token and return the application session.`
+      );
+    } finally {
+      setGoogleLoading(false);
+    }
+  }, [rememberMe, safeRedirect, setLocation]);
+
+  useEffect(() => {
+    let active = true;
+    const scriptUrl = 'https://accounts.google.com/gsi/client';
+
+    const initializeGoogleButton = () => {
+      if (!active || !googleButtonRef.current || !window.google?.accounts.id) return;
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (response) => {
+          void handleGoogleCredential(response);
+        },
+      });
+      googleButtonRef.current.replaceChildren();
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        theme: 'outline',
+        size: 'large',
+        shape: 'pill',
+        text: 'continue_with',
+        width: '360',
+      });
+    };
+
+    if (window.google?.accounts.id) {
+      initializeGoogleButton();
+    } else {
+      let script = document.querySelector<HTMLScriptElement>(`script[src="${scriptUrl}"]`);
+      if (!script) {
+        script = document.createElement('script');
+        script.src = scriptUrl;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+      script.addEventListener('load', initializeGoogleButton, { once: true });
+      script.addEventListener('error', () => {
+        if (active) setErrorMessage('Google sign-in could not load. Check your connection and try again.');
+      }, { once: true });
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [handleGoogleCredential]);
 
   // Forgot password modal
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
@@ -315,6 +416,20 @@ export default function AuthPage({ mode }: AuthPageProps) {
             </div>
           )}
 
+          <div className="auth-google-section">
+            <div className="auth-google-button" ref={googleButtonRef} />
+            {googleLoading && (
+              <p className="auth-google-status" role="status">
+                <Loader2 size={14} className="animate-spin" /> Verifying Google account…
+              </p>
+            )}
+            <p className="auth-google-note">
+              <ShieldCheck size={13} /> Your Google identity is verified securely.
+            </p>
+          </div>
+
+          <div className="auth-divider" aria-hidden="true"><span>or continue with email</span></div>
+
           {/* Main Auth Form */}
           <form className="auth-form-body" onSubmit={handleAuthSubmit} noValidate>
             {/* 1. Full Name (Sign Up only) */}
@@ -489,7 +604,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
             <button
               type="submit"
               className="auth-submit-btn"
-              disabled={loading}
+              disabled={loading || googleLoading}
               data-testid="button-submit-auth"
             >
               {loading ? (
