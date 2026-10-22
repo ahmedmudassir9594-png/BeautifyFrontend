@@ -3163,3 +3163,37 @@
     min-width: 610px;
   }
 }
+
+/* ==========================================================================
+   Hidden Admin Dashboard Shortcut (Discreet Role-Verified Control)
+   ========================================================================== */
+.mb-admin-shortcut-btn {
+  text-decoration: none;
+  color: var(--mb-text-dark, #2b2b2b);
+}
+
+.mb-admin-shortcut-btn:hover {
+  border-color: #d4af37 !important;
+  background: rgba(212, 175, 55, 0.08) !important;
+  color: var(--mb-primary, #123a30) !important;
+  transform: translateY(-1px);
+}
+
+.mb-admin-shortcut-icon {
+  color: var(--mb-primary, #123a30);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.mb-admin-shortcut-btn:hover .mb-admin-shortcut-icon {
+  color: #936f23;
+  transform: scale(1.08);
+}
+
+.mb-profile-admin-link {
+  background: rgba(23, 92, 76, 0.04);
+}
+
+.mb-profile-admin-link:hover {
+  background: rgba(23, 92, 76, 0.1);
+}
+

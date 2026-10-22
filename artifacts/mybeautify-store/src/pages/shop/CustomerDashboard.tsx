@@ -29,7 +29,9 @@ import {
   Trash2,
   SlidersHorizontal,
   Share2,
+  Shield,
 } from 'lucide-react';
+import { hasAdminRole } from '@/utils/auth';
 import {
   fetchProducts,
   fetchCategories,
@@ -89,6 +91,12 @@ export default function CustomerDashboard() {
   // Authentication & User State
   const [user, setUser] = useState<UserResponse | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  // Hidden admin shortcut verified role - strictly requires verified ADMIN role and non-loading state
+  const isVerifiedAdmin = useMemo(() => {
+    if (authLoading || !user) return false;
+    return hasAdminRole(user.role) || hasAdminRole(user);
+  }, [authLoading, user]);
 
   // Layout & UI States
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -603,6 +611,19 @@ export default function CustomerDashboard() {
 
           {/* Right actions: Wishlist, Cart, Profile */}
           <div className="mb-header-right-actions mz-header-right-actions">
+            {/* Discreet Admin Dashboard Shortcut - Visible strictly ONLY for verified ADMIN */}
+            {isVerifiedAdmin && (
+              <Link
+                href="/admin"
+                className="mb-header-icon-btn mz-header-icon-btn mb-admin-shortcut-btn"
+                aria-label="Admin Dashboard"
+                title="Admin Dashboard"
+                data-testid="header-admin-shortcut-btn"
+              >
+                <Shield size={20} className="mb-admin-shortcut-icon" />
+              </Link>
+            )}
+
             {/* Wishlist icon button */}
             <button
               type="button"
@@ -741,6 +762,19 @@ export default function CustomerDashboard() {
                     <Heart size={15} />
                     <span>Saved Wishlist</span>
                   </button>
+
+                  {isVerifiedAdmin && (
+                    <Link
+                      href="/admin"
+                      className="mb-profile-menu-item mb-profile-admin-link"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      title="Admin Dashboard"
+                      data-testid="menu-admin-shortcut-link"
+                    >
+                      <Shield size={15} style={{ color: 'var(--mb-primary, #123a30)' }} />
+                      <span style={{ fontWeight: 600, color: 'var(--mb-primary, #123a30)' }}>Admin Dashboard</span>
+                    </Link>
+                  )}
 
                   {user ? (
                     <button

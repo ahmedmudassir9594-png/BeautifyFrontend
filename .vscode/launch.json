@@ -2,7 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "MyBeautify Store (Vite)",
+      "name": "MyBeautify Store (Run Without Debugging)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/run-dev.js",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "MyBeautify Store (Chrome)",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:5173/",

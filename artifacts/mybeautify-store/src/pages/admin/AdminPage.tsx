@@ -5,6 +5,8 @@ import { customFetch } from '@workspace/api-client-react/custom-fetch';
 import { ArrowRight, Gem, Layers3, Package, Pencil, Plus, Sparkles, TrendingDown, Trash2 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { getJewelleryImage } from '@/lib/jewellery-images';
+import { AuditLogsView } from './AuditLogsView';
+import { DeveloperToolsView } from './DeveloperToolsView';
 import '@/styles/admin.css';
 
 type AdminProduct = {
@@ -258,7 +260,7 @@ function CrudPanel<T extends { id: number }>({
 }
 
 function AdminConsole() {
-  const [section, setSection] = useState<'products' | 'categories' | 'brands'>('products');
+  const [section, setSection] = useState<'products' | 'categories' | 'brands' | 'audit' | 'developer'>('products');
   const [page, setPage] = useState(0);
   const productsQuery = useQuery({
     queryKey: ['admin-products', page],
@@ -332,10 +334,30 @@ function AdminConsole() {
         <small>{!productsQuery.data ? 'Stock overview' : lowStockCount ? 'Items to replenish' : 'Stock levels look healthy'}</small>
       </article>
     </section>
-    <nav className="admin-tabs" aria-label="Admin management sections">
-      {(['products', 'categories', 'brands'] as const).map((item) => <button key={item} type="button" className={`admin-tab ${section === item ? 'active' : ''}`} onClick={() => { setSection(item); setPage(0); }}>
-        {item[0].toUpperCase() + item.slice(1)}
-      </button>)}
+    <nav className="admin-tabs" aria-label="Admin management sections" role="tablist">
+      {(
+        [
+          { id: 'products', label: 'Products' },
+          { id: 'categories', label: 'Categories' },
+          { id: 'brands', label: 'Brands' },
+          { id: 'audit', label: 'Audit Logs' },
+          { id: 'developer', label: 'Developer' },
+        ] as const
+      ).map((item) => (
+        <button
+          key={item.id}
+          type="button"
+          role="tab"
+          aria-selected={section === item.id}
+          className={`admin-tab ${section === item.id ? 'active' : ''}`}
+          onClick={() => {
+            setSection(item.id);
+            setPage(0);
+          }}
+        >
+          {item.label}
+        </button>
+      ))}
     </nav>
     {section === 'products' && (productsQuery.isLoading || categoriesQuery.isLoading || brandsQuery.isLoading)
       ? <div className="skeleton line" />
@@ -386,7 +408,11 @@ function AdminConsole() {
                         { label: 'Description', render: (item) => item.description ?? '—' },
                         { label: 'Status', render: (item) => item.active ? 'Active' : 'Inactive' },
                       ]} />
-                      : null}
+                      : section === 'audit'
+                        ? <AuditLogsView />
+                        : section === 'developer'
+                          ? <DeveloperToolsView />
+                          : null}
     <p className="admin-back"><Link href="/account">Back to account</Link></p>
   </main>;
 }

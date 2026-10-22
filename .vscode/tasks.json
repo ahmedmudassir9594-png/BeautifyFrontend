@@ -4,9 +4,9 @@
     {
       "label": "Start MyBeautify Frontend",
       "type": "shell",
-      "command": "npm run dev",
+      "command": "node scripts/run-dev.js",
       "options": {
-        "cwd": "${workspaceFolder}/artifacts/mybeautify-store"
+        "cwd": "${workspaceFolder}"
       },
       "isBackground": true,
       "problemMatcher": {
@@ -17,7 +17,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".*",
-          "endsPattern": "(Local:\\s*http|ready in)"
+          "endsPattern": "(Local:\\s*http|ready in|already running|Opening Google Chrome)"
         }
       },
       "presentation": {

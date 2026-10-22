@@ -542,10 +542,39 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: requestUrl };
 
-  const response = await fetch(requestUrl, { ...init, method, headers, body: requestBody });
+  let response: Response;
+  try {
+    response = await fetch(requestUrl, { ...init, method, headers, body: requestBody });
+  } catch (netErr: any) {
+    if (typeof window !== "undefined" && typeof (window as any).__malkaz_record_diagnostic === "function") {
+      try {
+        (window as any).__malkaz_record_diagnostic({
+          status: null,
+          statusText: "Network Failure",
+          method,
+          endpoint: requestUrl,
+          errorMessage: netErr?.message || "Network request failed",
+          isNetworkError: true,
+        });
+      } catch {}
+    }
+    throw netErr;
+  }
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
+    if (typeof window !== "undefined" && typeof (window as any).__malkaz_record_diagnostic === "function") {
+      try {
+        (window as any).__malkaz_record_diagnostic({
+          status: response.status,
+          statusText: response.statusText,
+          method,
+          endpoint: requestUrl,
+          errorMessage: buildErrorMessage(response, errorData),
+          isNetworkError: false,
+        });
+      } catch {}
+    }
     throw new ApiError(response, errorData, requestInfo);
   }
 

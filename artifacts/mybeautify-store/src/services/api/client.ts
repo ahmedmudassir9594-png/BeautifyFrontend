@@ -4,8 +4,13 @@
  */
 
 import { STORAGE_KEYS } from '@/constants';
+import { recordApiDiagnosticError } from '@/services/diagnostics/diagnosticStore';
 
-const DEFAULT_API_BASE_URL = 'https://1h14g3nx-8080.inc1.devtunnels.ms/api';
+if (typeof window !== 'undefined') {
+  (window as any).__malkaz_record_diagnostic = recordApiDiagnosticError;
+}
+
+const DEFAULT_API_BASE_URL = 'http://localhost:8080/api';
 
 export function getApiBaseUrl(): string {
   const envUrl =
@@ -136,6 +141,8 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
   }
 
   const url = buildApiUrl(endpoint);
+  const method = (options.method || 'GET').toUpperCase();
+  const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
   let res: Response;
   try {
@@ -145,6 +152,16 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
     });
   } catch (netErr: any) {
     const errorMsg = netErr?.message || 'Network error: could not connect to backend at ' + getApiBaseUrl();
+    const duration = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
+    recordApiDiagnosticError({
+      status: null,
+      statusText: 'Network Failure',
+      method,
+      endpoint,
+      errorMessage: errorMsg,
+      durationMs: duration,
+      isNetworkError: true,
+    });
     throw new Error(errorMsg);
   }
 
@@ -168,15 +185,37 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
     }
   }
 
+  const duration = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
+  const correlationId = res.headers.get('x-correlation-id') || res.headers.get('x-request-id');
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
     const msg = data?.message || data?.error || (typeof data === 'string' ? data : null) || `Request failed with status ${res.status}`;
+    recordApiDiagnosticError({
+      status: res.status,
+      statusText: res.statusText || `HTTP ${res.status}`,
+      method,
+      endpoint,
+      errorMessage: msg,
+      correlationId,
+      durationMs: duration,
+      isNetworkError: false,
+    });
     throw new Error(msg);
   }
 
   // Handle explicit failure flags in 200 responses
   if (data && typeof data === 'object' && 'success' in data && data.success === false) {
+    recordApiDiagnosticError({
+      status: res.status,
+      statusText: 'Operation Failed',
+      method,
+      endpoint,
+      errorMessage: data.message || 'Operation failed',
+      correlationId,
+      durationMs: duration,
+      isNetworkError: false,
+    });
     throw new Error(data.message || 'Operation failed');
   }
 

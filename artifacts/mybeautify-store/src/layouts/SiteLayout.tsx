@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react';
+import { Menu, Search, ShoppingBag, UserRound, X, Shield } from 'lucide-react';
 import { useGetCart } from '@workspace/api-client-react';
 import { BrandMark } from '@/components/common/BrandMark';
 import { toArray } from '@/utils/array';
 import { hasAdminRole } from '@/utils/auth';
 import { STORAGE_KEYS } from '@/constants';
+import { getAuthToken } from '@/services/api/client';
 
 export interface SiteLayoutProps {
   children: ReactNode;
@@ -56,13 +57,15 @@ export function SiteLayout({ children }: SiteLayoutProps) {
           ))}
         </nav>
         <div className="nav-actions">
-          {hasAdminRole(currentUser?.role) && (
+          {Boolean(getAuthToken()) && hasAdminRole(currentUser?.role) && (
             <Link
               href="/admin"
-              className="button secondary small"
+              className="icon-button"
+              aria-label="Admin Dashboard"
+              title="Admin Dashboard"
               data-testid="link-admin-dashboard"
             >
-              Admin
+              <Shield size={18} />
             </Link>
           )}
           <Link href="/shop" className="icon-button" aria-label="Search products" data-testid="link-search">
