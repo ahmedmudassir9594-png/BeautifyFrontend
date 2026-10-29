@@ -29,7 +29,9 @@ import {
   RotateCcw,
   Check,
   Menu,
+  Shield,
 } from 'lucide-react';
+import { hasAdminRole } from '@/utils/auth';
 import {
   fetchOrders,
   fetchOrderById,
@@ -466,14 +468,58 @@ export default function MyOrdersPage() {
       <main className="mb-orders-main">
         {/* Top Header Bar */}
         <header className="mb-orders-topbar">
-          <button
-            type="button"
-            className="mz-orders-mobile-menu"
-            onClick={() => setMobileSidebarOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={24} />
-          </button>
+          <div className="mb-orders-topbar-top-row">
+            <button
+              type="button"
+              className="mz-orders-mobile-menu"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={24} />
+            </button>
+
+            {/* Mobile brand emblem + title */}
+            <Link href="/shop" className="mz-mobile-brand-mark" aria-label="Malkaz Home">
+              <span className="mz-mobile-brand-icon">
+                <Sparkles size={16} />
+              </span>
+              <span className="mz-mobile-brand-name">MALKAZ</span>
+            </Link>
+
+            <div className="mb-orders-topbar-actions">
+              {/* Admin Panel Link for Staff / Admins */}
+              {user && hasAdminRole(user) && (
+                <Link
+                  href="/admin"
+                  className="mb-orders-icon-btn mz-admin-badge-btn"
+                  title="Admin Control Panel"
+                  aria-label="Admin Control Panel"
+                >
+                  <Shield size={19} />
+                  <span className="mz-admin-badge-label">Admin</span>
+                </Link>
+              )}
+
+              {/* Wishlist Button */}
+              <Link href="/wishlist" className="mb-orders-icon-btn" aria-label="Wishlist">
+                <Heart size={20} />
+                {wishlistCount > 0 && <span className="mb-orders-badge-pill">{wishlistCount}</span>}
+              </Link>
+
+              {/* Cart Button matching Checkout & My Orders shared component */}
+              <HeaderCartButton count={cartCount} href="/cart" />
+
+              {/* Customer Profile Pill matching Checkout */}
+              <CustomerProfilePill
+                user={user}
+                isOpen={profileDropdownOpen}
+                onToggle={() => setProfileDropdownOpen((prev) => !prev)}
+                onClose={() => setProfileDropdownOpen(false)}
+                onLogout={handleLogout}
+              />
+            </div>
+          </div>
+
           <div className="mb-orders-search-wrap">
             <Search size={18} className="mb-orders-search-icon" />
             <input
@@ -486,26 +532,6 @@ export default function MyOrdersPage() {
                   if (val.trim()) setLocation(`/shop?q=${encodeURIComponent(val.trim())}`);
                 }
               }}
-            />
-          </div>
-
-          <div className="mb-orders-topbar-actions">
-            {/* Wishlist Button */}
-            <Link href="/wishlist" className="mb-orders-icon-btn" aria-label="Wishlist">
-              <Heart size={20} />
-              {wishlistCount > 0 && <span className="mb-orders-badge-pill">{wishlistCount}</span>}
-            </Link>
-
-            {/* Cart Button matching Checkout & My Orders shared component */}
-            <HeaderCartButton count={cartCount} href="/cart" />
-
-            {/* Customer Profile Pill matching Checkout */}
-            <CustomerProfilePill
-              user={user}
-              isOpen={profileDropdownOpen}
-              onToggle={() => setProfileDropdownOpen((prev) => !prev)}
-              onClose={() => setProfileDropdownOpen(false)}
-              onLogout={handleLogout}
             />
           </div>
         </header>

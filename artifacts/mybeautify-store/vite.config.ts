@@ -9,7 +9,7 @@ import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
 const rawPort = process.env.PORT || '5173';
 const port = Number(rawPort) || 5173;
 const basePath = process.env.BASE_PATH || '/';
-const apiProxyTarget = process.env.API_PROXY_TARGET || 'http://localhost:8080';
+const apiProxyTarget = process.env.API_PROXY_TARGET || 'https://malkaz.onrender.com';
 
 export default defineConfig({
   base: basePath,

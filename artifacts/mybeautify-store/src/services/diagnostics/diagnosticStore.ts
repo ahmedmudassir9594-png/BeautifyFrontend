@@ -206,12 +206,12 @@ export const HTTP_STATUS_REFERENCE: HttpStatusReferenceItem[] = [
     category: '5xx',
     explanation: 'The proxy or gateway received an invalid response from the upstream Spring Boot application server.',
     potentialCauses: [
-      'Spring Boot backend process terminated unexpectedly or crashed on port 8080',
-      'Vite dev server proxy unable to reach http://localhost:8080/api',
+      'Spring Boot backend process terminated unexpectedly or crashed',
+      'Vite dev server proxy unable to reach https://malkaz.onrender.com/api',
     ],
     operationalImpact: 'All frontend API calls fail immediately with gateway connection refusal.',
     recommendedResolution: [
-      'Verify Spring Boot backend is actively running and listening on port 8080.',
+      'Verify Spring Boot backend is actively running at https://malkaz.onrender.com/api.',
       'Check backend console for fatal startup errors or out-of-memory errors.',
     ],
     affectedModules: ['Vite Proxy', 'Storefront Network Layer'],
@@ -270,13 +270,13 @@ function generateInterpretation(status: number | null, isNetwork: boolean, endpo
     return {
       errorSummary: 'Network connectivity failure — unable to establish connection with backend server.',
       potentialCauses: [
-        'Spring Boot backend service is not running on port 8080',
+        'Spring Boot backend service is not running or unreachable',
         'Vite dev server proxy misconfiguration or target mismatch',
         'Local firewall or network socket connection refused',
       ],
       operationalImpact: 'All communication with the server is blocked. Storefront and admin actions cannot complete.',
-      recommendedResolution: 'Check if the Spring Boot application is running on port 8080. Test GET /api/healthz directly.',
-      developerInvestigation: 'Inspect terminal logs of Spring Boot and Vite dev server. Verify PORT=8080 and API_PROXY_TARGET.',
+      recommendedResolution: 'Check if the backend is reachable at https://malkaz.onrender.com/api. Test GET /api/healthz directly.',
+      developerInvestigation: 'Inspect network requests and Vite dev server. Verify API_PROXY_TARGET.',
     };
   }
 

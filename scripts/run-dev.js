@@ -9,6 +9,7 @@
  */
 
 import http from 'node:http';
+import https from 'node:https';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const storeRootDir = path.resolve(__dirname, '..');
 
+const RENDER_BACKEND_URL = 'https://malkaz.onrender.com/api/healthz';
 const BACKEND_URL = 'http://localhost:8080/api/healthz';
 const BACKEND_PORT = 8080;
 const FRONTEND_PORT = 5173;
@@ -54,9 +56,11 @@ function checkPort(port, host = '127.0.0.1', timeout = 1000) {
   });
 }
 
-function checkHttp(url, timeout = 2000) {
+function checkHttp(url, timeout = 3000) {
   return new Promise((resolve) => {
-    const req = http.get(url, { timeout }, (res) => {
+    const isHttps = url.startsWith('https:');
+    const client = isHttps ? https : http;
+    const req = client.get(url, { timeout }, (res) => {
       resolve(res.statusCode >= 200 && res.statusCode < 500);
     });
     req.on('error', () => resolve(false));
@@ -68,10 +72,15 @@ function checkHttp(url, timeout = 2000) {
 }
 
 async function isBackendRunning() {
+  const remoteOk = await checkHttp(RENDER_BACKEND_URL);
+  if (remoteOk) return { ok: true, source: 'Render (https://malkaz.onrender.com/api)' };
+
   const portOpen = await checkPort(BACKEND_PORT);
-  if (!portOpen) return false;
-  const httpOk = await checkHttp(BACKEND_URL);
-  return httpOk || portOpen;
+  if (portOpen) {
+    const httpOk = await checkHttp(BACKEND_URL);
+    if (httpOk || portOpen) return { ok: true, source: 'Local port 8080' };
+  }
+  return { ok: false };
 }
 
 async function isFrontendRunning() {
@@ -115,22 +124,18 @@ async function main() {
   console.log('======================================================================\n');
 
   // 1. Verify Backend is running
-  log('Checking Spring Boot backend on port 8080...');
-  const backendUp = await isBackendRunning();
-  if (!backendUp) {
+  log('Checking backend API (Render: https://malkaz.onrender.com/api or Local port 8080)...');
+  const backendStatus = await isBackendRunning();
+  if (!backendStatus.ok) {
     console.error('\n' + '='.repeat(70));
-    console.error('❌ [ERROR] Spring Boot backend is NOT responding on port 8080!');
+    console.error('❌ [ERROR] Backend is NOT responding!');
     console.error('----------------------------------------------------------------------');
-    console.error('The frontend requires the Spring Boot backend to function properly.');
-    console.error('\nACTION REQUIRED:');
-    console.error('1. Open IntelliJ IDEA.');
-    console.error(`2. Open backend project at: ${BACKEND_PROJECT_DIR}`);
-    console.error('3. Start the Spring Boot Application (port 8080, context path /api).');
-    console.error('4. Once started in IntelliJ, click "Run Without Debugging" in Antigravity.');
+    console.error('The frontend requires the backend API to function properly.');
+    console.error('Checked: https://malkaz.onrender.com/api and http://localhost:8080/api');
     console.error('='.repeat(70) + '\n');
     process.exit(1);
   }
-  log('✅ Spring Boot backend is RUNNING and responding on port 8080 (context path: /api).');
+  log(`✅ Backend is ACTIVE and responding via ${backendStatus.source}.`);
 
   // 2. Check Frontend status
   log('Checking if Vite frontend is already running on port 5173...');

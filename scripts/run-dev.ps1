@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $StoreRootDir = Split-Path -Parent $ScriptDir
 
-$BackendUrl = "http://localhost:8080/api/healthz"
+$BackendUrl = "https://malkaz.onrender.com/api/healthz"
 $BackendProjectDir = "C:\Users\HP\OneDrive\Desktop\cosmeticszainab"
 $FrontendUrl = "http://localhost:5173/"
 
@@ -23,36 +23,37 @@ Write-Host "🌸 MyBeautify Store — Run Without Debugging Workflow" -Foregroun
 Write-Host "======================================================================" -ForegroundColor Magenta
 Write-Host ""
 
-# 1. Verify Backend on port 8080
-Write-Host "[MyBeautify] Checking Spring Boot backend on port 8080..." -ForegroundColor Yellow
+# 1. Verify Backend
+Write-Host "[MyBeautify] Checking backend API ($BackendUrl)..." -ForegroundColor Yellow
 $backendUp = $false
 try {
-  $tcp = Test-NetConnection -ComputerName "localhost" -Port 8080 -WarningAction SilentlyContinue
-  if ($tcp.TcpTestSucceeded) {
+  $res = Invoke-RestMethod -Uri $BackendUrl -Method Get -TimeoutSec 4 -ErrorAction Stop
+  if ($res.success -or $res.message) {
     $backendUp = $true
+    Write-Host "[MyBeautify] ✅ Backend is RUNNING at https://malkaz.onrender.com/api." -ForegroundColor Green
   }
 } catch {
-  $backendUp = $false
+  try {
+    $tcp = Test-NetConnection -ComputerName "localhost" -Port 8080 -WarningAction SilentlyContinue
+    if ($tcp.TcpTestSucceeded) {
+      $backendUp = $true
+      Write-Host "[MyBeautify] ✅ Local Spring Boot backend is RUNNING on port 8080." -ForegroundColor Green
+    }
+  } catch {}
 }
 
 if (-not $backendUp) {
   Write-Host ""
   Write-Host "======================================================================" -ForegroundColor Red
-  Write-Host "❌ [ERROR] Spring Boot backend is NOT responding on port 8080!" -ForegroundColor Red
+  Write-Host "❌ [ERROR] Backend is NOT responding!" -ForegroundColor Red
   Write-Host "----------------------------------------------------------------------" -ForegroundColor Red
-  Write-Host "The frontend requires the Spring Boot backend to function properly." -ForegroundColor Yellow
-  Write-Host ""
-  Write-Host "ACTION REQUIRED:" -ForegroundColor Cyan
-  Write-Host "1. Open IntelliJ IDEA." -ForegroundColor White
-  Write-Host "2. Open backend project at: $BackendProjectDir" -ForegroundColor White
-  Write-Host "3. Start the Spring Boot Application (port 8080, context path /api)." -ForegroundColor White
-  Write-Host "4. Once started in IntelliJ, click 'Run Without Debugging' in Antigravity." -ForegroundColor White
+  Write-Host "The frontend requires the backend API to function properly." -ForegroundColor Yellow
+  Write-Host "Render URL: https://malkaz.onrender.com/api" -ForegroundColor Cyan
+  Write-Host "Local port: http://localhost:8080/api" -ForegroundColor Cyan
   Write-Host "======================================================================" -ForegroundColor Red
   Write-Host ""
   exit 1
 }
-
-Write-Host "[MyBeautify] ✅ Spring Boot backend is RUNNING on http://localhost:8080 (context path: /api)." -ForegroundColor Green
 
 # 2. Check if Frontend is already running
 Write-Host "[MyBeautify] Checking if Vite frontend is already running on port 5173..." -ForegroundColor Yellow

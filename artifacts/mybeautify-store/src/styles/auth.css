@@ -749,4 +749,34 @@
     width: 100%;
     justify-content: space-between;
   }
+
+  .auth-text-input {
+    font-size: 16px; /* Prevents unwanted iOS Safari auto-zoom */
+  }
+}
+
+@media (max-width: 360px) {
+  .auth-page-container {
+    padding: 8px;
+  }
+
+  .auth-visual-col {
+    padding: 18px 12px 14px;
+  }
+
+  .auth-form-col {
+    padding: 18px 12px;
+  }
+
+  .auth-brand-title {
+    font-size: 22px;
+  }
+
+  .auth-main-title {
+    font-size: 24px;
+  }
+
+  .auth-submit-btn {
+    height: 46px;
+  }
 }

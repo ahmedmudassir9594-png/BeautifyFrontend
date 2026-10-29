@@ -1,4 +1,4 @@
-﻿{
+{
     "openapi":  "3.1.0",
     "info":  {
                  "title":  "Cosmetics E-Commerce API",
@@ -7,7 +7,7 @@
              },
     "servers":  [
                     {
-                        "url":  "http://localhost:8080/api",
+                        "url":  "https://malkaz.onrender.com/api",
                         "description":  "Generated server url"
                     }
                 ],

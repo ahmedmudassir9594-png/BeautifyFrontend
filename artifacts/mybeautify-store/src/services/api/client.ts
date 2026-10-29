@@ -1,6 +1,6 @@
 /**
  * Core HTTP Request Client for Spring Boot API backend
- * Context path: /api (proxied via Vite server to http://localhost:8080/api)
+ * Context path: /api (proxied via Vite server or direct to https://malkaz.onrender.com/api)
  */
 
 import { STORAGE_KEYS } from '@/constants';
@@ -10,7 +10,7 @@ if (typeof window !== 'undefined') {
   (window as any).__malkaz_record_diagnostic = recordApiDiagnosticError;
 }
 
-const DEFAULT_API_BASE_URL = 'http://localhost:8080/api';
+const DEFAULT_API_BASE_URL = 'https://malkaz.onrender.com/api';
 
 export function getApiBaseUrl(): string {
   const envUrl =

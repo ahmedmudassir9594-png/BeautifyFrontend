@@ -102,7 +102,7 @@ export function DeveloperToolsView() {
       setHealthState({
         status: 'error',
         latencyMs: duration,
-        errorMessage: err?.message || 'Network failure: could not connect to port 8080',
+        errorMessage: err?.message || 'Network failure: could not connect to backend API',
         timestamp: new Date().toLocaleTimeString(),
       });
     }
@@ -435,7 +435,7 @@ export function DeveloperToolsView() {
               </div>
               <div className="dev-prop-row">
                 <span className="dev-prop-label">Proxy Target</span>
-                <span className="dev-prop-val">http://localhost:8080</span>
+                <span className="dev-prop-val">https://malkaz.onrender.com</span>
               </div>
               <div className="dev-prop-row">
                 <span className="dev-prop-label">Environment</span>

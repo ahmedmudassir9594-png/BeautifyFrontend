@@ -24,7 +24,9 @@ import {
   AlertCircle,
   ExternalLink,
   ShieldCheck,
+  Shield,
 } from 'lucide-react';
+import { hasAdminRole } from '@/utils/auth';
 import {
   fetchMyReferralSummary,
   type ReferralSummary,
@@ -213,133 +215,167 @@ export function ShareReferralPage() {
       <div className="mb-main-content">
         {/* Top Header */}
         <header className="mb-top-header mz-top-header">
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="mb-mobile-hamburger mz-mobile-hamburger"
-            onClick={() => setMobileSidebarOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={24} />
-          </button>
-
-          {/* Search bar */}
-          <HeaderSearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search jewellery, collections and more..."
-          />
-
-          {/* Right actions */}
-          <div className="mb-header-right mz-header-right-actions">
-            {/* Wishlist */}
-            <Link
-              href="/wishlist"
-              className="mb-header-icon-btn mz-header-icon-btn"
-              title="Wishlist"
-              aria-label="View Wishlist"
+          <div className="mz-header-top-row">
+            {/* Mobile hamburger */}
+            <button
+              type="button"
+              className="mb-mobile-hamburger mz-mobile-hamburger"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open menu"
             >
-              <Heart size={20} />
-              {wishlistCount > 0 && (
-                <span className="mb-badge mz-badge-gold">{wishlistCount}</span>
-              )}
+              <Menu size={24} />
+            </button>
+
+            {/* Mobile brand emblem + title */}
+            <Link href="/shop" className="mz-mobile-brand-mark" aria-label="Malkaz Home">
+              <span className="mz-mobile-brand-icon">
+                <Sparkles size={16} />
+              </span>
+              <span className="mz-mobile-brand-name">MALKAZ</span>
             </Link>
 
-            {/* Cart */}
-            <Link
-              href="/checkout"
-              className="mb-header-icon-btn mz-header-icon-btn"
-              title="Cart"
-              aria-label="View Cart"
-            >
-              <ShoppingBag size={20} />
-              {cartCount > 0 && (
-                <span className="mb-badge mz-badge-gold">{cartCount}</span>
-              )}
-            </Link>
+            {/* Desktop Search bar */}
+            <div className="mz-desktop-search-slot">
+              <HeaderSearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search jewellery, collections and more..."
+              />
+            </div>
 
-            {/* Neutral Customer profile dropdown */}
-            <div className="mb-header-profile-wrap mz-header-profile-wrap">
-              <button
-                type="button"
-                className="mb-header-profile-chip mz-header-profile-chip mb-customer-profile-pill"
-                onClick={() => setProfileDropdownOpen((o) => !o)}
-                aria-expanded={profileDropdownOpen}
-                aria-label="User account menu"
+            {/* Right actions */}
+            <div className="mb-header-right mz-header-right-actions">
+              {/* Admin Panel Link for Staff / Admins */}
+              {user && hasAdminRole(user) && (
+                <Link
+                  href="/admin"
+                  className="mb-header-icon-btn mz-header-icon-btn mz-admin-badge-btn"
+                  title="Admin Control Panel"
+                  aria-label="Admin Control Panel"
+                >
+                  <Shield size={19} />
+                  <span className="mz-admin-badge-label">Admin</span>
+                </Link>
+              )}
+
+              {/* Wishlist */}
+              <Link
+                href="/wishlist"
+                className="mb-header-icon-btn mz-header-icon-btn"
+                title="Wishlist"
+                aria-label="View Wishlist"
               >
-                <div className="mb-header-avatar mz-header-avatar mb-customer-avatar-circle">
-                  <UserIcon size={18} aria-hidden="true" />
-                </div>
-                <span className="mb-header-profile-name mz-header-profile-name mb-customer-profile-name">
-                  {customerName}
-                </span>
-                <ChevronDown
-                  size={15}
-                  className="mb-header-profile-chevron"
-                  style={{
-                    transform: profileDropdownOpen ? 'rotate(180deg)' : 'none',
-                    transition: 'transform 0.2s ease',
-                  }}
-                />
-              </button>
+                <Heart size={20} />
+                {wishlistCount > 0 && (
+                  <span className="mb-badge mz-badge-gold">{wishlistCount}</span>
+                )}
+              </Link>
 
-              {profileDropdownOpen && (
-                <div className="mb-header-profile-menu mz-header-profile-menu">
-                  <div className="mb-profile-menu-header">
-                    <div className="mb-profile-menu-name">{customerName}</div>
-                    {user?.email && <div className="mb-profile-menu-email">{user.email}</div>}
+              {/* Cart */}
+              <Link
+                href="/checkout"
+                className="mb-header-icon-btn mz-header-icon-btn"
+                title="Cart"
+                aria-label="View Cart"
+              >
+                <ShoppingBag size={20} />
+                {cartCount > 0 && (
+                  <span className="mb-badge mz-badge-gold">{cartCount}</span>
+                )}
+              </Link>
+
+              {/* Neutral Customer profile dropdown */}
+              <div className="mb-header-profile-wrap mz-header-profile-wrap">
+                <button
+                  type="button"
+                  className="mb-header-profile-chip mz-header-profile-chip mb-customer-profile-pill"
+                  onClick={() => setProfileDropdownOpen((o) => !o)}
+                  aria-expanded={profileDropdownOpen}
+                  aria-label="User account menu"
+                >
+                  <div className="mb-header-avatar mz-header-avatar mb-customer-avatar-circle">
+                    <UserIcon size={18} aria-hidden="true" />
                   </div>
+                  <span className="mb-header-profile-name mz-header-profile-name mb-customer-profile-name">
+                    {customerName}
+                  </span>
+                  <ChevronDown
+                    size={15}
+                    className="mb-header-profile-chevron"
+                    style={{
+                      transform: profileDropdownOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease',
+                    }}
+                  />
+                </button>
 
-                  <Link
-                    href="/account"
-                    className="mb-profile-menu-item"
-                    onClick={() => setProfileDropdownOpen(false)}
-                  >
-                    <UserIcon size={15} />
-                    <span>My Profile</span>
-                  </Link>
+                {profileDropdownOpen && (
+                  <div className="mb-header-profile-menu mz-header-profile-menu">
+                    <div className="mb-profile-menu-header">
+                      <div className="mb-profile-menu-name">{customerName}</div>
+                      {user?.email && <div className="mb-profile-menu-email">{user.email}</div>}
+                    </div>
 
-                  <Link
-                    href="/orders"
-                    className="mb-profile-menu-item"
-                    onClick={() => setProfileDropdownOpen(false)}
-                  >
-                    <Package size={15} />
-                    <span>My Orders</span>
-                  </Link>
-
-                  <div className="mb-profile-menu-divider" />
-
-                  {user ? (
-                    <button
-                      type="button"
-                      className="mb-profile-menu-item logout"
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        handleLogout();
-                      }}
-                    >
-                      <LogOut size={15} />
-                      <span>Logout</span>
-                    </button>
-                  ) : (
                     <Link
-                      href="/sign-in"
+                      href="/account"
                       className="mb-profile-menu-item"
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <UserIcon size={15} />
-                      <span>Sign In</span>
+                      <span>My Profile</span>
                     </Link>
-                  )}
-                </div>
-              )}
+
+                    <Link
+                      href="/orders"
+                      className="mb-profile-menu-item"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
+                      <Package size={15} />
+                      <span>My Orders</span>
+                    </Link>
+
+                    <div className="mb-profile-menu-divider" />
+
+                    {user ? (
+                      <button
+                        type="button"
+                        className="mb-profile-menu-item logout"
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          handleLogout();
+                        }}
+                      >
+                        <LogOut size={15} />
+                        <span>Logout</span>
+                      </button>
+                    ) : (
+                      <Link
+                        href="/sign-in"
+                        className="mb-profile-menu-item"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        <UserIcon size={15} />
+                        <span>Sign In</span>
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* Mobile search row */}
+          <div className="mz-mobile-search-row">
+            <HeaderSearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search jewellery, collections and more..."
+            />
           </div>
         </header>
 
         {/* Breadcrumb / Top Bar */}
-        <div style={{ padding: '16px 32px 0 32px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#7A6F62' }}>
+        <div style={{ padding: '14px 16px 0 16px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#7A6F62' }}>
           <Link href="/" style={{ color: '#063B2F', fontWeight: 600, textDecoration: 'none' }}>Home</Link>
           <span>/</span>
           <span style={{ color: '#D4AF63', fontWeight: 700 }}>Share & Referral</span>
@@ -394,10 +430,11 @@ export function ShareReferralPage() {
                 background: '#FFF9ED',
                 border: '1px solid #F1D489',
                 borderRadius: 14,
-                padding: '20px 24px',
+                padding: '18px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                flexWrap: 'wrap',
                 gap: 16,
               }}
             >

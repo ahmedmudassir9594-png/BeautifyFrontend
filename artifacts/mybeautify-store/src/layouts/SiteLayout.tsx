@@ -44,12 +44,20 @@ export function SiteLayout({ children }: SiteLayoutProps) {
       </div>
       <header className="nav">
         <BrandMark />
-        <nav className={`navlinks ${menu ? 'show' : ''}`}>
+        {menu && (
+          <div
+            className="mobile-nav-backdrop"
+            onClick={() => setMenu(false)}
+            aria-hidden="true"
+          />
+        )}
+        <nav className={`navlinks ${menu ? 'show' : ''}`} aria-label="Main navigation">
           {nav.map(([label, href]) => (
             <Link
               key={href}
               href={href}
               className={location === href ? 'active' : ''}
+              onClick={() => setMenu(false)}
               data-testid={`link-nav-${label.toLowerCase().replace(' ', '-')}`}
             >
               {label}
@@ -85,10 +93,11 @@ export function SiteLayout({ children }: SiteLayoutProps) {
           <button
             className="icon-button mobile-menu"
             onClick={() => setMenu((open) => !open)}
-            aria-label="Toggle menu"
+            aria-label={menu ? 'Close menu' : 'Open menu'}
+            aria-expanded={menu}
             data-testid="button-mobile-menu"
           >
-            {menu ? <X size={19} /> : <Menu size={19} />}
+            {menu ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>

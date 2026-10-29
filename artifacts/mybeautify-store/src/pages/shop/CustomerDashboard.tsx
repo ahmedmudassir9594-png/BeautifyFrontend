@@ -100,6 +100,7 @@ export default function CustomerDashboard() {
 
   // Layout & UI States
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -526,8 +527,191 @@ export default function CustomerDashboard() {
   // Wishlist count
   const wishlistCount = wishlistIds.size;
 
+  // Active filter count for mobile badge
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (selectedCategory) count++;
+    if (maxPrice < 100000) count++;
+    if (minRating !== null) count++;
+    if (minDiscount !== null) count++;
+    return count;
+  }, [selectedCategory, maxPrice, minRating, minDiscount]);
+
   // Filter display brands list (with "+ Show more")
   const brandListToDisplay = showMoreBrands ? brands : brands.slice(0, 5);
+
+  // Render filter controls for desktop panel and mobile drawer
+  const renderFilterControls = (isMobileDrawer = false) => (
+    <>
+      <div className="mb-filter-header mz-filter-header">
+        <h3 className="mb-filter-heading mz-filter-heading">Filter by</h3>
+        <button
+          type="button"
+          className="mb-clear-all-btn mz-clear-all-btn"
+          onClick={() => {
+            clearAllFilters();
+            if (isMobileDrawer) setMobileFilterOpen(false);
+          }}
+        >
+          Clear All
+        </button>
+      </div>
+
+      {/* Category Filter */}
+      <div className="mb-filter-section mz-filter-section">
+        <button
+          type="button"
+          className="mb-filter-section-title mz-filter-section-title"
+          onClick={() => setCategoryOpen((o) => !o)}
+          aria-expanded={categoryOpen}
+        >
+          <span>Category</span>
+          {categoryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {categoryOpen && (
+          <div className="mb-filter-options">
+            {categories
+              .filter((category) => category.active !== false)
+              .map((cat) => {
+                const count = categoryCounts[cat.name] || 0;
+                const isChecked = selectedCategory === cat.name;
+                return (
+                  <label key={cat.id} className="mb-filter-checkbox-row mz-checkbox-row">
+                    <span className="mb-filter-label-group">
+                      <input
+                        type="checkbox"
+                        className="mb-checkbox mz-checkbox"
+                        checked={isChecked}
+                        onChange={() => setSelectedCategory(isChecked ? null : cat.name)}
+                      />
+                      <span>{cat.name}</span>
+                    </span>
+                    <span className="mb-filter-count mz-filter-count">({count})</span>
+                  </label>
+                );
+              })}
+          </div>
+        )}
+      </div>
+
+      {/* Price Range Filter */}
+      <div className="mb-filter-section mz-filter-section">
+        <button
+          type="button"
+          className="mb-filter-section-title mz-filter-section-title"
+          onClick={() => setPriceOpen((o) => !o)}
+          aria-expanded={priceOpen}
+        >
+          <span>Price Range</span>
+          {priceOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {priceOpen && (
+          <div className="mb-price-slider-wrap mz-price-slider-wrap">
+            <input
+              type="range"
+              min={5000}
+              max={100000}
+              step={1000}
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="mb-price-range-slider mz-price-range-slider"
+              aria-label="Price range filter"
+            />
+            <div className="mb-price-label mz-price-label">
+              ₹ 5,000 – ₹ {maxPrice.toLocaleString('en-IN')}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Rating Filter */}
+      <div className="mb-filter-section mz-filter-section">
+        <button
+          type="button"
+          className="mb-filter-section-title mz-filter-section-title"
+          onClick={() => setRatingOpen((o) => !o)}
+          aria-expanded={ratingOpen}
+        >
+          <span>Rating</span>
+          {ratingOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {ratingOpen && (
+          <div className="mb-filter-options">
+            {[4, 3, 2].map((rating) => {
+              const count = products.filter((product) => getProductRating(product) >= rating).length;
+              return (
+                <label key={rating} className="mb-filter-checkbox-row mz-checkbox-row">
+                  <span className="mb-filter-label-group">
+                    <input
+                      type="checkbox"
+                      className="mb-checkbox mz-checkbox"
+                      checked={minRating === rating}
+                      onChange={() => setMinRating(minRating === rating ? null : rating)}
+                    />
+                    <span>{rating}★ & above</span>
+                  </span>
+                  <span className="mb-filter-count mz-filter-count">({count})</span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Discount Filter */}
+      <div className="mb-filter-section mz-filter-section">
+        <button
+          type="button"
+          className="mb-filter-section-title mz-filter-section-title"
+          onClick={() => setDiscountOpen((o) => !o)}
+          aria-expanded={discountOpen}
+        >
+          <span>Discount</span>
+          {discountOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {discountOpen && (
+          <div className="mb-filter-options">
+            {[10, 20, 30].map((pct) => {
+              const count = products.filter((product) => {
+                const discountPrice = product.discountPrice;
+                if (!discountPrice || discountPrice >= product.price) return false;
+                return ((product.price - discountPrice) / product.price) * 100 >= pct;
+              }).length;
+              return (
+                <label key={pct} className="mb-filter-checkbox-row mz-checkbox-row">
+                  <span className="mb-filter-label-group">
+                    <input
+                      type="checkbox"
+                      className="mb-checkbox mz-checkbox"
+                      checked={minDiscount === pct}
+                      onChange={() => setMinDiscount(minDiscount === pct ? null : pct)}
+                    />
+                    <span>{pct}% or more</span>
+                  </span>
+                  <span className="mb-filter-count mz-filter-count">({count})</span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {isMobileDrawer && (
+        <button
+          type="button"
+          className="mz-hero-cta-btn"
+          style={{ width: '100%', justifyContent: 'center', marginTop: 18, minHeight: 44, borderRadius: 10 }}
+          onClick={() => setMobileFilterOpen(false)}
+        >
+          <span>Show {sortedAndFilteredProducts.length} Products</span>
+        </button>
+      )}
+    </>
+  );
 
   if (authLoading) {
     return (
@@ -587,220 +771,246 @@ export default function CustomerDashboard() {
             2. TOP HEADER
             ================================================================== */}
         <header className="mb-top-header mz-top-header">
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="mb-mobile-hamburger mz-mobile-hamburger"
-            onClick={() => setMobileSidebarOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={24} />
-          </button>
-
-          {/* Search bar */}
-          <HeaderSearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onSubmit={(val) => {
-              setSearchQuery(val);
-              setDebouncedQuery(val);
-            }}
-            showToast={showToast}
-            placeholder="Search jewellery, collections and more..."
-          />
-
-          {/* Right actions: Wishlist, Cart, Profile */}
-          <div className="mb-header-right-actions mz-header-right-actions">
-            {/* Discreet Admin Dashboard Shortcut - Visible strictly ONLY for verified ADMIN */}
-            {isVerifiedAdmin && (
-              <Link
-                href="/admin"
-                className="mb-header-icon-btn mz-header-icon-btn mb-admin-shortcut-btn"
-                aria-label="Admin Dashboard"
-                title="Admin Dashboard"
-                data-testid="header-admin-shortcut-btn"
-              >
-                <Shield size={20} className="mb-admin-shortcut-icon" />
-              </Link>
-            )}
-
-            {/* Wishlist icon button */}
-            <button
-              type="button"
-              className="mb-header-icon-btn mz-header-icon-btn"
-              onClick={() => {
-                if (!user) {
-                  showToast('Please log in or create an account to view your wishlist.');
-                  setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                  return;
-                }
-                setActiveModal('wishlist');
-              }}
-              aria-label="View wishlist"
-              data-testid="header-wishlist-btn"
-            >
-              <Heart size={20} />
-              {wishlistCount > 0 && (
-                <span className="mb-header-badge mz-header-badge">{wishlistCount}</span>
-              )}
-            </button>
-
-            {/* Cart icon button */}
-            <button
-              type="button"
-              className="mb-header-icon-btn mz-header-icon-btn"
-              onClick={() => {
-                if (!user) {
-                  showToast('Please log in or create an account to view your cart.');
-                  setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                  return;
-                }
-                setActiveModal('cart');
-              }}
-              aria-label="View shopping bag"
-              data-testid="header-cart-btn"
-            >
-              <ShoppingCart size={20} />
-              {cartItemCount > 0 && (
-                <span className="mb-header-badge mz-header-badge">{cartItemCount}</span>
-              )}
-            </button>
-
-            {/* Customer profile dropdown */}
-            <div className="mb-header-profile-wrap mz-header-profile-wrap">
+          <div className="mz-header-top-row">
+            {/* Left cluster: Mobile hamburger + Mobile Brand Mark */}
+            <div className="mz-header-left-cluster">
               <button
                 type="button"
-                className="mb-header-profile-chip mz-header-profile-chip mb-customer-profile-pill"
-                onClick={() => setProfileDropdownOpen((o) => !o)}
-                aria-expanded={profileDropdownOpen}
-                aria-label="User account menu"
-                data-testid="header-profile-chip"
+                className="mb-mobile-hamburger mz-mobile-hamburger"
+                onClick={() => setMobileSidebarOpen(true)}
+                aria-label="Open menu"
+                data-testid="button-mobile-hamburger"
               >
-                <div className="mb-header-avatar mz-header-avatar mb-customer-avatar-circle">
-                  <UserIcon size={18} aria-hidden="true" />
-                </div>
-                <span className="mb-header-profile-name mz-header-profile-name mb-customer-profile-name">
-                  {customerName || 'Sign in'}
-                </span>
-                <ChevronDown
-                  size={15}
-                  className="mb-header-profile-chevron"
-                  style={{
-                    transform: profileDropdownOpen ? 'rotate(180deg)' : 'none',
-                    transition: 'transform 0.2s ease',
-                  }}
-                />
+                <Menu size={22} />
               </button>
 
-              {profileDropdownOpen && (
-                <div className="mb-header-profile-menu mz-header-profile-menu">
-                  <div className="mb-profile-menu-header">
-                    <div className="mb-profile-menu-name">{customerName || 'Welcome to MALKAZ'}</div>
-                    {user?.email && <div className="mb-profile-menu-email">{user.email}</div>}
+              <Link href="/" className="mz-mobile-brand-mark" aria-label="MALKAZ Royal Jewels">
+                <img src="/malka-zai-emblem.png" alt="" className="mz-mobile-brand-img" />
+                <span className="mz-mobile-brand-text">MALKAZ</span>
+              </Link>
+            </div>
+
+            {/* Desktop search bar (visible in top row on >= 901px screens) */}
+            <div className="mz-desktop-search-slot">
+              <HeaderSearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onSubmit={(val) => {
+                  setSearchQuery(val);
+                  setDebouncedQuery(val);
+                }}
+                showToast={showToast}
+                placeholder="Search jewellery, collections and more..."
+              />
+            </div>
+
+            {/* Right actions: Admin shortcut, Wishlist, Cart, Profile */}
+            <div className="mb-header-right-actions mz-header-right-actions">
+              {/* Discreet Admin Dashboard Shortcut - Visible strictly ONLY for verified ADMIN */}
+              {isVerifiedAdmin && (
+                <Link
+                  href="/admin"
+                  className="mb-header-icon-btn mz-header-icon-btn mb-admin-shortcut-btn"
+                  aria-label="Admin Dashboard"
+                  title="Admin Dashboard"
+                  data-testid="header-admin-shortcut-btn"
+                >
+                  <Shield size={19} className="mb-admin-shortcut-icon" />
+                </Link>
+              )}
+
+              {/* Wishlist icon button */}
+              <button
+                type="button"
+                className="mb-header-icon-btn mz-header-icon-btn"
+                onClick={() => {
+                  if (!user) {
+                    showToast('Please log in or create an account to view your wishlist.');
+                    setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
+                    return;
+                  }
+                  setActiveModal('wishlist');
+                }}
+                aria-label="View wishlist"
+                data-testid="header-wishlist-btn"
+              >
+                <Heart size={19} />
+                {wishlistCount > 0 && (
+                  <span className="mb-header-badge mz-header-badge">{wishlistCount}</span>
+                )}
+              </button>
+
+              {/* Cart icon button */}
+              <button
+                type="button"
+                className="mb-header-icon-btn mz-header-icon-btn"
+                onClick={() => {
+                  if (!user) {
+                    showToast('Please log in or create an account to view your cart.');
+                    setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
+                    return;
+                  }
+                  setActiveModal('cart');
+                }}
+                aria-label="View shopping bag"
+                data-testid="header-cart-btn"
+              >
+                <ShoppingCart size={19} />
+                {cartItemCount > 0 && (
+                  <span className="mb-header-badge mz-header-badge">{cartItemCount}</span>
+                )}
+              </button>
+
+              {/* Customer profile dropdown */}
+              <div className="mb-header-profile-wrap mz-header-profile-wrap">
+                <button
+                  type="button"
+                  className="mb-header-profile-chip mz-header-profile-chip mb-customer-profile-pill"
+                  onClick={() => setProfileDropdownOpen((o) => !o)}
+                  aria-expanded={profileDropdownOpen}
+                  aria-label="User account menu"
+                  data-testid="header-profile-chip"
+                >
+                  <div className="mb-header-avatar mz-header-avatar mb-customer-avatar-circle">
+                    <UserIcon size={16} aria-hidden="true" />
                   </div>
-
-                  <button
-                    type="button"
-                    className="mb-profile-menu-item"
-                    onClick={() => {
-                      if (!user) {
-                        setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-                      } else {
-                        setActiveModal('profile');
-                      }
-                      setProfileDropdownOpen(false);
+                  <span className="mb-header-profile-name mz-header-profile-name mb-customer-profile-name">
+                    {customerName || 'Sign in'}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className="mb-header-profile-chevron"
+                    style={{
+                      transform: profileDropdownOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease',
                     }}
-                  >
-                    <UserIcon size={15} />
-                    <span>My Profile</span>
-                  </button>
+                  />
+                </button>
 
-                  <button
-                    type="button"
-                    className="mb-profile-menu-item"
-                    onClick={() => {
-                      if (user) {
-                        void handleOpenOrders();
-                      } else {
-                        setLocation('/sign-in?redirect=' + encodeURIComponent('/orders'));
-                      }
-                      setProfileDropdownOpen(false);
-                    }}
-                  >
-                    <Package size={15} />
-                    <span>My Orders</span>
-                  </button>
+                {profileDropdownOpen && (
+                  <div className="mb-header-profile-menu mz-header-profile-menu">
+                    <div className="mb-profile-menu-header">
+                      <div className="mb-profile-menu-name">{customerName || 'Welcome to MALKAZ'}</div>
+                      {user?.email && <div className="mb-profile-menu-email">{user.email}</div>}
+                    </div>
 
-                  <button
-                    type="button"
-                    className="mb-profile-menu-item"
-                    onClick={() => {
-                      if (user) {
-                        void handleOpenAddresses();
-                      } else {
-                        setLocation('/sign-in?redirect=' + encodeURIComponent('/account?panel=addresses'));
-                      }
-                      setProfileDropdownOpen(false);
-                    }}
-                  >
-                    <MapPin size={15} />
-                    <span>Saved Addresses</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="mb-profile-menu-item"
-                    onClick={() => {
-                      if (user) {
-                        setActiveModal('wishlist');
-                      } else {
-                        setLocation('/sign-in?redirect=' + encodeURIComponent('/account?panel=wishlist'));
-                      }
-                      setProfileDropdownOpen(false);
-                    }}
-                  >
-                    <Heart size={15} />
-                    <span>Saved Wishlist</span>
-                  </button>
-
-                  {isVerifiedAdmin && (
-                    <Link
-                      href="/admin"
-                      className="mb-profile-menu-item mb-profile-admin-link"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      title="Admin Dashboard"
-                      data-testid="menu-admin-shortcut-link"
-                    >
-                      <Shield size={15} style={{ color: 'var(--mb-primary, #123a30)' }} />
-                      <span style={{ fontWeight: 600, color: 'var(--mb-primary, #123a30)' }}>Admin Dashboard</span>
-                    </Link>
-                  )}
-
-                  {user ? (
                     <button
                       type="button"
-                      className="mb-profile-menu-item logout"
+                      className="mb-profile-menu-item"
                       onClick={() => {
-                        handleLogout();
+                        if (!user) {
+                          setLocation('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
+                        } else {
+                          setActiveModal('profile');
+                        }
                         setProfileDropdownOpen(false);
                       }}
                     >
-                      <LogOut size={15} />
-                      <span>Sign Out</span>
-                    </button>
-                  ) : (
-                    <Link
-                      href="/sign-in"
-                      className="mb-profile-menu-item"
-                      onClick={() => setProfileDropdownOpen(false)}
-                    >
                       <UserIcon size={15} />
-                      <span>Sign In</span>
-                    </Link>
-                  )}
-                </div>
-              )}
+                      <span>My Profile</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="mb-profile-menu-item"
+                      onClick={() => {
+                        if (user) {
+                          void handleOpenOrders();
+                        } else {
+                          setLocation('/sign-in?redirect=' + encodeURIComponent('/orders'));
+                        }
+                        setProfileDropdownOpen(false);
+                      }}
+                    >
+                      <Package size={15} />
+                      <span>My Orders</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="mb-profile-menu-item"
+                      onClick={() => {
+                        if (user) {
+                          void handleOpenAddresses();
+                        } else {
+                          setLocation('/sign-in?redirect=' + encodeURIComponent('/account?panel=addresses'));
+                        }
+                        setProfileDropdownOpen(false);
+                      }}
+                    >
+                      <MapPin size={15} />
+                      <span>Saved Addresses</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="mb-profile-menu-item"
+                      onClick={() => {
+                        if (user) {
+                          setActiveModal('wishlist');
+                        } else {
+                          setLocation('/sign-in?redirect=' + encodeURIComponent('/account?panel=wishlist'));
+                        }
+                        setProfileDropdownOpen(false);
+                      }}
+                    >
+                      <Heart size={15} />
+                      <span>Saved Wishlist</span>
+                    </button>
+
+                    {isVerifiedAdmin && (
+                      <Link
+                        href="/admin"
+                        className="mb-profile-menu-item mb-profile-admin-link"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        title="Admin Dashboard"
+                        data-testid="menu-admin-shortcut-link"
+                      >
+                        <Shield size={15} style={{ color: 'var(--mb-primary, #123a30)' }} />
+                        <span style={{ fontWeight: 600, color: 'var(--mb-primary, #123a30)' }}>Admin Dashboard</span>
+                      </Link>
+                    )}
+
+                    {user ? (
+                      <button
+                        type="button"
+                        className="mb-profile-menu-item logout"
+                        onClick={() => {
+                          handleLogout();
+                          setProfileDropdownOpen(false);
+                        }}
+                      >
+                        <LogOut size={15} />
+                        <span>Sign Out</span>
+                      </button>
+                    ) : (
+                      <Link
+                        href="/sign-in"
+                        className="mb-profile-menu-item"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        <UserIcon size={15} />
+                        <span>Sign In</span>
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* Mobile search row (full width on screens <= 900px) */}
+          <div className="mz-mobile-search-row">
+            <HeaderSearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              onSubmit={(val) => {
+                setSearchQuery(val);
+                setDebouncedQuery(val);
+              }}
+              showToast={showToast}
+              placeholder="Search jewellery, collections and more..."
+            />
           </div>
         </header>
 
@@ -880,159 +1090,43 @@ export default function CustomerDashboard() {
               ================================================================ */}
           <div className="mb-shop-columns mz-shop-columns">
             {/* ==============================================================
-                6. LEFT FILTER PANEL (Brand Filter Removed)
+                6. LEFT FILTER PANEL (Desktop)
                 ============================================================== */}
             <aside className="mb-filter-panel mz-filter-panel">
-              <div className="mb-filter-header mz-filter-header">
-                <h3 className="mb-filter-heading mz-filter-heading">Filter by</h3>
-                <button type="button" className="mb-clear-all-btn mz-clear-all-btn" onClick={clearAllFilters}>
-                  Clear All
-                </button>
-              </div>
-
-              {/* Category Filter */}
-              <div className="mb-filter-section mz-filter-section">
-                <button
-                  type="button"
-                  className="mb-filter-section-title mz-filter-section-title"
-                  onClick={() => setCategoryOpen((o) => !o)}
-                >
-                  <span>Category</span>
-                  {categoryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-
-                {categoryOpen && (
-                  <div className="mb-filter-options">
-                    {categories
-                      .filter((category) => category.active !== false)
-                      .map((cat) => {
-                        const count = categoryCounts[cat.name] || 0;
-                        const isChecked = selectedCategory === cat.name;
-                        return (
-                          <label key={cat.id} className="mb-filter-checkbox-row mz-checkbox-row">
-                            <span className="mb-filter-label-group">
-                              <input
-                                type="checkbox"
-                                className="mb-checkbox mz-checkbox"
-                                checked={isChecked}
-                                onChange={() => setSelectedCategory(isChecked ? null : cat.name)}
-                              />
-                              <span>{cat.name}</span>
-                            </span>
-                            <span className="mb-filter-count mz-filter-count">({count})</span>
-                          </label>
-                        );
-                      })}
-                  </div>
-                )}
-              </div>
-
-              {/* Price Range Filter */}
-              <div className="mb-filter-section mz-filter-section">
-                <button
-                  type="button"
-                  className="mb-filter-section-title mz-filter-section-title"
-                  onClick={() => setPriceOpen((o) => !o)}
-                >
-                  <span>Price Range</span>
-                  {priceOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-
-                {priceOpen && (
-                  <div className="mb-price-slider-wrap mz-price-slider-wrap">
-                    <input
-                      type="range"
-                      min={5000}
-                      max={100000}
-                      step={1000}
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(Number(e.target.value))}
-                      className="mb-price-range-slider mz-price-range-slider"
-                    />
-                    <div className="mb-price-label mz-price-label">
-                      ₹ 5,000 – ₹ {maxPrice.toLocaleString('en-IN')}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Rating Filter */}
-              <div className="mb-filter-section mz-filter-section">
-                <button
-                  type="button"
-                  className="mb-filter-section-title mz-filter-section-title"
-                  onClick={() => setRatingOpen((o) => !o)}
-                >
-                  <span>Rating</span>
-                  {ratingOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-
-                {ratingOpen && (
-                  <div className="mb-filter-options">
-                    {[4, 3, 2].map((rating) => {
-                      const count = products.filter((product) => getProductRating(product) >= rating).length;
-                      return (
-                        <label key={rating} className="mb-filter-checkbox-row mz-checkbox-row">
-                          <span className="mb-filter-label-group">
-                            <input
-                              type="checkbox"
-                              className="mb-checkbox mz-checkbox"
-                              checked={minRating === rating}
-                              onChange={() => setMinRating(minRating === rating ? null : rating)}
-                            />
-                            <span>{rating} & above</span>
-                          </span>
-                          <span className="mb-filter-count mz-filter-count">({count})</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Discount Filter */}
-              <div className="mb-filter-section mz-filter-section">
-                <button
-                  type="button"
-                  className="mb-filter-section-title mz-filter-section-title"
-                  onClick={() => setDiscountOpen((o) => !o)}
-                >
-                  <span>Discount</span>
-                  {discountOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-
-                {discountOpen && (
-                  <div className="mb-filter-options">
-                    {[10, 20, 30].map((pct) => {
-                      const count = products.filter((product) => {
-                        const discountPrice = product.discountPrice;
-                        if (!discountPrice || discountPrice >= product.price) return false;
-                        return ((product.price - discountPrice) / product.price) * 100 >= pct;
-                      }).length;
-                      return (
-                        <label key={pct} className="mb-filter-checkbox-row mz-checkbox-row">
-                          <span className="mb-filter-label-group">
-                            <input
-                              type="checkbox"
-                              className="mb-checkbox mz-checkbox"
-                              checked={minDiscount === pct}
-                              onChange={() => setMinDiscount(minDiscount === pct ? null : pct)}
-                            />
-                            <span>{pct}% or more</span>
-                          </span>
-                          <span className="mb-filter-count mz-filter-count">({count})</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              {renderFilterControls(false)}
             </aside>
 
             {/* ==============================================================
                 4 & 5. PRODUCT SECTION & CARDS
                 ============================================================== */}
             <section className="mb-product-section mz-product-section">
+              {/* Mobile Filter & Sort trigger bar (visible on mobile / tablets <= 900px) */}
+              <div className="mz-mobile-filter-trigger-bar">
+                <button
+                  type="button"
+                  className="mz-mobile-filter-btn"
+                  onClick={() => setMobileFilterOpen(true)}
+                  aria-label="Filter products"
+                >
+                  <SlidersHorizontal size={15} />
+                  <span>Filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}</span>
+                </button>
+
+                <div className="mz-mobile-sort-wrap">
+                  <select
+                    className="mz-mobile-sort-select"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    aria-label="Sort products"
+                  >
+                    <option value="popularity">Sort: Popularity</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="newest">Newest First</option>
+                  </select>
+                </div>
+              </div>
+
               {/* Product Controls Bar */}
               <div className="mb-product-controls-bar mz-product-controls-bar" id="featured-jewellery">
                 <div className="mz-featured-title-wrap">
@@ -1249,6 +1343,30 @@ export default function CustomerDashboard() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MOBILE FILTER DRAWER
+          ==================================================================== */}
+      {mobileFilterOpen && (
+        <div className="mb-modal-overlay mz-filter-drawer-overlay" onClick={() => setMobileFilterOpen(false)}>
+          <div className="mb-modal-card mz-filter-drawer-card" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-modal-header" style={{ marginBottom: 12 }}>
+              <h3 className="mb-modal-title">Filter Jewellery</h3>
+              <button
+                type="button"
+                className="mb-modal-close-btn"
+                onClick={() => setMobileFilterOpen(false)}
+                aria-label="Close filters"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="mb-modal-body mz-filter-drawer-body">
+              {renderFilterControls(true)}
             </div>
           </div>
         </div>

@@ -936,9 +936,154 @@
   }
 }
 
+@media (max-width: 768px) {
+  .mb-checkout-header {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+  .mb-checkout-logo-link {
+    order: 1;
+    gap: 8px;
+  }
+  .mb-checkout-logo-img {
+    width: 36px;
+    height: 36px;
+  }
+  .mb-checkout-brand-title {
+    font-size: 19px;
+  }
+  .mb-checkout-brand-sub {
+    display: none;
+  }
+  .mb-checkout-header-actions {
+    order: 2;
+    margin-left: auto;
+    gap: 8px;
+  }
+  .mb-checkout-icon-btn,
+  .mb-orders-icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .mb-checkout-search-wrap {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 2px;
+  }
+  .mb-checkout-search-input {
+    height: 38px;
+    font-size: 13.5px;
+    padding-left: 40px;
+  }
+  .mb-checkout-search-icon {
+    left: 12px;
+  }
+  .mb-checkout-stepper-wrap {
+    padding: 16px 12px 12px;
+  }
+  .mb-checkout-step-circle {
+    width: 32px;
+    height: 32px;
+  }
+  .mb-checkout-step-label {
+    font-size: 11px;
+  }
+  .mb-checkout-step-line {
+    margin: 0 4px;
+    margin-bottom: 20px;
+  }
+  .mb-checkout-main {
+    padding: 8px 12px 40px;
+    gap: 20px;
+  }
+  .mb-checkout-card {
+    padding: 16px 14px;
+    border-radius: 16px;
+  }
+  .mb-checkout-card-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .mb-checkout-summary-card {
+    position: static;
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+  .mb-checkout-form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .mb-checkout-form-full {
+    grid-column: span 1;
+  }
+  .mb-checkout-modal-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .mb-checkout-input {
+    font-size: 16px;
+  }
+}
+
 @media (max-width: 520px) {
   .mb-checkout-trust-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 20px 14px;
+  }
+  .mb-checkout-address-grid {
+    grid-template-columns: 1fr;
+  }
+  .mb-checkout-coupon-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .mb-checkout-coupon-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .mb-checkout-actions-row {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  .mb-checkout-btn-back,
+  .mb-checkout-btn-continue {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 380px) {
+  .mb-checkout-stepper-wrap {
+    padding: 12px 6px 10px;
+  }
+  .mb-checkout-step-circle {
+    width: 28px;
+    height: 28px;
+  }
+  .mb-checkout-step-circle svg {
+    width: 14px;
+    height: 14px;
+  }
+  .mb-checkout-step-label {
+    font-size: 10px;
+    letter-spacing: -0.02em;
+  }
+  .mb-checkout-step-line {
+    margin: 0 2px;
+    margin-bottom: 18px;
+  }
+  .mb-checkout-header {
+    padding: 8px 10px;
+  }
+  .mb-checkout-card {
+    padding: 14px 10px;
+  }
+  .mb-checkout-summary-card {
+    padding: 16px 10px;
   }
 }
 

@@ -1786,7 +1786,7 @@
 
 /* 2. Top Header */
 .mz-top-header {
-  height: 74px;
+  min-height: 74px;
   padding: 0 32px;
   display: flex;
   align-items: center;
@@ -1798,12 +1798,62 @@
   position: sticky;
   top: 0;
   z-index: 30;
+  box-sizing: border-box;
+}
+
+.mz-header-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+}
+
+.mz-header-left-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.mz-mobile-brand-mark {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.mz-mobile-brand-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.mz-mobile-brand-text {
+  font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #063B2F;
+}
+
+.mz-desktop-search-slot {
+  flex: 1;
+  max-width: 580px;
+  display: flex;
+  align-items: center;
+}
+
+.mz-mobile-search-row {
+  display: none;
+  width: 100%;
 }
 
 .mz-header-right-actions {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .mz-header-icon-btn {
@@ -2258,27 +2308,327 @@
 }
 
 @media (max-width: 900px) {
+  .mz-top-header {
+    height: auto !important;
+    min-height: 60px !important;
+    padding: 10px 14px 10px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .mz-header-top-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .mz-mobile-brand-mark {
+    display: inline-flex !important;
+  }
+
+  .mz-desktop-search-slot {
+    display: none !important;
+  }
+
+  .mz-mobile-search-row {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .mz-mobile-hamburger {
+    display: flex !important;
+    width: 38px !important;
+    height: 38px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #FFFFFF !important;
+    border: 1px solid #EAE0D0 !important;
+    border-radius: 9px !important;
+    color: #063B2F !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mz-header-right-actions {
+    gap: 8px !important;
+  }
+
+  .mz-header-icon-btn {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+  }
+
+  .mz-header-profile-name {
+    display: none !important;
+  }
+
+  .mz-header-profile-chip {
+    padding: 3px 6px 3px 3px !important;
+  }
+
+  .mb-shop-columns,
+  .mz-shop-columns {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .mz-filter-panel {
+    display: none !important;
+  }
+
+  .mz-mobile-filter-trigger-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin: 8px 0 16px !important;
+    padding: 8px 12px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #EAE4D9 !important;
+    border-radius: 12px !important;
+  }
+
+  .mz-mobile-filter-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    background: #063B2F !important;
+    color: #FAF7F2 !important;
+    border: 1px solid #D4AF63 !important;
+    padding: 8px 14px !important;
+    border-radius: 999px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    min-height: 38px !important;
+    transition: background 0.2s ease !important;
+  }
+
+  .mz-mobile-filter-btn:hover {
+    background: #0B473A !important;
+  }
+
+  .mz-mobile-filter-btn svg {
+    color: #D4AF63 !important;
+  }
+
+  .mz-mobile-sort-wrap {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .mz-mobile-sort-select {
+    border: 1px solid #EAE4D9 !important;
+    border-radius: 999px !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #063B2F !important;
+    background: #FAF7F2 !important;
+    outline: none !important;
+    cursor: pointer !important;
+    min-height: 38px !important;
+  }
+
+  .mz-filter-drawer-card {
+    max-width: 480px !important;
+    width: 100% !important;
+    max-height: 85vh !important;
+    max-height: 85dvh !important;
+    overflow-y: auto !important;
+  }
+
+  .mz-filter-drawer-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
   .mz-product-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
   }
+
   .mz-category-shortcuts-row {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 10px !important;
+    padding: 4px 2px 10px !important;
+    margin-bottom: 18px !important;
+    scrollbar-width: thin !important;
   }
+
+  .mz-category-card {
+    flex: 0 0 auto !important;
+    min-width: 150px !important;
+    scroll-snap-align: start !important;
+  }
+
   .mz-hero-banner {
-    flex-direction: column;
+    flex-direction: column !important;
+    min-height: auto !important;
   }
+
+  .mz-hero-left {
+    padding: 24px 20px !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+
+  .mz-hero-title {
+    font-size: clamp(22px, 5.5vw, 32px) !important;
+  }
+
+  .mz-hero-subtitle {
+    font-size: 13.5px !important;
+    margin: 6px 0 16px !important;
+  }
+
   .mz-hero-right {
-    width: 100%;
-    min-height: 180px;
+    width: 100% !important;
+    min-height: 180px !important;
+    max-height: 240px !important;
+  }
+
+  .mz-hero-banner-img {
+    min-height: 180px !important;
+    max-height: 240px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .mb-page-body,
+  .mz-page-body {
+    padding: 12px 10px !important;
+    gap: 14px !important;
+  }
+
+  .mz-card-info {
+    padding: 10px 10px 12px !important;
+  }
+
+  .mz-card-name {
+    font-size: 12.5px !important;
+    white-space: normal !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    height: 32px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 4px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .mz-card-price-row {
+    gap: 5px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .mz-card-current-price {
+    font-size: 13px !important;
+  }
+
+  .mz-card-original-price {
+    font-size: 11px !important;
+  }
+
+  .mz-card-discount-tag {
+    font-size: 9px !important;
+    padding: 1px 4px !important;
+  }
+
+  .mz-card-add-btn {
+    height: 36px !important;
+    font-size: 11.5px !important;
+    gap: 5px !important;
+  }
+
+  .mz-card-top-badge {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+    top: 6px !important;
+    left: 6px !important;
+  }
+
+  .mz-card-wish-btn {
+    width: 32px !important;
+    height: 32px !important;
+    top: 6px !important;
+    right: 6px !important;
+  }
+
+  .mb-modal-overlay {
+    padding: 10px !important;
+    align-items: flex-end !important;
+  }
+
+  .mb-modal-card {
+    max-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 20px 16px !important;
+    max-height: 85vh !important;
+    max-height: 85dvh !important;
+  }
+
+  .mb-drawer-card {
+    width: 100vw !important;
+    max-width: 100vw !important;
   }
 }
 
 @media (max-width: 580px) {
   .mz-product-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
-  .mz-category-shortcuts-row {
-    grid-template-columns: 1fr;
+}
+
+@media (max-width: 360px) {
+  .mz-top-header {
+    padding: 8px 10px 10px !important;
+  }
+
+  .mz-mobile-brand-text {
+    font-size: 15px !important;
+  }
+
+  .mz-mobile-brand-img {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .mz-header-right-actions {
+    gap: 5px !important;
+  }
+
+  .mz-header-icon-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+  }
+
+  .mz-hero-left {
+    padding: 16px 12px !important;
+  }
+
+  .mz-hero-right {
+    min-height: 150px !important;
+    max-height: 180px !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .mz-product-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
 }
 
