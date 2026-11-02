@@ -71,7 +71,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [referralCode, setReferralCode] = useState(() => {
     try {
       const urlParam = new URLSearchParams(window.location.search).get('ref');

@@ -46,7 +46,7 @@ export function logout(): void {
 
 export async function login(
   payload: LoginRequest,
-  remember = false
+  remember = true
 ): Promise<AuthResponse> {
   const res = await request<AuthResponse>('/auth/login', {
     method: 'POST',
@@ -70,7 +70,7 @@ export async function login(
 
 export async function register(
   payload: RegisterRequest,
-  remember = false
+  remember = true
 ): Promise<AuthResponse> {
   const res = await request<AuthResponse>('/auth/register', {
     method: 'POST',
@@ -94,7 +94,7 @@ export async function register(
 
 export async function loginWithGoogle(
   credential: string,
-  remember = false
+  remember = true
 ): Promise<AuthResponse> {
   if (!credential.trim()) {
     throw new Error('Google did not return an identity token.');
@@ -147,9 +147,13 @@ export async function refreshSessionToken(
 
   const token = res.accessToken || res.token;
   if (token) {
-    setAuthToken(token);
+    const remember = Boolean(
+      localStorage.getItem(STORAGE_KEYS.TOKEN) ||
+      localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
+    );
+    setAuthToken(token, remember);
     if (res.refreshToken) {
-      setRefreshToken(res.refreshToken);
+      setRefreshToken(res.refreshToken, remember);
     }
   }
 

@@ -188,6 +188,14 @@ export function SiteLayout({ children }: SiteLayoutProps) {
           <Link href="/wishlist" data-testid="link-footer-wishlist">
             Saved items
           </Link>
+          {' '}&nbsp;·&nbsp;{' '}
+          <Link href="/about-us" data-testid="link-footer-about-us">
+            About Us
+          </Link>
+          {' '}&nbsp;·&nbsp;{' '}
+          <Link href="/privacy-conditions" data-testid="link-footer-privacy-conditions">
+            Privacy &amp; Conditions
+          </Link>
         </nav>
       </footer>
     </div>

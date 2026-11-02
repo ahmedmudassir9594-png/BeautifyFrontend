@@ -188,8 +188,9 @@ export default function MyOrdersPage() {
       })
       .catch((err) => {
         console.error('Failed to fetch user:', err);
-        setAuthToken(null);
-        setLocation('/sign-in');
+        if (!getAuthToken()) {
+          setLocation('/sign-in');
+        }
       })
       .finally(() => {
         setAuthLoading(false);

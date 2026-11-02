@@ -4787,15 +4787,13 @@
 @media (max-width: 900px) {
   .mz-home-top-header {
     display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) auto;
-    grid-template-areas:
-      "menu brand actions"
-      "search search search";
-    min-height: 120px;
+    grid-template-columns: 40px minmax(0, 1fr) 42px auto;
+    grid-template-areas: "menu brand search actions";
+    min-height: 64px;
     height: auto;
     padding: 9px 16px 12px;
     column-gap: 12px;
-    row-gap: 9px;
+    row-gap: 0;
   }
 
   .mz-home-top-header .mb-mobile-hamburger {
@@ -4813,7 +4811,10 @@
 
   .mz-home-top-header .mb-header-search-wrap {
     grid-area: search;
-    max-width: none;
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    justify-self: center;
   }
 
   .mz-home-top-header .mz-header-right-actions {
@@ -4824,11 +4825,11 @@
 
 @media (max-width: 580px) {
   .mz-home-top-header {
-    grid-template-columns: 38px minmax(0, 1fr) auto;
-    min-height: 116px;
-    padding: 8px 11px 11px;
-    column-gap: 8px;
-    row-gap: 8px;
+    grid-template-columns: 36px minmax(0, 1fr) 40px auto;
+    min-height: 60px;
+    padding: 8px;
+    column-gap: 4px;
+    row-gap: 0;
   }
 
   .mz-home-top-header .mz-mobile-brand .brand-name {
@@ -4841,20 +4842,46 @@
 
   .mz-home-top-header .mb-header-search-toggle {
     display: flex;
-    flex: 0 0 42px !important;
-    width: 42px !important;
-    min-width: 42px;
-    height: 42px !important;
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    min-width: 40px;
+    height: 40px !important;
     padding: 0;
   }
 
   .mz-home-top-header .mz-header-right-actions {
-    gap: 4px;
+    gap: 2px;
   }
 
   .mz-home-top-header .mz-header-icon-btn {
-    width: 35px;
-    height: 35px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .mz-home-top-header .mz-mobile-brand,
+  .mz-home-top-header .mz-header-right-actions {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .mz-home-top-header {
+    grid-template-columns: 34px minmax(0, 1fr) 38px auto;
+    column-gap: 3px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .mz-home-top-header .mb-header-search-wrap,
+  .mz-home-top-header .mb-header-search-toggle {
+    width: 38px !important;
+    min-width: 38px;
+    flex-basis: 38px !important;
+  }
+
+  .mz-home-top-header .mz-header-icon-btn {
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -5020,6 +5047,45 @@
 .mz-product-grid > *:nth-child(6) { --product-index: 5; }
 .mz-product-grid > *:nth-child(7) { --product-index: 6; }
 .mz-product-grid > *:nth-child(8) { --product-index: 7; }
+
+.mz-legal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 20px clamp(16px, 4vw, 42px);
+  border-top: 1px solid #E8DEC8;
+  background: #FFFEFA;
+  color: #65756E;
+  font-size: 12px;
+}
+
+.mz-legal-footer a,
+.mb-checkout-legal-link a {
+  color: #063B2F;
+  text-decoration: underline;
+  text-decoration-color: #D4AF63;
+  text-underline-offset: 3px;
+}
+
+.mz-legal-footer a:hover,
+.mb-checkout-legal-link a:hover {
+  color: #A98235;
+}
+
+.mb-checkout-legal-link {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 12px;
+}
+
+@media (max-width: 520px) {
+  .mz-legal-footer {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+}
 
 @keyframes mz-product-rise {
   from { opacity: 0; translate: 0 14px; }

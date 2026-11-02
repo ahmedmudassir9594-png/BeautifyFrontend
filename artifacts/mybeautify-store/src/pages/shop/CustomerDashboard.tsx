@@ -33,6 +33,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { hasAdminRole } from '@/utils/auth';
+import { matchesProductPrice, parsePriceSearchQuery } from '@/utils/product-price-search';
 import {
   fetchProducts,
   fetchCategories,
@@ -53,6 +54,7 @@ import {
   applyCoupon as apiApplyCoupon,
   getAuthToken,
   setAuthToken,
+  getCachedUser,
   setCachedUser,
   type ProductResponse,
   type CategoryResponse,
@@ -173,7 +175,9 @@ export default function CustomerDashboard() {
   const [location, setLocation] = useLocation();
 
   // Authentication & User State
-  const [user, setUser] = useState<UserResponse | null>(null);
+  const [user, setUser] = useState<UserResponse | null>(() =>
+    getAuthToken() ? getCachedUser() : null
+  );
   const [authLoading, setAuthLoading] = useState(true);
 
   // Hidden admin shortcut verified role - strictly requires verified ADMIN role and non-loading state
@@ -184,7 +188,7 @@ export default function CustomerDashboard() {
 
   // Layout & UI States
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -317,8 +321,19 @@ export default function CustomerDashboard() {
       })
       .catch((err) => {
         console.error('Failed to fetch user:', err);
-        setAuthToken(null);
-        setUser(null);
+        if (!getAuthToken()) {
+          setUser(null);
+          const protectedPath = location.split('?')[0];
+          if (
+            protectedPath === '/account' ||
+            protectedPath === '/cart' ||
+            protectedPath === '/wishlist'
+          ) {
+            setLocation('/sign-in?redirect=' + encodeURIComponent(location));
+          }
+        } else {
+          setUser((currentUser) => currentUser || getCachedUser());
+        }
       })
       .finally(() => {
         setAuthLoading(false);
@@ -364,6 +379,7 @@ export default function CustomerDashboard() {
   const loadBackendProducts = useCallback(() => {
     setLoadingProducts(true);
     setProductError(null);
+    const searchedPrice = parsePriceSearchQuery(debouncedQuery);
 
     // Map UI sort to backend sort parameter
     let sortParam = 'createdAt,desc';
@@ -372,7 +388,7 @@ export default function CustomerDashboard() {
     else if (sortBy === 'newest') sortParam = 'createdAt,desc';
 
     fetchProducts({
-      query: debouncedQuery || undefined,
+      query: searchedPrice === null ? debouncedQuery || undefined : undefined,
       size: 100,
       sort: sortParam,
     })
@@ -506,7 +522,10 @@ export default function CustomerDashboard() {
 
   // Client-side and faceted filtering on the real products
   const filteredProducts = useMemo(() => {
+    const searchedPrice = parsePriceSearchQuery(debouncedQuery);
     return products.filter((p) => {
+      if (searchedPrice !== null && !matchesProductPrice(p, searchedPrice)) return false;
+
       // Category filter (match by name or ID)
       if (appliedFilters.category) {
         const catMatch =
@@ -541,7 +560,7 @@ export default function CustomerDashboard() {
       if (appliedFilters.inStockOnly && p.stockQuantity <= 0) return false;
       return true;
     });
-  }, [products, appliedFilters]);
+  }, [products, appliedFilters, debouncedQuery]);
 
   // Order products to match reference display when on default popularity sort
   const sortedAndFilteredProducts = useMemo(() => {
@@ -1566,6 +1585,13 @@ export default function CustomerDashboard() {
             </section>
           </div>
         </main>
+        <footer className="mz-legal-footer">
+          <span>© MALKAZ</span>
+          <Link href="/about-us" data-testid="link-footer-about-us">
+            About Us
+          </Link>
+        
+        </footer>
       </div>
 
       {/* ====================================================================

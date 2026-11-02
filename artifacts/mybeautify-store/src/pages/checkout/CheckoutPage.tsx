@@ -138,8 +138,9 @@ export default function CheckoutPage() {
       })
       .catch((err) => {
         console.error('Failed to load user:', err);
-        setAuthToken(null);
-        setLocation('/sign-in');
+        if (!getAuthToken()) {
+          setLocation('/sign-in');
+        }
       })
       .finally(() => {
         setAuthLoading(false);
@@ -1005,6 +1006,15 @@ export default function CheckoutPage() {
               </span>
             </div>
           </div>
+        </div>
+        <div className="mb-checkout-legal-link">
+          <Link href="/about-us" data-testid="link-footer-about-us">
+            About Us
+          </Link>
+          {' '}·{' '}
+          <Link href="/privacy-conditions" data-testid="link-footer-privacy-conditions">
+            Privacy &amp; Conditions
+          </Link>
         </div>
       </footer>
 

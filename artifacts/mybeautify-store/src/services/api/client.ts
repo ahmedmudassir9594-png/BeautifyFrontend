@@ -10,7 +10,7 @@ if (typeof window !== 'undefined') {
   (window as any).__malkaz_record_diagnostic = recordApiDiagnosticError;
 }
 
-const DEFAULT_API_BASE_URL = 'https://1h14g3nx-8080.inc1.devtunnels.ms/api';
+const DEFAULT_API_BASE_URL = 'https://api.fashionmalkaz.com/api';
 
 export function getApiBaseUrl(): string {
   const envUrl =
@@ -49,6 +49,8 @@ export function setAuthToken(token: string | null, remember = false): void {
     sessionStorage.setItem(STORAGE_KEYS.TOKEN, token);
     if (remember) {
       localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
     }
   } else {
     sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
@@ -64,6 +66,8 @@ export function setRefreshToken(refreshToken: string | null, remember = false): 
     sessionStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
     if (remember) {
       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     }
   } else {
     sessionStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
@@ -71,12 +75,17 @@ export function setRefreshToken(refreshToken: string | null, remember = false): 
   }
 }
 
-// In-flight refresh promise to prevent duplicate refresh requests
-let refreshPromise: Promise<string | null> | null = null;
+type TokenRefreshResult =
+  | { status: 'refreshed'; token: string }
+  | { status: 'invalid' }
+  | { status: 'unavailable' };
 
-async function attemptTokenRefresh(): Promise<string | null> {
+// In-flight refresh promise to prevent duplicate refresh requests
+let refreshPromise: Promise<TokenRefreshResult> | null = null;
+
+async function attemptTokenRefresh(): Promise<TokenRefreshResult> {
   const currentRefresh = getRefreshToken();
-  if (!currentRefresh) return null;
+  if (!currentRefresh) return { status: 'invalid' };
 
   if (refreshPromise) {
     return refreshPromise;
@@ -95,14 +104,29 @@ async function attemptTokenRefresh(): Promise<string | null> {
       });
 
       if (!res.ok) {
-        setAuthToken(null);
-        return null;
+        if (res.status === 401 || res.status === 403) {
+          setAuthToken(null);
+          return { status: 'invalid' };
+        }
+        return { status: 'unavailable' };
       }
 
-      const resData = await res.json().catch(() => null);
+      let resData: unknown;
+      try {
+        resData = await res.json();
+      } catch {
+        return { status: 'unavailable' };
+      }
       const data = (resData && typeof resData === 'object' && 'data' in resData) ? resData.data : resData;
-      const newAccessToken = data?.accessToken || data?.token;
-      const newRefreshToken = data?.refreshToken;
+      if (!data || typeof data !== 'object') return { status: 'unavailable' };
+      const newAccessToken = 'accessToken' in data && typeof data.accessToken === 'string'
+        ? data.accessToken
+        : 'token' in data && typeof data.token === 'string'
+          ? data.token
+          : null;
+      const newRefreshToken = 'refreshToken' in data && typeof data.refreshToken === 'string'
+        ? data.refreshToken
+        : null;
 
       if (newAccessToken) {
         const remember = Boolean(localStorage.getItem(STORAGE_KEYS.TOKEN) || localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN));
@@ -110,14 +134,20 @@ async function attemptTokenRefresh(): Promise<string | null> {
         if (newRefreshToken) {
           setRefreshToken(newRefreshToken, remember);
         }
-        return newAccessToken;
+        return { status: 'refreshed', token: newAccessToken };
       }
 
-      setAuthToken(null);
-      return null;
-    } catch {
-      setAuthToken(null);
-      return null;
+      return { status: 'unavailable' };
+    } catch (error) {
+      recordApiDiagnosticError({
+        status: null,
+        statusText: 'Refresh Network Failure',
+        method: 'POST',
+        endpoint: '/auth/refresh-token',
+        errorMessage: error instanceof Error ? error.message : 'Token refresh request failed.',
+        isNetworkError: true,
+      });
+      return { status: 'unavailable' };
     } finally {
       refreshPromise = null;
     }
@@ -167,11 +197,11 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
 
   // Handle expired/unauthorized session with automatic refresh
   const isAuthEndpoint = endpoint.includes('/auth/login') || endpoint.includes('/auth/register') || endpoint.includes('/auth/refresh-token');
-  if ((res.status === 401 || res.status === 403) && token && !isAuthEndpoint) {
-    const newToken = await attemptTokenRefresh();
-    if (newToken) {
+  if (res.status === 401 && token && !isAuthEndpoint) {
+    const refreshResult = await attemptTokenRefresh();
+    if (refreshResult.status === 'refreshed') {
       // Retry original request with newly refreshed token
-      headers.set('Authorization', `Bearer ${newToken}`);
+      headers.set('Authorization', `Bearer ${refreshResult.token}`);
       try {
         res = await fetch(url, {
           ...options,
@@ -180,7 +210,10 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
       } catch (retryErr: any) {
         throw new Error(retryErr?.message || 'Network error on retried request');
       }
-    } else {
+      if (res.status === 401) {
+        setAuthToken(null);
+      }
+    } else if (refreshResult.status === 'invalid') {
       setAuthToken(null);
     }
   }

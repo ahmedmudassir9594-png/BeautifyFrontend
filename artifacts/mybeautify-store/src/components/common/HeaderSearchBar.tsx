@@ -4,6 +4,7 @@ import { useLocation } from 'wouter';
 import { Search, Mic, Camera, X, Sparkles } from 'lucide-react';
 import { fetchProducts, type ProductResponse } from '@/lib/api';
 import { getJewelleryImage } from '@/lib/jewellery-images';
+import { matchesProductPrice, parsePriceSearchQuery } from '@/utils/product-price-search';
 
 const SEARCH_PLACEHOLDER_PHRASES = [
   'Search for bridal necklaces',
@@ -80,9 +81,13 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   }, [animatedPlaceholder, isDeletingPlaceholder, placeholderPhraseIndex, value]);
 
   const searchTerm = value.trim().toLocaleLowerCase();
-  const matchingSuggestions = suggestions
-    ? suggestions.filter((product) =>
-        !searchTerm || [
+  const searchedPrice = parsePriceSearchQuery(value);
+  const searchProducts = searchedPrice !== null ? loadedSuggestions : suggestions ?? loadedSuggestions;
+  const matchingSuggestions = searchProducts
+    .filter((product) =>
+        searchedPrice !== null
+          ? matchesProductPrice(product, searchedPrice)
+          : !searchTerm || [
           product.name,
           product.brandName,
           product.categoryName,
@@ -90,8 +95,8 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           product.shortDescription,
           product.description,
         ].some((field) => field?.toLocaleLowerCase().includes(searchTerm))
-      ).slice(0, 5)
-    : loadedSuggestions;
+      )
+    .slice(0, 5);
 
   // Helper to show toast using parent handler or internal toast
   const notify = useCallback(
@@ -158,12 +163,17 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen || suggestions) return;
+    if (!isOpen || (suggestions && searchedPrice === null)) return;
     let active = true;
     const timer = window.setTimeout(() => {
       setLoadingSuggestions(true);
       setSuggestionError(null);
-      fetchProducts({ query: value.trim() || undefined, size: 5, sort: 'createdAt,desc' })
+      setLoadedSuggestions([]);
+      fetchProducts({
+        query: searchedPrice === null ? value.trim() || undefined : undefined,
+        size: searchedPrice === null ? 5 : 100,
+        sort: 'createdAt,desc',
+      })
         .then((page) => {
           if (active) setLoadedSuggestions(page.content ?? []);
         })
@@ -181,7 +191,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
       active = false;
       window.clearTimeout(timer);
     };
-  }, [isOpen, suggestions, value]);
+  }, [isOpen, searchedPrice, suggestions, value]);
 
   // Voice search handler
   const handleMicClick = () => {
