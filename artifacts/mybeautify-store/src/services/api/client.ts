@@ -10,7 +10,7 @@ if (typeof window !== 'undefined') {
   (window as any).__malkaz_record_diagnostic = recordApiDiagnosticError;
 }
 
-const DEFAULT_API_BASE_URL = 'http://localhost:8080/api';
+const DEFAULT_API_BASE_URL = 'https://1h14g3nx-8080.inc1.devtunnels.ms/api';
 
 export function getApiBaseUrl(): string {
   const envUrl =

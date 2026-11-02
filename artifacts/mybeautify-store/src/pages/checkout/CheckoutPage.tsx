@@ -44,6 +44,7 @@ import {
 } from '@/lib/api';
 import { CustomerProfilePill, HeaderCartButton } from '@/components/common';
 import { getJewelleryImage } from '@/lib/jewellery-images';
+import { animateTrashCan } from '@/lib/cart-animations';
 import '@/styles/checkout.css';
 
 const getProductImage = (productId: number, imageUrl?: string, productName?: string) =>
@@ -195,13 +196,16 @@ export default function CheckoutPage() {
   }, [loadAddresses]);
 
   // Remove item from cart
-  const handleRemoveItem = async (itemId: number) => {
+  const handleRemoveItem = async (itemId: number, removeButton: HTMLElement) => {
     setRemovingItemId(itemId);
+    let restoreTrashIcon = () => {};
     try {
+      restoreTrashIcon = await animateTrashCan(removeButton);
       await removeCartItem(itemId);
       await loadCartData();
       showToast('Item removed from cart.');
     } catch (err) {
+      restoreTrashIcon();
       console.error('Failed to remove item:', err);
       showToast('Could not remove item.');
     } finally {
@@ -446,13 +450,13 @@ export default function CheckoutPage() {
 
       {/* ====================================================================
           1. HEADER (Exact match to reference mockup)
-          - MALKAZ Royal Jewels branding
+          - MALKAZ branding
           - Center search bar
           - Wishlist, Cart with count, Profile icon & User initials pill
           - NO general navigation links!
           ==================================================================== */}
       <header className="mb-checkout-header">
-        <Link href="/" className="mb-checkout-logo-link" aria-label="MALKAZ Royal Jewels">
+        <Link href="/" className="mb-checkout-logo-link" aria-label="MALKAZ">
           <img
             src="/malka-zai-emblem.png"
             alt="MALKAZ"
@@ -460,7 +464,6 @@ export default function CheckoutPage() {
           />
           <div className="mb-checkout-brand-info">
             <span className="mb-checkout-brand-title">MALKAZ</span>
-            <span className="mb-checkout-brand-sub">ROYAL JEWELS</span>
           </div>
         </Link>
 
@@ -846,16 +849,14 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         className="mb-checkout-item-remove-btn"
-                        onClick={() => handleRemoveItem(item.id)}
-                        disabled={removingItemId === item.id}
+                        onClick={(event) => {
+                          void handleRemoveItem(item.id, event.currentTarget);
+                        }}
+                        disabled={removingItemId !== null}
                         title="Remove item"
                         aria-label="Remove item"
                       >
-                        {removingItemId === item.id ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <Trash2 size={16} />
-                        )}
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   );
@@ -950,7 +951,6 @@ export default function CheckoutPage() {
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                   <span className="mb-checkout-watermark-brand">MALKAZ</span>
-                  <span className="mb-checkout-watermark-tagline">ROYAL JEWELS</span>
                 </div>
               </div>
               <div className="mb-checkout-watermark-slogan">MALKAZ jewellery, delivered with care</div>
@@ -1002,9 +1002,6 @@ export default function CheckoutPage() {
             <div className="mb-checkout-trust-text">
               <span className="mb-checkout-trust-title" style={{ fontFamily: 'var(--app-font-serif, Georgia, serif)', fontSize: 16 }}>
                 MALKAZ
-              </span>
-              <span className="mb-checkout-trust-sub" style={{ fontSize: 9, letterSpacing: '0.12em' }}>
-                ROYAL JEWELS
               </span>
             </div>
           </div>

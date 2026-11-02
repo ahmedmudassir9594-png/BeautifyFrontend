@@ -28,7 +28,6 @@ import {
   CreditCard,
   RotateCcw,
   Check,
-  Menu,
 } from 'lucide-react';
 import {
   fetchOrders,
@@ -60,7 +59,7 @@ interface ProductMeta {
 }
 
 const getProductMeta = (): ProductMeta => ({
-  brand: 'MALKAZ Royal Jewels',
+  brand: 'MALKAZ',
   imageUrl: '/products/jewels/royal-emerald-necklace.jpg',
 });
 
@@ -471,8 +470,10 @@ export default function MyOrdersPage() {
             className="mz-orders-mobile-menu"
             onClick={() => setMobileSidebarOpen(true)}
             aria-label="Open menu"
+            aria-expanded={mobileSidebarOpen}
+            aria-controls="malkaz-navigation"
           >
-            <Menu size={24} />
+            <span className="mz-hamburger-mark" aria-hidden="true"><span /><span /></span>
           </button>
           <div className="mb-orders-search-wrap">
             <Search size={18} className="mb-orders-search-icon" />
@@ -515,6 +516,7 @@ export default function MyOrdersPage() {
           {/* Promotional Banner */}
           <div className="mb-orders-banner">
             <div className="mb-orders-banner-content">
+              <span className="mb-orders-banner-kicker"><Sparkles size={14} /> YOUR MALKAZ JOURNEY</span>
               <h1 className="mb-orders-banner-title">My Orders</h1>
               <p className="mb-orders-banner-desc">Track, manage and review your purchases</p>
             </div>
@@ -528,9 +530,8 @@ export default function MyOrdersPage() {
             </div>
 
             <div className="mb-orders-banner-script">
-              <span>Jewellery</span>
-              <span>for every</span>
-              <span>occasion</span>
+              <span>Made to</span>
+              <span>be treasured</span>
             </div>
           </div>
 

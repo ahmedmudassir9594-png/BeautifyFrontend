@@ -36,6 +36,7 @@ export function WishlistPage() {
                 key={product.id}
                 product={product}
                 saved
+                adding={actions.adding}
                 onSave={actions.save}
                 onAdd={actions.add}
               />

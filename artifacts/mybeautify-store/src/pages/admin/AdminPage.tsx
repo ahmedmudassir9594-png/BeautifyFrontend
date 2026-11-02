@@ -260,7 +260,7 @@ function CrudPanel<T extends { id: number }>({
 }
 
 function AdminConsole() {
-  const [section, setSection] = useState<'products' | 'categories' | 'brands' | 'audit' | 'developer'>('products');
+  const [section, setSection] = useState<'products' | 'categories' | 'audit' | 'developer'>('products');
   const [page, setPage] = useState(0);
   const productsQuery = useQuery({
     queryKey: ['admin-products', page],
@@ -275,7 +275,7 @@ function AdminConsole() {
   const brandsQuery = useQuery({
     queryKey: ['admin-brands'],
     queryFn: async () => parseList<AdminBrand>(await customFetch<unknown>('/api/brands')),
-    enabled: section === 'products' || section === 'brands',
+    enabled: section === 'products',
   });
   const productFields = useMemo<FieldSpec[]>(() => [
     { key: 'name', label: 'Product name', type: 'text', required: true },
@@ -305,7 +305,7 @@ function AdminConsole() {
           <img src="/malka-zai-emblem.png" alt="" width={42} height={42} />
           <span>MALKAZ <i>Atelier administration</i></span>
         </div>
-        <div className="admin-hero-eyebrow"><Sparkles size={14} /> ROYAL JEWELS · STORE MANAGEMENT</div>
+        <div className="admin-hero-eyebrow"><Sparkles size={14} /> MALKAZ · STORE MANAGEMENT</div>
         <h1>Curate your<br /><em>jewellery house.</em></h1>
         <p>Manage the MALKAZ collection, keep an eye on stock, and bring every product detail to life.</p>
         <Link href="/shop" className="admin-hero-link">View storefront <ArrowRight size={15} /></Link>
@@ -339,7 +339,6 @@ function AdminConsole() {
         [
           { id: 'products', label: 'Products' },
           { id: 'categories', label: 'Categories' },
-          { id: 'brands', label: 'Brands' },
           { id: 'audit', label: 'Audit Logs' },
           { id: 'developer', label: 'Developer' },
         ] as const
@@ -393,26 +392,11 @@ function AdminConsole() {
                   { label: 'Description', render: (item) => item.description ?? '—' },
                   { label: 'Status', render: (item) => item.active ? 'Active' : 'Inactive' },
                 ]} />
-                : section === 'brands' && brandsQuery.isLoading
-                  ? <div className="skeleton line" />
-                  : section === 'brands' && brandsQuery.isError
-                    ? <div className="error-state" role="alert"><h3>Brands could not be loaded.</h3><p>{getMessage(brandsQuery.error)}</p><button className="button secondary" onClick={() => { void brandsQuery.refetch(); }}>Try again</button></div>
-                    : section === 'brands' && brandsQuery.data
-                      ? <CrudPanel title="Brand" endpoint="/api/admin/brands" queryKey={['admin-brands']} items={brandsQuery.data.items} fields={[
-                        { key: 'name', label: 'Brand name', type: 'text', required: true },
-                        { key: 'description', label: 'Description', type: 'textarea' },
-                        { key: 'logoUrl', label: 'Logo URL', type: 'url' },
-                        { key: 'active', label: 'Active', type: 'checkbox', defaultValue: true },
-                      ]} columns={[
-                        { label: 'Name', render: (item) => item.name },
-                        { label: 'Description', render: (item) => item.description ?? '—' },
-                        { label: 'Status', render: (item) => item.active ? 'Active' : 'Inactive' },
-                      ]} />
-                      : section === 'audit'
-                        ? <AuditLogsView />
-                        : section === 'developer'
-                          ? <DeveloperToolsView />
-                          : null}
+                : section === 'audit'
+                  ? <AuditLogsView />
+                  : section === 'developer'
+                    ? <DeveloperToolsView />
+                    : null}
     <p className="admin-back"><Link href="/account">Back to account</Link></p>
   </main>;
 }

@@ -1,8 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, Search, ShoppingBag, UserRound, X, Shield } from 'lucide-react';
-import { useGetCart } from '@workspace/api-client-react';
+import { ShoppingBag, UserRound, X, Shield } from 'lucide-react';
+import { useGetCart, useGetCategories, type Category } from '@workspace/api-client-react';
 import { BrandMark } from '@/components/common/BrandMark';
+import { HeaderSearchBar } from '@/components/common/HeaderSearchBar';
+import { AnnouncementBar } from '@/components/common/AnnouncementBar';
 import { toArray } from '@/utils/array';
 import { hasAdminRole } from '@/utils/auth';
 import { STORAGE_KEYS } from '@/constants';
@@ -15,6 +17,8 @@ export interface SiteLayoutProps {
 export function SiteLayout({ children }: SiteLayoutProps) {
   const [location] = useLocation();
   const [menu, setMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const categories = useGetCategories();
 
   const currentUser = (() => {
     try {
@@ -33,23 +37,41 @@ export function SiteLayout({ children }: SiteLayoutProps) {
   const nav = [
     ['Shop', '/shop'],
     ['Categories', '/categories'],
-    ['Brands', '/brands'],
     ['Our collection', '/#edit'],
   ];
 
+  useEffect(() => {
+    setMenu(false);
+  }, [location]);
+
+  useEffect(() => {
+    if (!menu) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenu(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [menu]);
+
   return (
     <div className="site-shell">
-      <div className="topline">
-        Discover fine jewellery from MALKAZ Royal Jewels
-      </div>
+      <AnnouncementBar />
       <header className="nav">
         <BrandMark />
-        <nav className={`navlinks ${menu ? 'show' : ''}`}>
+        <nav className="navlinks" aria-label="Primary navigation">
           {nav.map(([label, href]) => (
             <Link
               key={href}
               href={href}
               className={location === href ? 'active' : ''}
+              onClick={() => setMenu(false)}
               data-testid={`link-nav-${label.toLowerCase().replace(' ', '-')}`}
             >
               {label}
@@ -68,9 +90,12 @@ export function SiteLayout({ children }: SiteLayoutProps) {
               <Shield size={18} />
             </Link>
           )}
-          <Link href="/shop" className="icon-button" aria-label="Search products" data-testid="link-search">
-            <Search size={18} />
-          </Link>
+          <HeaderSearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search jewellery, collections and more..."
+            className="site-nav-search"
+          />
           <Link href="/account" className="icon-button" aria-label="Account" data-testid="link-account">
             <UserRound size={18} />
           </Link>
@@ -85,13 +110,68 @@ export function SiteLayout({ children }: SiteLayoutProps) {
           <button
             className="icon-button mobile-menu"
             onClick={() => setMenu((open) => !open)}
-            aria-label="Toggle menu"
+            aria-label={menu ? 'Close menu' : 'Open menu'}
+            aria-expanded={menu}
+            aria-controls="mobile-navigation-drawer"
             data-testid="button-mobile-menu"
           >
-            {menu ? <X size={19} /> : <Menu size={19} />}
+            {menu ? (
+              <X size={19} />
+            ) : (
+              <span className="nav-hamburger-mark" aria-hidden="true">
+                <span />
+                <span />
+              </span>
+            )}
           </button>
         </div>
       </header>
+      <button
+        type="button"
+        className={`nav-drawer-backdrop ${menu ? 'show' : ''}`}
+        onClick={() => setMenu(false)}
+        aria-label="Close navigation"
+        aria-hidden={!menu}
+        tabIndex={menu ? 0 : -1}
+      />
+      <nav
+        id="mobile-navigation-drawer"
+        className={`nav-drawer ${menu ? 'open' : ''}`}
+        aria-label="Mobile navigation"
+        aria-hidden={!menu}
+        inert={!menu}
+      >
+        <div className="nav-drawer-heading">
+          <span>Explore MALKAZ</span>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={() => setMenu(false)}
+            aria-label="Close navigation"
+          >
+            <X size={19} />
+          </button>
+        </div>
+        {nav.map(([label, href]) => (
+          <Link
+            key={href}
+            href={href}
+            className={location === href ? 'active' : ''}
+            onClick={() => setMenu(false)}
+          >
+            {label}
+          </Link>
+        ))}
+        {toArray<Category>(categories.data).map((category) => (
+          <Link
+            key={category.id}
+            href={`/shop?category=${encodeURIComponent(String(category.id))}`}
+            onClick={() => setMenu(false)}
+          >
+            {category.name}
+          </Link>
+        ))}
+      </nav>
       {children}
       <footer className="footer">
         <BrandMark href="/" testId="link-footer-home" />

@@ -154,7 +154,7 @@ export default function ResetPasswordPage() {
       <div className="reset-content-wrapper">
         {/* ================= LEFT SECTION: Brand & Reset Hero ================= */}
         <section className="reset-hero-col" aria-label="Brand introduction">
-          <Link href="/" className="reset-brand-lockup" title="Return to MALKAZ Royal Jewels">
+          <Link href="/" className="reset-brand-lockup" title="Return to MALKAZ">
             <img
               src="/malka-zai-emblem.png"
               alt="MALKAZ emblem"
@@ -162,7 +162,6 @@ export default function ResetPasswordPage() {
             />
             <div className="reset-brand-text-block">
               <span className="reset-brand-title">MALKAZ</span>
-              <span className="reset-brand-tagline">ROYAL JEWELS</span>
             </div>
           </Link>
 

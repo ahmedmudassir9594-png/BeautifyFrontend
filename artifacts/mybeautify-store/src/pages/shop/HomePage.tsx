@@ -25,12 +25,12 @@ export function HomePage() {
       <main className="page">
         <section className="hero">
           <div>
-            <div className="eyebrow">MALKAZ Royal Jewels / 01</div>
+            <div className="eyebrow">MALKAZ / 01</div>
             <h1>
               Jewellery made for <em>your story.</em>
             </h1>
             <p className="lede">
-              Discover thoughtfully selected gold, gemstones, and timeless designs from MALKAZ Royal Jewels.
+              Discover thoughtfully selected gold, gemstones, and timeless designs from MALKAZ.
             </p>
             <div className="hero-actions">
               <Link href="/shop" className="button" data-testid="link-hero-shop">
@@ -67,6 +67,7 @@ export function HomePage() {
                   key={product.id}
                   product={product}
                   saved={actions.savedIds.has(product.id)}
+                  adding={actions.adding}
                   onSave={actions.save}
                   onAdd={actions.add}
                 />
@@ -84,21 +85,22 @@ export function HomePage() {
         <section className="section">
           <div className="section-head">
             <div>
-              <div className="eyebrow">Shop by collection</div>
-              <h2 className="section-title">Find your signature piece</h2>
+              <div className="eyebrow">MALKAZ collections</div>
+              <h2 className="section-title">Shop by Collection</h2>
             </div>
             <Link href="/categories" className="button secondary small" data-testid="link-all-categories">
               All collections <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="category-strip">
+          <div className="category-strip home-category-circles">
             {categoryList.slice(0, 4).map((category) => (
               <Link
                 href={`/shop?category=${category.id}`}
-                className="category-tile"
+                className="category-tile home-category-circle"
                 key={category.id}
                 data-testid={`card-category-${category.id}`}
               >
+                <img src={category.image || '/cat-necklaces.jpg'} alt="" loading="lazy" />
                 <h3>{category.name}</h3>
                 <p>{category.description || `${category.productCount || 0} fine jewellery pieces`}</p>
               </Link>

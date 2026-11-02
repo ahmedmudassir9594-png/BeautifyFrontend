@@ -18,7 +18,6 @@ import {
   Star,
   Headphones,
   LogOut,
-  Menu,
   ChevronDown,
   Loader2,
   AlertCircle,
@@ -172,7 +171,7 @@ export function ShareReferralPage() {
   const handleNativeShare = useCallback(async () => {
     if (!fullReferralLink) return;
     const shareData = {
-      title: 'MALKAZ Royal Jewels',
+      title: 'MALKAZ',
       text: `Discover royal handcrafted jewellery at MALKAZ! Use my personal referral link to enjoy an exclusive ${summary?.discountPercent || 10}% discount on your first order.`,
       url: fullReferralLink,
     };
@@ -212,15 +211,17 @@ export function ShareReferralPage() {
 
       <div className="mb-main-content">
         {/* Top Header */}
-        <header className="mb-top-header mz-top-header">
+        <header className="mb-top-header mz-top-header mz-referral-top-header">
           {/* Mobile hamburger */}
           <button
             type="button"
             className="mb-mobile-hamburger mz-mobile-hamburger"
             onClick={() => setMobileSidebarOpen(true)}
             aria-label="Open menu"
+            aria-expanded={mobileSidebarOpen}
+            aria-controls="malkaz-navigation"
           >
-            <Menu size={24} />
+            <span className="mz-hamburger-mark" aria-hidden="true"><span /><span /></span>
           </button>
 
           {/* Search bar */}

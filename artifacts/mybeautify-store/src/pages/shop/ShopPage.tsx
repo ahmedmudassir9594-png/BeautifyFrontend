@@ -37,7 +37,7 @@ export function ShopPage() {
       <main className="page">
         <div className="catalog-head">
           <div>
-            <div className="eyebrow">MALKAZ Royal Jewels</div>
+            <div className="eyebrow">MALKAZ</div>
             <h1>Explore fine jewellery.</h1>
           </div>
           <div className="catalog-tools">
@@ -104,6 +104,7 @@ export function ShopPage() {
                     key={product.id}
                     product={product}
                     saved={actions.savedIds.has(product.id)}
+                    adding={actions.adding}
                     onSave={actions.save}
                     onAdd={actions.add}
                   />

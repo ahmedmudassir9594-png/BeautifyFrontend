@@ -1,12 +1,14 @@
-import { Heart } from 'lucide-react';
+import { Heart, Loader2, ShoppingCart } from 'lucide-react';
 import { Link } from 'wouter';
 import type { Product } from '@workspace/api-client-react';
 import { imageFor } from '@/utils/image';
 import { money } from '@/utils/format';
+import { animateProductToCart } from '@/lib/cart-animations';
 
 export interface ProductCardProps {
   product: Product;
   saved?: boolean;
+  adding?: boolean;
   onSave?: (product: Product) => void;
   onAdd?: (product: Product) => void;
 }
@@ -14,6 +16,7 @@ export interface ProductCardProps {
 export function ProductCard({
   product,
   saved = false,
+  adding = false,
   onSave,
   onAdd,
 }: ProductCardProps) {
@@ -35,14 +38,24 @@ export function ProductCard({
           <img src={imageFor(product.image)} alt={product.name} />
         </Link>
         {onAdd && (
+          <button
+            type="button"
+            className="button product-card-add"
+            onClick={(event) => {
+              event.stopPropagation();
+              animateProductToCart(event.currentTarget);
+              onAdd(product);
+            }}
+            disabled={adding || product.stock === 0}
+            aria-label={product.stock === 0 ? `${product.name} is out of stock` : `Add ${product.name} to cart`}
+            title={product.stock === 0 ? 'Out of stock' : 'Add to cart'}
+            data-testid={`button-add-${product.id}`}
+          >
+            {adding ? <Loader2 size={16} className="animate-spin" /> : <ShoppingCart size={16} />}
+          </button>
+        )}
+        {onAdd && (
           <div className="product-overlay">
-            <button
-              className="button small"
-              onClick={() => onAdd(product)}
-              data-testid={`button-add-${product.id}`}
-            >
-              Add to bag
-            </button>
             <Link
               href={`/product/${product.id}`}
               className="button small secondary"

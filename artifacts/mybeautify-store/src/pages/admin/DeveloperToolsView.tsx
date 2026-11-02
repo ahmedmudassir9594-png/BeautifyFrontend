@@ -419,7 +419,7 @@ export function DeveloperToolsView() {
               </div>
               <div className="dev-prop-row">
                 <span className="dev-prop-label">Application Name</span>
-                <span className="dev-prop-val">MALKAZ Royal Jewels</span>
+                <span className="dev-prop-val">MALKAZ</span>
               </div>
               <div className="dev-prop-row">
                 <span className="dev-prop-label">Frontend Stack</span>

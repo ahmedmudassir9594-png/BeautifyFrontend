@@ -1,8 +1,9 @@
 import React from 'react';
 import { useLocation } from 'wouter';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, Loader2, ShoppingCart } from 'lucide-react';
 import type { ProductResponse } from '@/types/product.types';
 import { getJewelleryImage } from '@/lib/jewellery-images';
+import { animateProductToCart } from '@/lib/cart-animations';
 
 export interface MalkazProductCardProps {
   product: ProductResponse;
@@ -97,6 +98,22 @@ export const MalkazProductCard: React.FC<MalkazProductCardProps> = ({
           <Heart size={15} fill={isWishlisted ? '#D4AF63' : 'none'} color={isWishlisted ? '#D4AF63' : '#063B2F'} />
         </button>
 
+        <button
+          type="button"
+          className="mz-card-cart-icon"
+          disabled={cartLoading || product.stockQuantity === 0}
+          onClick={(event) => {
+            event.stopPropagation();
+            animateProductToCart(event.currentTarget);
+            onAddToCart?.(product);
+          }}
+          aria-label={product.stockQuantity === 0 ? `${product.name} is out of stock` : `Add ${product.name} to cart`}
+          title={product.stockQuantity === 0 ? 'Out of stock' : 'Add to cart'}
+          data-testid={`btn-add-cart-${product.id}`}
+        >
+          {cartLoading ? <Loader2 size={15} className="animate-spin" /> : <ShoppingCart size={15} />}
+        </button>
+
         <img
           src={productImage}
           alt={product.name}
@@ -149,22 +166,6 @@ export const MalkazProductCard: React.FC<MalkazProductCardProps> = ({
           )}
         </div>
 
-        {/* Add to Cart Button */}
-        <button
-          type="button"
-          className="mb-card-add-btn mz-card-add-btn"
-          disabled={cartLoading || product.stockQuantity === 0}
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddToCart?.(product);
-          }}
-          data-testid={`btn-add-cart-${product.id}`}
-        >
-          <ShoppingCart size={14} className="mz-add-cart-icon" />
-          <span>
-            {product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart'}
-          </span>
-        </button>
       </div>
     </article>
   );

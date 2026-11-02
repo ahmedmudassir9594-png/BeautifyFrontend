@@ -701,21 +701,34 @@
 }
 
 .mb-checkout-item-remove-btn {
-  background: transparent;
-  border: none;
-  color: #8B7445;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  background: #FFF9F8;
+  border: 1px solid rgba(145, 52, 65, .18);
+  color: #A9434B;
   cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  padding: 0;
+  border-radius: 50%;
+  transition: all 0.18s ease;
 }
 
-.mb-checkout-item-remove-btn:hover {
-  color: #E11D48;
-  background: #F4EBD8;
+.mb-checkout-item-remove-btn:hover:not(:disabled) {
+  color: #842D36;
+  background: #FCEBED;
+  border-color: #A9434B;
+  transform: translateY(-1px);
+}
+
+.mb-checkout-item-remove-btn:disabled {
+  opacity: .7;
+  cursor: wait;
+}
+
+.mb-checkout-item-remove-btn svg {
+  transform-origin: 50% 20%;
 }
 
 /* Price rows */

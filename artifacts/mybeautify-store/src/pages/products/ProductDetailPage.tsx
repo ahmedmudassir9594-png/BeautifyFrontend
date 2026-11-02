@@ -17,7 +17,6 @@ import {
   Headphones,
   LogOut,
   Sparkles,
-  Menu,
   Plus,
   Minus,
   CheckCircle2,
@@ -69,6 +68,7 @@ import '@/styles/product-detail.css';
 import { HeaderSearchBar } from '@/components/common/HeaderSearchBar';
 import { MalkazSidebar } from '@/components/layout/MalkazSidebar';
 import { getJewelleryImage } from '@/lib/jewellery-images';
+import { animateProductToCart, animateTrashCan } from '@/lib/cart-animations';
 
 export function ProductDetailPage() {
   const params = useParams<{ productId?: string; id?: string }>();
@@ -104,6 +104,7 @@ export function ProductDetailPage() {
 
   // Cart & Wishlist State
   const [cart, setCart] = useState<CartResponse | null>(null);
+  const [removingCartItemId, setRemovingCartItemId] = useState<number | null>(null);
   const [wishlist, setWishlist] = useState<ProductResponse[]>([]);
   const [wishlistIds, setWishlistIds] = useState<Set<number>>(new Set());
 
@@ -239,7 +240,7 @@ export function ProductDetailPage() {
 
   // Add to Cart Handler
   const handleAddToCart = async () => {
-    if (!product) return;
+    if (!product || cartLoading) return;
     const token = getAuthToken();
     if (!token) {
       showToast('Please log in or create an account to add items to your cart.');
@@ -428,14 +429,21 @@ export function ProductDetailPage() {
     }
   };
 
-  const handleRemoveCartItem = async (itemId: number) => {
+  const handleRemoveCartItem = async (itemId: number, removeButton: HTMLElement) => {
+    if (removingCartItemId !== null) return;
+    setRemovingCartItemId(itemId);
+    let restoreTrashIcon = () => {};
     try {
+      restoreTrashIcon = await animateTrashCan(removeButton);
       await removeCartItem(itemId);
       const updated = await fetchCart();
       setCart(updated);
       showToast('Item removed from cart.');
     } catch (err: any) {
+      restoreTrashIcon();
       showToast(err.message || 'Failed to remove item.');
+    } finally {
+      setRemovingCartItemId(null);
     }
   };
 
@@ -536,8 +544,10 @@ export function ProductDetailPage() {
               className="mb-mobile-hamburger"
               onClick={() => setMobileSidebarOpen(true)}
               aria-label="Open menu"
+              aria-expanded={mobileSidebarOpen}
+              aria-controls="malkaz-navigation"
             >
-              <Menu size={24} />
+              <span className="mz-hamburger-mark" aria-hidden="true"><span /><span /></span>
             </button>
             <HeaderSearchBar
               value=""
@@ -616,8 +626,10 @@ export function ProductDetailPage() {
             className="mb-mobile-hamburger"
             onClick={() => setMobileSidebarOpen(true)}
             aria-label="Open menu"
+            aria-expanded={mobileSidebarOpen}
+            aria-controls="malkaz-navigation"
           >
-            <Menu size={24} />
+            <span className="mz-hamburger-mark" aria-hidden="true"><span /><span /></span>
           </button>
 
           {/* Search bar */}
@@ -809,7 +821,7 @@ export function ProductDetailPage() {
         </header>
 
         {/* Page Content */}
-        <main className="mb-page-body" style={{ padding: '24px 36px 48px' }}>
+        <main className="mb-page-body mb-product-detail-body">
           {/* Breadcrumb Navigation */}
           <nav className="mb-breadcrumb" aria-label="Breadcrumb">
             <Link href="/" className="mb-breadcrumb-link">
@@ -902,7 +914,7 @@ export function ProductDetailPage() {
               <div className="mb-detail-specs-row">
                 <span>{product.categoryName || 'Fine Jewellery'}</span>
                 <span className="mb-detail-specs-dot">|</span>
-                <span>MALKAZ Royal Jewels</span>
+                <span>MALKAZ</span>
                 <span className="mb-detail-specs-dot">|</span>
                 <span>{displaySize}</span>
               </div>
@@ -1012,7 +1024,10 @@ export function ProductDetailPage() {
                   type="button"
                   className="mb-detail-add-cart-btn"
                   disabled={cartLoading || product.stockQuantity === 0}
-                  onClick={handleAddToCart}
+                  onClick={(event) => {
+                    animateProductToCart(event.currentTarget);
+                    void handleAddToCart();
+                  }}
                   data-testid="btn-detail-add-to-cart"
                 >
                   {cartLoading ? (
@@ -1152,7 +1167,7 @@ export function ProductDetailPage() {
                         </li>
                         <li className="mb-feature-check-item">
                           <span className="mb-check-icon-circle">✓</span>
-                          <span>Thoughtfully selected by MALKAZ Royal Jewels</span>
+                          <span>Thoughtfully selected by MALKAZ</span>
                         </li>
                         <li className="mb-feature-check-item">
                           <span className="mb-check-icon-circle">✓</span>
@@ -1198,7 +1213,7 @@ export function ProductDetailPage() {
                       <div className="mb-specs-highlights-card">
                         <div className="mb-specs-highlight-item">
                           <span className="mb-specs-highlight-icon">✦</span>
-                          <span>MALKAZ Royal Jewels</span>
+                          <span>MALKAZ</span>
                         </div>
                         <div className="mb-specs-highlight-item">
                           <span className="mb-specs-highlight-icon">✦</span>
@@ -1719,11 +1734,15 @@ export function ProductDetailPage() {
                           </div>
                           <button
                             type="button"
-                            style={{ background: 'none', border: 'none', color: '#063B2F', cursor: 'pointer' }}
-                            onClick={() => handleRemoveCartItem(item.id)}
-                            title="Remove item"
+                            className="mb-cart-item-remove-btn"
+                            onClick={(event) => {
+                              void handleRemoveCartItem(item.id, event.currentTarget);
+                            }}
+                            disabled={removingCartItemId !== null}
+                            title={`Remove ${item.productName}`}
+                            aria-label={`Remove ${item.productName} from cart`}
                           >
-                            <Trash2 size={15} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </div>
@@ -2145,11 +2164,39 @@ export function ProductDetailPage() {
                 Have questions about your order, jewellery care, sizing, or returns? The MALKAZ Client Care team is here to help.
               </p>
               <div style={{ padding: 14, background: '#F4EBD8', borderRadius: 12, border: '1px solid var(--mb-border)' }}>
-                <div><strong>Client Care:</strong> MALKAZ Royal Jewels</div>
+                <div><strong>Client Care:</strong> MALKAZ</div>
                 <div style={{ marginTop: 6 }}><strong>Hours:</strong> Mon – Sat, 9:00 AM – 7:00 PM IST</div>
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {product && (
+        <div className="mb-detail-sticky-cart" role="region" aria-label="Quick add to cart">
+          <div className="mb-detail-sticky-copy">
+            <strong>{product.name}</strong>
+            <span>₹ {(product.sellingPrice || product.price).toLocaleString('en-IN')} · Qty {quantity}</span>
+          </div>
+          <button
+            type="button"
+            className="mb-detail-sticky-button"
+            disabled={cartLoading || product.stockQuantity === 0}
+            onClick={(event) => {
+              animateProductToCart(event.currentTarget);
+              void handleAddToCart();
+            }}
+            data-testid="btn-sticky-detail-add-to-cart"
+          >
+            {cartLoading ? <Loader2 size={18} className="animate-spin" /> : <ShoppingCart size={18} />}
+            <span>
+              {product.stockQuantity === 0
+                ? 'Out of Stock'
+                : cartLoading
+                  ? 'Adding...'
+                  : 'Add to Cart'}
+            </span>
+          </button>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   getGetCartQueryKey,
@@ -10,6 +10,7 @@ import {
   type Product,
 } from '@workspace/api-client-react';
 import { toArray } from '@/utils/array';
+import { toast } from '@/hooks/use-toast';
 
 export function useProductActions() {
   const qc = useQueryClient();
@@ -17,6 +18,7 @@ export function useProductActions() {
   const addWish = useAddWishlistItem();
   const removeWish = useRemoveWishlistItem();
   const wishlist = useGetWishlist();
+  const addPending = useRef(false);
 
   const savedIds = useMemo(
     () => new Set(toArray<{ id: string | number }>(wishlist.data).map((item) => item.id)),
@@ -37,13 +39,32 @@ export function useProductActions() {
     }
   };
 
-  const add = (product: Product) =>
+  const add = (product: Product) => {
+    if (addPending.current || product.stock === 0) return;
+    addPending.current = true;
     addCart.mutate(
       { data: { productId: product.id, quantity: 1 } },
-      { onSuccess: () => qc.invalidateQueries({ queryKey: getGetCartQueryKey() }) }
+      {
+        onSuccess: (updatedCart) => {
+          qc.setQueryData(getGetCartQueryKey(), updatedCart);
+          void qc.invalidateQueries({ queryKey: getGetCartQueryKey() });
+          toast({ title: 'Added to your bag', description: product.name });
+        },
+        onError: (error) => {
+          toast({
+            title: 'Could not add this item',
+            description: error instanceof Error ? error.message : 'Please try again.',
+            variant: 'destructive',
+          });
+        },
+        onSettled: () => {
+          addPending.current = false;
+        },
+      }
     );
+  };
 
-  return { savedIds, save, add };
+  return { savedIds, save, add, adding: addCart.isPending };
 }
 
 export default useProductActions;
