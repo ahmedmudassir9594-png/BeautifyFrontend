@@ -6,10 +6,8 @@ import {
   Home,
   LogOut,
   Package,
-  Share2,
   Star,
   Tags,
-  Ticket,
   UserRound,
   X,
 } from 'lucide-react';
@@ -21,7 +19,6 @@ export type MalkazSidebarAction =
   | 'wishlist'
   | 'profile'
   | 'addresses'
-  | 'coupons'
   | 'reviews'
   | 'support';
 
@@ -99,14 +96,6 @@ export function MalkazSidebar({
     { key: 'home', label: 'Home', icon: <Home size={18} />, href: '/' },
     { key: 'categories', label: 'Categories', icon: <Tags size={18} />, href: '/categories' },
     { key: 'orders', label: 'My Orders', icon: <Package size={18} />, href: '/orders' },
-    {
-      key: 'coupons',
-      label: 'Coupons & Offers',
-      icon: <Ticket size={18} />,
-      href: '/account?panel=coupons',
-      action: 'coupons',
-    },
-    { key: 'referral', label: 'Share & Referral', icon: <Share2 size={18} />, href: '/share-referral' },
     {
       key: 'reviews',
       label: 'Reviews',
