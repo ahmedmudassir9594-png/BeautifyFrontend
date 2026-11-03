@@ -273,6 +273,20 @@
   background: #fffefa;
 }
 
+.admin-image-hint {
+  color: #78857d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.admin-image-preview {
+  width: 88px;
+  height: 88px;
+  border: 1px solid #e3dac9;
+  border-radius: 9px;
+  object-fit: cover;
+}
+
 .admin-form .form-field .input:focus,
 .admin-form .form-field .select:focus {
   border-color: #b8954e;

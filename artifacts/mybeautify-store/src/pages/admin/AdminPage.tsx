@@ -1,10 +1,11 @@
-import { type FormEvent, type ReactNode, useMemo, useState } from 'react';
+import { type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { customFetch } from '@workspace/api-client-react/custom-fetch';
 import { ArrowRight, Gem, Layers3, Package, Pencil, Plus, Sparkles, TrendingDown, Trash2 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { getJewelleryImage } from '@/lib/jewellery-images';
+import { uploadImage } from '@/services/uploads/uploads.service';
 import { AuditLogsView } from './AuditLogsView';
 import { DeveloperToolsView } from './DeveloperToolsView';
 import '@/styles/admin.css';
@@ -57,14 +58,19 @@ type FormValues = Record<string, InputValue>;
 type FieldSpec = {
   key: string;
   label: string;
-  type: 'text' | 'url' | 'number' | 'textarea' | 'checkbox' | 'select' | 'list' | 'datetime-local';
+  type: 'text' | 'url' | 'number' | 'textarea' | 'checkbox' | 'select' | 'list' | 'datetime-local' | 'file';
   required?: boolean;
   defaultValue?: InputValue;
   min?: number;
   step?: string;
+  accept?: string;
+  hint?: string;
   options?: Array<{ value: string; label: string }>;
 };
 type Column<T> = { label: string; render: (item: T) => ReactNode };
+
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -116,7 +122,7 @@ function inputValue(item: unknown, field: FieldSpec): InputValue {
 }
 
 function makePayload(values: FormValues, fields: FieldSpec[]): Record<string, unknown> {
-  return Object.fromEntries(fields.map((field) => {
+  return Object.fromEntries(fields.filter((field) => field.type !== 'file').map((field) => {
     const value = values[field.key];
     if (field.type === 'checkbox') return [field.key, value === true];
     if (field.type === 'number') {
@@ -154,20 +160,40 @@ function CrudPanel<T extends { id: number }>({
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<T | null>(null);
   const [values, setValues] = useState<FormValues>({});
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreviewUrl(null);
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(imageFile);
+    setImagePreviewUrl(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [imageFile]);
+
   const mutation = useMutation({
-    mutationFn: async (request: { method: 'POST' | 'PUT' | 'DELETE'; id?: number; payload?: Record<string, unknown> }) => {
+    mutationFn: async (request: { method: 'POST' | 'PUT' | 'DELETE'; id?: number; payload?: Record<string, unknown>; imageFile?: File }) => {
       const url = request.id === undefined ? endpoint : `${endpoint}/${request.id}`;
+      const payload = { ...request.payload };
+      if (request.imageFile) {
+        payload.imageUrl = await uploadImage(request.imageFile);
+      }
       return customFetch<unknown>(url, {
         method: request.method,
-        ...(request.payload ? { body: JSON.stringify(request.payload) } : {}),
+        ...(request.payload ? { body: JSON.stringify(payload) } : {}),
       });
     },
     onSuccess: async (_, request) => {
       await queryClient.invalidateQueries({ queryKey });
       setEditing(null);
       setValues({});
+      setImageFile(null);
+      if (imageInputRef.current) imageInputRef.current.value = '';
       setError('');
       setMessage(request.method === 'DELETE' ? 'Record deleted.' : request.method === 'POST' ? 'Record added.' : 'Changes saved.');
     },
@@ -180,12 +206,16 @@ function CrudPanel<T extends { id: number }>({
   const beginCreate = () => {
     setEditing(null);
     setValues(Object.fromEntries(fields.map((field) => [field.key, field.defaultValue ?? (field.type === 'checkbox' ? false : '')])));
+    setImageFile(null);
+    if (imageInputRef.current) imageInputRef.current.value = '';
     setMessage('');
     setError('');
   };
   const beginEdit = (item: T) => {
     setEditing(item);
     setValues(Object.fromEntries(fields.map((field) => [field.key, inputValue(item, field)])));
+    setImageFile(null);
+    if (imageInputRef.current) imageInputRef.current.value = '';
     setMessage('');
     setError('');
   };
@@ -195,11 +225,17 @@ function CrudPanel<T extends { id: number }>({
     setError('');
     try {
       const payload = makePayload(values, fields);
+      if (imageFile && !ACCEPTED_IMAGE_TYPES.has(imageFile.type)) {
+        throw new Error('Choose a JPEG, PNG, or WebP image.');
+      }
+      if (imageFile && imageFile.size > MAX_IMAGE_SIZE_BYTES) {
+        throw new Error('Image files must be 5 MB or smaller.');
+      }
       const hiddenProductFields = ['ingredients', 'benefits', 'howToUse', 'skinType', 'shade', 'expiryDate'];
       for (const [key, value] of Object.entries(editing ?? {})) {
         if (hiddenProductFields.includes(key)) payload[key] = value;
       }
-      mutation.mutate({ method: editing ? 'PUT' : 'POST', id: editing?.id, payload });
+      mutation.mutate({ method: editing ? 'PUT' : 'POST', id: editing?.id, payload, imageFile: imageFile ?? undefined });
     } catch (submitError) {
       setError(getMessage(submitError));
     }
@@ -222,6 +258,43 @@ function CrudPanel<T extends { id: number }>({
         {fields.map((field) => <label className={`form-field ${field.type === 'checkbox' ? 'admin-checkbox-field' : ''}`} key={field.key}>
           {field.type === 'checkbox'
             ? <><input type="checkbox" checked={values[field.key] === true} onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.checked }))} />{field.label}</>
+            : field.type === 'file'
+              ? <><span>{field.label}</span>
+                <input
+                  ref={imageInputRef}
+                  className="input"
+                  type="file"
+                  accept={field.accept}
+                  disabled={mutation.isPending}
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0] ?? null;
+                    if (!file) return;
+                    if (!ACCEPTED_IMAGE_TYPES.has(file.type)) {
+                      setImageFile(null);
+                      setError('Choose a JPEG, PNG, or WebP image.');
+                      event.currentTarget.value = '';
+                      return;
+                    }
+                    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+                      setImageFile(null);
+                      setError('Image files must be 5 MB or smaller.');
+                      event.currentTarget.value = '';
+                      return;
+                    }
+                    setImageFile(file);
+                    setError('');
+                    setMessage('');
+                  }}
+                />
+                {field.hint && <small className="admin-image-hint">{field.hint}</small>}
+                {(imagePreviewUrl || (typeof values.imageUrl === 'string' && values.imageUrl)) && (
+                  <img
+                    className="admin-image-preview"
+                    src={imagePreviewUrl ?? String(values.imageUrl)}
+                    alt={imageFile ? `Preview of ${imageFile.name}` : 'Current image'}
+                  />
+                )}
+              </>
             : <><span>{field.label}</span>
               {field.type === 'textarea'
                 ? <textarea className="input" rows={3} required={field.required} value={String(values[field.key] ?? '')} onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))} />
@@ -289,6 +362,7 @@ function AdminConsole() {
     { key: 'shortDescription', label: 'Short description', type: 'textarea' },
     { key: 'description', label: 'Description', type: 'textarea', required: true },
     { key: 'imageUrl', label: 'Image URL', type: 'url' },
+    { key: 'imageFile', label: 'Upload image', type: 'file', accept: 'image/jpeg,image/png,image/webp', hint: 'JPEG, PNG, or WebP. Maximum file size: 5 MB. A selected file replaces the image URL.' },
     { key: 'size', label: 'Size / dimensions', type: 'text' },
     { key: 'featured', label: 'Featured', type: 'checkbox' },
     { key: 'active', label: 'Active', type: 'checkbox', defaultValue: true },
@@ -386,6 +460,7 @@ function AdminConsole() {
                   { key: 'name', label: 'Category name', type: 'text', required: true },
                   { key: 'description', label: 'Description', type: 'textarea' },
                   { key: 'imageUrl', label: 'Image URL', type: 'url' },
+                  { key: 'imageFile', label: 'Upload image', type: 'file', accept: 'image/jpeg,image/png,image/webp', hint: 'JPEG, PNG, or WebP. Maximum file size: 5 MB. A selected file replaces the image URL.' },
                   { key: 'active', label: 'Active', type: 'checkbox', defaultValue: true },
                 ]} columns={[
                   { label: 'Name', render: (item) => item.name },
