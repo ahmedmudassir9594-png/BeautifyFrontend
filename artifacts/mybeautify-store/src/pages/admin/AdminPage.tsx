@@ -361,8 +361,7 @@ function AdminConsole() {
     { key: 'categoryId', label: 'Category', type: 'select', required: true, options: (categoriesQuery.data?.items ?? []).map((category) => ({ value: String(category.id), label: category.name })) },
     { key: 'shortDescription', label: 'Short description', type: 'textarea' },
     { key: 'description', label: 'Description', type: 'textarea', required: true },
-    { key: 'imageUrl', label: 'Image URL', type: 'url' },
-    { key: 'imageFile', label: 'Upload image', type: 'file', accept: 'image/jpeg,image/png,image/webp', hint: 'JPEG, PNG, or WebP. Maximum file size: 5 MB. A selected file replaces the image URL.' },
+    { key: 'imageFile', label: 'Upload image', type: 'file', accept: 'image/jpeg,image/png,image/webp', hint: 'JPEG, PNG, or WebP. Maximum file size: 5 MB. A selected file replaces the current image.' },
     { key: 'size', label: 'Size / dimensions', type: 'text' },
     { key: 'featured', label: 'Featured', type: 'checkbox' },
     { key: 'active', label: 'Active', type: 'checkbox', defaultValue: true },
@@ -459,8 +458,7 @@ function AdminConsole() {
                 ? <CrudPanel title="Category" endpoint="/api/admin/categories" queryKey={['admin-categories']} items={categoriesQuery.data.items} fields={[
                   { key: 'name', label: 'Category name', type: 'text', required: true },
                   { key: 'description', label: 'Description', type: 'textarea' },
-                  { key: 'imageUrl', label: 'Image URL', type: 'url' },
-                  { key: 'imageFile', label: 'Upload image', type: 'file', accept: 'image/jpeg,image/png,image/webp', hint: 'JPEG, PNG, or WebP. Maximum file size: 5 MB. A selected file replaces the image URL.' },
+                  { key: 'imageFile', label: 'Upload image', type: 'file', accept: 'image/jpeg,image/png,image/webp', hint: 'JPEG, PNG, or WebP. Maximum file size: 5 MB. A selected file replaces the current image.' },
                   { key: 'active', label: 'Active', type: 'checkbox', defaultValue: true },
                 ]} columns={[
                   { label: 'Name', render: (item) => item.name },
