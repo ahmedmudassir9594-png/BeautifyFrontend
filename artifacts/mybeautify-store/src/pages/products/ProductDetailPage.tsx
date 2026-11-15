@@ -262,40 +262,29 @@ export function ProductDetailPage() {
     }, 3200);
   }, []);
 
-  const loadSimilarStyles = useCallback(async (id: number, categoryId?: number | null) => {
+  const loadSimilarStyles = useCallback(async (id: number, _categoryId?: number | null) => {
     const requestId = ++similarProductsRequestId.current;
     setSimilarProductsLoading(true);
     setSimilarProductsError(null);
     try {
       let items: SimilarProductResponse[] = [];
       try {
-        const response = await fetchSimilarProducts(id, { limit: 4, page: 0 });
+        const response = await fetchSimilarProducts(id, { limit: 4, page: 0, explicitOnly: true });
         if (response && Array.isArray(response.content)) {
-          items = response.content.filter((p) => p.id !== id);
+          // Strictly display ONLY products explicitly linked/selected in Admin Panel's "Similar products" mapping.
+          // Exclude any automatic matches (STYLE_MATCH, CATEGORY_MATCH, CATALOG_MATCH).
+          items = response.content.filter(
+            (p) =>
+              p.id !== id &&
+              typeof p.relationshipType === 'string' &&
+              !['STYLE_MATCH', 'CATEGORY_MATCH', 'CATALOG_MATCH'].includes(p.relationshipType)
+          );
         }
       } catch (err) {
-        console.warn('Similar products endpoint not available, trying catalog category products:', err);
+        console.warn('Similar products endpoint not available:', err);
       }
 
-      // If backend has no explicit relationships, fetch from the same category
-      if (items.length === 0 && categoryId) {
-        try {
-          const catalogRes = await fetchProducts({ categoryId, size: 5 });
-          const catalogItems = (catalogRes.content || [])
-            .filter((p) => p.id !== id)
-            .map((p) => ({
-              id: p.id,
-              name: p.name,
-              slug: p.slug || String(p.id),
-              price: p.price,
-              sellingPrice: p.discountPrice || p.sellingPrice || p.price,
-              imageUrl: p.imageUrl,
-              categoryName: p.categoryName,
-            }));
-          items = catalogItems;
-        } catch {}
-      }
-
+      // No fallback to general or random products: if no explicit similar products are assigned, keep items empty
       if (requestId === similarProductsRequestId.current) {
         setSimilarProducts(items.slice(0, 4));
       }
@@ -1323,12 +1312,6 @@ export function ProductDetailPage() {
                 {discount && <span className="mb-detail-discount-pill">{discount}</span>}
               </div>
 
-              {/* Short description */}
-              <p className="mb-detail-description" style={{ whiteSpace: 'pre-line' }}>
-                {product.description ||
-                  `${product.name} from the MALKAZ fine jewellery collection.`}
-              </p>
-
               {/* 4 Benefit Icon Highlights */}
               <div className="mb-benefit-pills-row">
                 <div className="mb-benefit-pill-item">
@@ -1695,158 +1678,118 @@ export function ProductDetailPage() {
                   aria-labelledby="mb-tab-delivery"
                   className="mb-tab-panel mb-tab-panel-delivery"
                 >
-                  <div className="mb-panel-grid-2col">
-                    <div className="mb-panel-col-main">
-                      <div className="mb-delivery-panel">
-                        <h3 className="mb-col-heading">
-                          <Truck size={18} style={{ color: 'var(--mb-primary)' }} />
-                          <span>Delivery & Shipping Information</span>
-                        </h3>
+                  <div className="mb-delivery-single-col">
+                    <div className="mb-delivery-panel">
+                      <h3 className="mb-col-heading">
+                        <Truck size={18} style={{ color: 'var(--mb-primary)' }} />
+                        <span>Delivery & Shipping Information</span>
+                      </h3>
 
-                        <div className="mb-delivery-header-row">
-                          <div className="mb-delivery-loc">
-                            <span>Deliver to</span>
-                            <MapPin size={14} style={{ color: 'var(--mb-primary)' }} />
-                            <strong>{pincode} - {selectedCity}</strong>
-                          </div>
-                          <button
-                            type="button"
-                            className="mb-delivery-change-btn"
-                            onClick={() => {
-                              fetchAddresses().then((a) => setAddresses(a)).catch(() => {});
-                              setActiveModal('addresses');
-                            }}
-                          >
-                            Change
-                          </button>
+                      <div className="mb-delivery-header-row">
+                        <div className="mb-delivery-loc">
+                          <span>Deliver to</span>
+                          <MapPin size={14} style={{ color: 'var(--mb-primary)' }} />
+                          <strong>{pincode} - {selectedCity}</strong>
                         </div>
-
-                        {/* PIN Code check box */}
-                        <div className="mb-pincode-check-row">
-                          <input
-                            type="text"
-                            className="mb-pincode-input"
-                            placeholder="Enter Pincode"
-                            value={pincode}
-                            onChange={(e) => setPincode(e.target.value)}
-                            maxLength={6}
-                          />
-                          <button
-                            type="button"
-                            className="mb-pincode-check-btn"
-                            onClick={handleCheckPincode}
-                          >
-                            CHECK
-                          </button>
-                        </div>
-                        {pincodeStatus && (
-                          <div style={{ fontSize: 12, color: '#2B7A4B', marginBottom: 14, fontWeight: 600 }}>
-                            ✓ {pincodeStatus}
-                          </div>
-                        )}
-
-                        {/* Delivery radio options */}
-                        <div className="mb-delivery-options">
-                          <label
-                            className={`mb-del-option-card ${deliveryType === 'standard' ? 'selected' : ''}`}
-                          >
-                            <input
-                              type="radio"
-                              name="delOption"
-                              className="mb-del-radio"
-                              checked={deliveryType === 'standard'}
-                              onChange={() => setDeliveryType('standard')}
-                            />
-                            <div className="mb-del-option-body">
-                              <div className="mb-del-option-title">
-                                <span>Standard Delivery</span>
-                              </div>
-                              <div className="mb-del-option-desc">
-                                <strong>FREE</strong> on orders above ₹499 or standard shipping fee.
-                              </div>
-                              <div className="mb-del-option-desc">
-                                Estimated delivery: 2 - 4 business days · Dispatches within 24 hours
-                              </div>
-                            </div>
-                          </label>
-
-                          <label
-                            className={`mb-del-option-card ${deliveryType === 'express' ? 'selected' : ''}`}
-                          >
-                            <input
-                              type="radio"
-                              name="delOption"
-                              className="mb-del-radio"
-                              checked={deliveryType === 'express'}
-                              onChange={() => setDeliveryType('express')}
-                            />
-                            <div className="mb-del-option-body">
-                              <div className="mb-del-option-title">
-                                <span>Express Delivery</span>
-                                <span className="mb-del-extra-pill">₹99 Extra</span>
-                              </div>
-                              <div className="mb-del-option-desc">
-                                Get it in 1 – 2 business days.
-                              </div>
-                              <div className="mb-del-option-desc">
-                                Order within 2 hrs for same-day priority dispatch.
-                              </div>
-                            </div>
-                          </label>
-                        </div>
-
-                        {/* Delivery Perks */}
-                        <div className="mb-del-perks">
-                          <div className="mb-del-perk-item">
-                            <Banknote size={15} style={{ color: 'var(--mb-primary)' }} />
-                            <span>Cash on Delivery (COD) available</span>
-                          </div>
-                          <div className="mb-del-perk-item">
-                            <ShieldCheck size={15} style={{ color: 'var(--mb-primary)' }} />
-                            <span>Safe & Hygienic Delivery with contactless handover</span>
-                          </div>
-                          <div className="mb-del-perk-item">
-                            <RotateCcw size={15} style={{ color: 'var(--mb-primary)' }} />
-                            <span>7 Days Easy Return Policy for unopened items</span>
-                          </div>
-                        </div>
+                        <button
+                          type="button"
+                          className="mb-delivery-change-btn"
+                          onClick={() => {
+                            fetchAddresses().then((a) => setAddresses(a)).catch(() => {});
+                            setActiveModal('addresses');
+                          }}
+                        >
+                          Change
+                        </button>
                       </div>
-                    </div>
 
-                    <div className="mb-panel-col-side">
-                      <div className="mb-return-policy-card">
-                        <h3 className="mb-col-heading">
-                          <RotateCcw size={18} style={{ color: 'var(--mb-primary)' }} />
-                          <span>Returns & Replacement Policy</span>
-                        </h3>
-
-                        <div className="mb-return-step">
-                          <div className="mb-return-step-num">1</div>
-                          <div className="mb-return-step-text">
-                            <strong>7-Day Return Window</strong>
-                            <p>You can request a return or replacement within 7 days of order delivery.</p>
-                          </div>
+                      {/* PIN Code check box */}
+                      <div className="mb-pincode-check-row">
+                        <input
+                          type="text"
+                          className="mb-pincode-input"
+                          placeholder="Enter Pincode"
+                          value={pincode}
+                          onChange={(e) => setPincode(e.target.value)}
+                          maxLength={6}
+                        />
+                        <button
+                          type="button"
+                          className="mb-pincode-check-btn"
+                          onClick={handleCheckPincode}
+                        >
+                          CHECK
+                        </button>
+                      </div>
+                      {pincodeStatus && (
+                        <div style={{ fontSize: 12, color: '#2B7A4B', marginBottom: 14, fontWeight: 600 }}>
+                          ✓ {pincodeStatus}
                         </div>
+                      )}
 
-                        <div className="mb-return-step">
-                          <div className="mb-return-step-num">2</div>
-                          <div className="mb-return-step-text">
-                            <strong>Condition Requirements</strong>
-                            <p>Products must be unused, sealed in original packaging with tags and invoice intact.</p>
+                      {/* Delivery radio options */}
+                      <div className="mb-delivery-options">
+                        <label
+                          className={`mb-del-option-card ${deliveryType === 'standard' ? 'selected' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name="delOption"
+                            className="mb-del-radio"
+                            checked={deliveryType === 'standard'}
+                            onChange={() => setDeliveryType('standard')}
+                          />
+                          <div className="mb-del-option-body">
+                            <div className="mb-del-option-title">
+                              <span>Standard Delivery</span>
+                            </div>
+                            <div className="mb-del-option-desc">
+                              Delivery charges are ₹69
+                            </div>
+                            <div className="mb-del-option-desc">
+                              Estimated delivery: 3 - 7 business days
+                            </div>
                           </div>
-                        </div>
+                        </label>
 
-                        <div className="mb-return-step">
-                          <div className="mb-return-step-num">3</div>
-                          <div className="mb-return-step-text">
-                            <strong>Quick Doorstep Pickup</strong>
-                            <p>Our courier picks up the product from your address. Full refund issued upon receipt.</p>
+                        <label
+                          className={`mb-del-option-card ${deliveryType === 'express' ? 'selected' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name="delOption"
+                            className="mb-del-radio"
+                            checked={deliveryType === 'express'}
+                            onChange={() => setDeliveryType('express')}
+                          />
+                          <div className="mb-del-option-body">
+                            <div className="mb-del-option-title">
+                              <span>Super Fast Delivery</span>
+                              <span className="mb-del-extra-pill">₹99 Extra</span>
+                            </div>
+                            <div className="mb-del-option-desc">
+                              Get it in 1 – 2 business days.
+                            </div>
+                            <div className="mb-del-option-desc">
+                              Order within 2 hrs for same-day priority dispatch.
+                            </div>
                           </div>
-                        </div>
+                        </label>
+                      </div>
 
-                        <div className="mb-return-guarantee-note">
-                          <ShieldCheck size={16} />
-                          <span>100% Buyer Protection & Money Back Guarantee</span>
+                      {/* Delivery Perks */}
+                      <div className="mb-del-perks">
+                        <div className="mb-del-perk-item">
+                          <Banknote size={15} style={{ color: 'var(--mb-primary)' }} />
+                          <span>Cash on Delivery (COD) available</span>
+                        </div>
+                        <div className="mb-del-perk-item">
+                          <ShieldCheck size={15} style={{ color: 'var(--mb-primary)' }} />
+                          <span>Safe & Hygienic Delivery with contactless handover</span>
+                        </div>
+                        <div className="mb-del-perk-item">
+                          <RotateCcw size={15} style={{ color: 'var(--mb-primary)' }} />
+                          <span>48 Hours Easy Return (Terms & conditions applied as per the company policy)</span>
                         </div>
                       </div>
                     </div>

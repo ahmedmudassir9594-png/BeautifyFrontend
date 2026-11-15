@@ -4,7 +4,7 @@
 
 import { request } from '@/services/api/client';
 import { extractArray } from '@/utils/array';
-import type { HeroBanner, HeroBannerRequest } from '@/types/banner.types';
+import type { HeroBanner, HeroBannerRequest, ShowcaseImage, ShowcaseImageRequest } from '@/types/banner.types';
 
 export async function fetchBanners(): Promise<HeroBanner[]> {
   try {
@@ -46,4 +46,54 @@ export async function deleteAdminBanner(id: number): Promise<void> {
     method: 'DELETE',
   });
 }
+
+export async function fetchShowcaseImages(): Promise<ShowcaseImage[]> {
+  try {
+    const res = await request<unknown>('/showcase-images');
+    return extractArray<ShowcaseImage>(res);
+  } catch (error) {
+    console.warn('Could not fetch active showcase images from backend:', error);
+    return [];
+  }
+}
+
+export async function fetchAdminShowcaseImages(): Promise<ShowcaseImage[]> {
+  const res = await request<unknown>('/admin/showcase-images');
+  return extractArray<ShowcaseImage>(res);
+}
+
+export async function createAdminShowcaseImage(data: ShowcaseImageRequest): Promise<ShowcaseImage> {
+  return request<ShowcaseImage>('/admin/showcase-images', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateAdminShowcaseImage(id: number, data: ShowcaseImageRequest): Promise<ShowcaseImage> {
+  return request<ShowcaseImage>(`/admin/showcase-images/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function toggleAdminShowcaseStatus(id: number, active: boolean): Promise<ShowcaseImage> {
+  return request<ShowcaseImage>(`/admin/showcase-images/${id}/status?active=${active}`, {
+    method: 'PATCH',
+  });
+}
+
+export async function deleteAdminShowcaseImage(id: number): Promise<void> {
+  return request<void>(`/admin/showcase-images/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function reorderAdminShowcaseImages(orderedIds: number[]): Promise<ShowcaseImage[]> {
+  const res = await request<unknown>('/admin/showcase-images/reorder', {
+    method: 'PUT',
+    body: JSON.stringify(orderedIds),
+  });
+  return extractArray<ShowcaseImage>(res);
+}
+
 

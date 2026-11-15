@@ -1081,6 +1081,12 @@
 }
 
 /* COLUMN 2: DELIVERY INFORMATION */
+.mb-delivery-single-col {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
 .mb-delivery-panel {
   background: #FAF7F2;
   border: 1px solid var(--mb-border);

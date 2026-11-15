@@ -54,11 +54,12 @@ export async function fetchProductBySlug(slug: string): Promise<ProductResponse>
 
 export async function fetchSimilarProducts(
   productId: number,
-  params: { limit?: number; page?: number } = {}
+  params: { limit?: number; page?: number; explicitOnly?: boolean } = {}
 ): Promise<PageResponse<SimilarProductResponse>> {
   const query = new URLSearchParams();
   if (params.limit !== undefined) query.set('limit', String(params.limit));
   if (params.page !== undefined) query.set('page', String(params.page));
+  if (params.explicitOnly !== undefined) query.set('explicitOnly', String(params.explicitOnly));
   const queryString = query.toString();
   const search = queryString ? `?${queryString}` : '';
   return request<PageResponse<SimilarProductResponse>>(`/products/${productId}/similar${search}`);

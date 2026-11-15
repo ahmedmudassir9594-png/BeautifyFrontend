@@ -11,7 +11,6 @@ import { fetchAdminSubcategories } from '@/services/subcategories/subcategories.
 import {
   COMMON_ATTRIBUTES,
   getCategoryAttributes,
-  generateProductDescriptionTemplate,
 } from '@/constants/product-attributes';
 import { AuditLogsView } from './AuditLogsView';
 import { DeveloperToolsView } from './DeveloperToolsView';
@@ -196,24 +195,6 @@ function CrudPanel<T extends { id: number }>({
   const selectedCategoryName = selectedCategory?.name;
   const categorySpecificAttributes = getCategoryAttributes(selectedCategoryName);
 
-  const handleGenerateDescription = () => {
-    const productName = String(values.name || '').trim();
-    if (!productName) {
-      alert('Please enter a Product Name first.');
-      return;
-    }
-    const currentDesc = String(values.description || '').trim();
-    if (currentDesc && !window.confirm('Replace current description with the auto-generated luxury template?')) {
-      return;
-    }
-    const generated = generateProductDescriptionTemplate(
-      productName,
-      selectedCategoryName || '',
-      attributes
-    );
-    setValues((current) => ({ ...current, description: generated }));
-  };
-
   const handleAddFiles = (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
     const newItems: GalleryItem[] = [];
@@ -384,7 +365,19 @@ function CrudPanel<T extends { id: number }>({
   };
   const beginEdit = (item: T) => {
     setEditing(item);
-    setValues(Object.fromEntries(fields.map((field) => [field.key, inputValue(item, field)])));
+    const initialValues = Object.fromEntries(fields.map((field) => [field.key, inputValue(item, field)]));
+    if (title === 'Product') {
+      const p = item as any;
+      if (p.price != null) {
+        initialValues.price = String(p.price);
+      }
+      if (p.discountPrice != null && Number(p.discountPrice) > 0 && Number(p.discountPrice) < Number(p.price)) {
+        initialValues.discountPrice = String(p.discountPrice);
+      } else {
+        initialValues.discountPrice = '';
+      }
+    }
+    setValues(initialValues);
     const itemAttributes = (item as any)?.attributes;
     setAttributes(itemAttributes && typeof itemAttributes === 'object' ? { ...itemAttributes } : {});
     setImageFile(null);
@@ -434,6 +427,21 @@ function CrudPanel<T extends { id: number }>({
       }
 
       if (title === 'Product') {
+        const regularPrice = Number(payload.price);
+        const rawDiscount = payload.discountPrice;
+        if (rawDiscount !== null && rawDiscount !== undefined && rawDiscount !== '') {
+          const discountVal = Number(rawDiscount);
+          if (discountVal <= 0 || discountVal === regularPrice) {
+            payload.discountPrice = null;
+          } else if (discountVal > regularPrice) {
+            throw new Error(`Discount price (₹${discountVal}) cannot be greater than regular price / MRP (₹${regularPrice}).`);
+          } else {
+            payload.discountPrice = discountVal;
+          }
+        } else {
+          payload.discountPrice = null;
+        }
+
         const cleanAttributes: Record<string, string> = {};
         for (const [k, v] of Object.entries(attributes)) {
           if (v && typeof v === 'string' && v.trim().length > 0) {
@@ -493,14 +501,6 @@ function CrudPanel<T extends { id: number }>({
                         Select jewellery attributes{selectedCategoryName ? ` for ${selectedCategoryName}` : ''}. These are automatically saved and shown in customer filters and product details.
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      className="generate-template-btn"
-                      onClick={handleGenerateDescription}
-                      title="Generate luxury description using product name and selected attributes"
-                    >
-                      <Sparkles size={14} /> ✨ Auto-Generate Description Template
-                    </button>
                   </div>
 
                   <div className="admin-attributes-grid">
@@ -808,22 +808,7 @@ function CrudPanel<T extends { id: number }>({
                         )}
                       </>
                     : <>
-                      {isProduct && isDescription ? (
-                        <div className="admin-desc-header-row">
-                          <span>{field.label}</span>
-                          <button
-                            type="button"
-                            className="generate-template-btn"
-                            style={{ padding: '3px 10px', fontSize: '11px' }}
-                            onClick={handleGenerateDescription}
-                            title="Auto-fill description from attributes"
-                          >
-                            <Sparkles size={12} /> ✨ Generate Description
-                          </button>
-                        </div>
-                      ) : (
-                        <span>{field.label}</span>
-                      )}
+                      <span>{field.label}</span>
                       {field.type === 'textarea'
                         ? <textarea className="input" rows={isDescription ? 7 : 3} required={field.required} value={String(values[field.key] ?? '')} onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))} />
                         : field.type === 'select'
@@ -900,8 +885,8 @@ function AdminConsole() {
   const productFields = useMemo<FieldSpec[]>(() => [
     { key: 'name', label: 'Product name', type: 'text', required: true },
     { key: 'sku', label: 'SKU', type: 'text', required: true },
-    { key: 'price', label: 'Price', type: 'number', required: true, min: 0, step: '0.01' },
-    { key: 'discountPrice', label: 'Discount price', type: 'number', min: 0, step: '0.01' },
+    { key: 'price', label: 'Price (MRP ₹)', type: 'number', required: true, min: 0, step: '0.01' },
+    { key: 'discountPrice', label: 'Discount price (Selling price ₹ - Optional)', type: 'number', min: 0, step: '0.01' },
     { key: 'stockQuantity', label: 'Stock quantity', type: 'number', required: true, min: 0, step: '1' },
     { key: 'lowStockThreshold', label: 'Low stock threshold', type: 'number', required: true, min: 0, step: '1' },
     { key: 'categoryId', label: 'Category', type: 'select', required: true, options: categoriesList.map((category) => ({ value: String(category.id), label: category.name })) },
@@ -993,7 +978,16 @@ function AdminConsole() {
             <CrudPanel title="Product" endpoint="/api/admin/products" queryKey={['admin-products']} items={productsList} fields={productFields} categories={categoriesList} columns={[
               { label: 'Piece', render: (item) => <div className="admin-product-cell"><img className="admin-product-thumb" src={getJewelleryImage(item.imageUrl, item.name, item.id)} alt="" loading="lazy" onError={(event) => { event.currentTarget.src = getJewelleryImage(null, item.name, item.id); }} /><div><span style={{ display: 'block', fontWeight: 600 }}>{item.name}</span>{Array.isArray(item.images) && item.images.length > 1 && <span className="admin-gallery-count-badge">{item.images.length} photos</span>}</div></div> },
               { label: 'SKU', render: (item) => item.sku },
-              { label: 'Price', render: (item) => `₹${Number(item.discountPrice ?? item.price).toLocaleString('en-IN', { maximumFractionDigits: 2 })}` },
+              { label: 'Price', render: (item) => (
+                <div>
+                  <span style={{ fontWeight: 600 }}>₹{Number(item.price).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                  {item.discountPrice != null && Number(item.discountPrice) > 0 && Number(item.discountPrice) < Number(item.price) && (
+                    <span style={{ display: 'block', fontSize: '11px', color: '#15803d', fontWeight: 600 }}>
+                      Sale: ₹{Number(item.discountPrice).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </span>
+                  )}
+                </div>
+              ) },
               { label: 'Stock', render: (item) => String(item.stockQuantity) },
               { label: 'Status', render: (item) => <span className={`admin-status ${item.active ? 'is-active' : 'is-inactive'}`}>{item.active ? 'Active' : 'Inactive'}</span> },
             ]} />

@@ -73,8 +73,8 @@ import { BrandMark } from '@/components/common/BrandMark';
 import MalkazProductCard from '@/components/products/MalkazProductCard';
 import { MalkazSidebar } from '@/components/layout/MalkazSidebar';
 import { getJewelleryImage, resolveImageUrl, handleImageError } from '@/lib/jewellery-images';
-import { fetchBanners } from '@/services/banners/banners.service';
-import type { HeroBanner } from '@/types/banner.types';
+import { fetchBanners, fetchShowcaseImages } from '@/services/banners/banners.service';
+import type { HeroBanner, ShowcaseImage } from '@/types/banner.types';
 import { INDIAN_STATES_AND_UTS, getCitiesForState, findMatchingState } from '@/constants/indian-states-cities';
 import { extractArray } from '@/utils/array';
 import { animateTrashCan } from '@/lib/cart-animations';
@@ -289,6 +289,7 @@ export default function CustomerDashboard() {
   const [newAddress, setNewAddress] = useState({ street: '', city: '', state: '', zipCode: '', country: 'India' });
   const [customAddressCity, setCustomAddressCity] = useState('');
   const [liveBanners, setLiveBanners] = useState<HeroBanner[]>([]);
+  const [liveShowcaseImages, setLiveShowcaseImages] = useState<ShowcaseImage[]>([]);
   const [couponCodeInput, setCouponCodeInput] = useState('');
   const [couponResult, setCouponResult] = useState<CouponResponse | null>(null);
   const [couponError, setCouponError] = useState('');
@@ -313,6 +314,21 @@ export default function CustomerDashboard() {
       link: '/shop',
     }));
   }, [liveBanners]);
+
+  const effectiveShowcaseImages = useMemo(() => {
+    if (liveShowcaseImages && liveShowcaseImages.length > 0) {
+      return liveShowcaseImages.map((s) => ({
+        url: resolveImageUrl(s.imageUrl),
+        title: s.title || '',
+        link: s.linkUrl || '/shop',
+      }));
+    }
+    return JEWELLERY_REEL_IMAGES.map((img) => ({
+      url: resolveImageUrl(img),
+      title: '',
+      link: '/shop',
+    }));
+  }, [liveShowcaseImages]);
 
   const hasUnavailableCartItems = useMemo(() => {
     if (!cart?.items) return false;
@@ -348,6 +364,11 @@ export default function CustomerDashboard() {
     fetchBanners().then((data) => {
       if (data && data.length > 0) {
         setLiveBanners(data);
+      }
+    });
+    fetchShowcaseImages().then((data) => {
+      if (data && data.length > 0) {
+        setLiveShowcaseImages(data);
       }
     });
   }, []);
@@ -1544,12 +1565,13 @@ export default function CustomerDashboard() {
               <div className="mz-motion-reel-track">
                 {[0, 1].map((setIndex) => (
                   <div className="mz-motion-reel-set" key={setIndex}>
-                    {JEWELLERY_REEL_IMAGES.map((image, index) => (
+                    {effectiveShowcaseImages.map((item, index) => (
                       <img
-                        key={`${setIndex}-${image}`}
-                        src={image}
-                        alt=""
+                        key={`${setIndex}-${item.url}-${index}`}
+                        src={item.url}
+                        alt={item.title || 'MALKAZ Showcase'}
                         loading="lazy"
+                        onError={(e) => handleImageError(e, '/products/jewels/royal-emerald-necklace.jpg')}
                         style={{ animationDelay: `${index * -260}ms` }}
                       />
                     ))}
@@ -2395,17 +2417,45 @@ export default function CustomerDashboard() {
                         gap: 14,
                       }}
                     >
-                      <img
-                        src={item.imageUrl || 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200'}
-                        alt={item.name}
-                        style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover' }}
-                      />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--mb-text-dark)' }}>
-                          {item.name}
-                        </div>
-                        <div style={{ fontSize: 12, color: 'var(--mb-text-muted)' }}>
-                          {item.brandName} • {formatCurrency(item.sellingPrice || item.price)}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          flex: 1,
+                          minWidth: 0,
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => {
+                          setActiveModal(null);
+                          setLocation(`/products/${item.id}`);
+                        }}
+                        title={`View ${item.name}`}
+                      >
+                        <img
+                          src={getJewelleryImage(item.imageUrl, item.name, item.id)}
+                          alt={item.name}
+                          style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+                          onError={(e) => {
+                            e.currentTarget.src = getJewelleryImage(null, item.name, item.id);
+                          }}
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 13.5,
+                              color: 'var(--mb-text-dark)',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {item.name}
+                          </div>
+                          <div style={{ fontSize: 12, color: 'var(--mb-text-muted)' }}>
+                            {item.brandName || 'MALKAZ'} • {formatCurrency(item.sellingPrice || item.price)}
+                          </div>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: 8 }}>

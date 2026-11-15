@@ -27,3 +27,22 @@ export interface HeroBannerRequest {
   active?: boolean;
 }
 
+export interface ShowcaseImage {
+  id: number;
+  title?: string | null;
+  imageUrl: string;
+  linkUrl?: string | null;
+  displayOrder: number;
+  active: boolean;
+  createdAt?: string;
+}
+
+export interface ShowcaseImageRequest {
+  title?: string;
+  imageUrl: string;
+  linkUrl?: string;
+  displayOrder?: number;
+  active?: boolean;
+}
+
+
